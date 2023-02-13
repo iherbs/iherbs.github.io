@@ -1,1 +1,173 @@
-Quran
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>iQuran</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="Description" content="iQuran. Digital Al-Qur'an">
+    <meta name="theme-color" content="#007070" />
+    <link rel="shortcut icon" type="image/png" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icon.png" />
+    <link rel="shortcut icon" type="image/png" href="icon.png" />
+    
+    <meta property="og:url" content="https://hangsbreaker.github.io/iquran/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="iQuran">
+    <meta property="og:description" content="iQuran. Digital Al-Qur'an">
+    <meta property="og:image" content="https://hangsbreaker.github.io/iquran/icon.png">
+    
+    
+    <link rel="stylesheet" href="dist/css/main.css">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BNJMPE9399"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-BNJMPE9399');
+    </script>
+</head>
+
+<body data-theme="light">
+
+    <div id="wrapmenu" style="display:none;">
+        <div id="menu" class="fixedmenu">
+            <div onclick="nextsurah()" id="lnav" class="mnav" style="left:0px;">
+                <span class="arrow arrow-left"></span>
+            </div>
+            <div onclick="prevsurah()" id="rnav" class="mnav" style="right:0px;">
+                <span class="arrow arrow-right"></span>
+            </div>
+            <div class="menutitle">
+                <div style="display:inline-block;">
+                    <span id="tohome" onclick="history.back()" class="icon-home"
+                        style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>
+                    <span id="tsurah"></span>
+                    <span id="toayah" onclick="_('#modalgotoayah').modal('show')" class="icon-turn-down"
+                        style="position:relative;top:2px;margin-left:5px;cursor:pointer;"></span>
+                </div>
+            </div>
+        </div>
+        <div id="gap"></div>
+    </div>
+
+    <div class="navmenu">
+        <div id="sidenavoverlay" onclick="closeNav()" style="display:none;"></div>
+        <div id="mySidenav" class="sidenav">
+            <div id="sidenavmenu" style="z-index:3;">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <br>
+                <a href="#">
+                    Theme
+                    <label class="switch" style="float: right;">
+                        <input type="checkbox" id="btntheme" onclick="setTheme()">
+                        <span class="slider slider-theme round"></span>
+                    </label>
+                </a>
+                <a href="#">
+                    Transliterasi
+                    <label class="switch" style="float: right;">
+                        <input type="checkbox" id="btntransliterasi" onclick="setTransliterasi()">
+                        <span class="slider round"></span>
+                    </label>
+                </a>
+                <a href="#">
+                    Translate
+                    <label class="switch" style="float: right;">
+                        <input type="checkbox" id="btntranslate" onclick="setTranslate()">
+                        <span class="slider round"></span>
+                    </label>
+                </a>
+                <a href="javascript:showpegon();">
+                    Pegon
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="content">
+            <div id="home">
+                <div class="navbutton" onclick="openNav()"></div>
+                <div id="menubookmark" onclick="dataBookmark()">
+                    <div class="bookmark-active" style="margin-left:8px;width:17px;"></div>
+                </div>
+                <div id="titleq">Al-Qur'an</div>
+                <div style="padding:5px;">
+                    <div class="findfield">
+                        <input type="text" id="cari" class="form-control txtfind" placeholder="Cari" />
+                        <div class="fndclear" id="clearsrc">×</div>
+                    </div>
+                </div>
+                <div id="list" style="overflow:hidden;"></div>
+                <div id="wload"></div>
+            </div>
+            <div id="surah"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="bookmarkpage">
+        <div class="modaloverlay"></div>
+        <div class="modalwrap">
+            <span class="modalclose">&times;</span>
+            <input type="hidden" id="nomark" value="" />
+            <div id="addfrmbook" class="addbook nmayah" onclick="addfrmBookmark()">+ Tambah</div>
+            <h3 id="ttladdbook" style="padding-bottom:7px;">Bookmark</h3>
+            <hr>
+            <div id="wrapbookmark" style="margin-top:12px;">
+                <div id="terakhirbaca"></div>
+                <div id="bookmarkfolder"></div>
+            </div>
+            <div id="bookmarkadd" style="margin-top:12px;display:none;">
+                Nama bookmark
+                <input type="text" id="grupbookmark" placeholder="Nama" class="form-control"
+                    style="margin-bottom:5px;" />
+                <button type="button" class="btn btn-theme" onclick="newBookmark()">Simpan</button>
+                <button type="button" class="btn btn-secondary" onclick="bataladdBookmark()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="confirmbox">
+        <div class="modaloverlay"></div>
+        <div class="modalwrap">
+            <span class="modalclose">&times;</span>
+            <div id="confirmcontent" style="padding:20px 20px;"></div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="modalgotoayah">
+        <div class="modaloverlay"></div>
+        <div class="modalwrap" style="width:170px;">
+            <span class="modalclose">&times;</span>
+            <div id="gotosurah" style="padding:10px 10px;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalwidget">
+        <div class="modaloverlay"></div>
+        <div class="modalwrap">
+            <span class="modalclose">&times;</span>
+            <div id="widgetcontent" style="padding:10px 10px;"></div>
+        </div>
+    </div>
+
+    <button id="scrolltop">
+        <span class="arrow arrow-up" style="margin-top:6px;"></span>
+    </button>
+
+    <div id="toast"></div>
+    <script src="dist/js/laconv.js"></script>
+    <script src="dist/js/main.js"></script>
+</body>
+
+</html>
