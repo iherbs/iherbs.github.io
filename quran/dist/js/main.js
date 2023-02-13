@@ -1,6 +1,7 @@
 var xmlhttp,
   surah = 0,
   markno = "";
+  url = "https://raw.githubusercontent.com/iherbs/quran-json/main/"
 let surah_list = {},
   surah_data = [];
 function _(id) {
@@ -137,7 +138,7 @@ async function getqlist() {
     "#list"
   ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
   let re = await get(
-    "https://raw.githubusercontent.com/iherbs/quran-json/main/surah_list.json"
+    url+"surah_list.json"
   );
   re = JSON.parse(re);
   surah_list = re;
@@ -193,7 +194,7 @@ async function carikata(qry = "") {
     ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
       let re = await get(
-        "https://raw.githubusercontent.com/iherbs/quran-json/main/Surah" +
+        url+"Surah/" +
           q +
           ".json"
       );
@@ -279,7 +280,7 @@ async function getsurah(surat = 1, nayah = "") {
   _("#tsurah").innerHTML = surah + ") " + srh["surat_name"];
 
   let re = await get(
-    "https://raw.githubusercontent.com/iherbs/quran-json/main/Surah" +
+    url+"Surah/" +
       surah +
       ".json"
   );
@@ -373,14 +374,14 @@ async function getayah(surat = 1, nayah = 1) {
   _("#rnav").style.display = "none";
 
   let resl = await get(
-    "https://raw.githubusercontent.com/iherbs/quran-json/main/surah_list.json"
+    url+"surah_list.json"
   );
 
   surah_list = JSON.parse(resl);
   let srh = surah_list[surat];
 
   let re = await get(
-    "https://raw.githubusercontent.com/iherbs/quran-json/main/Surah" +
+    url+"Surah/" +
       surat +
       ".json"
   );
