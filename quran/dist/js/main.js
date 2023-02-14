@@ -276,7 +276,7 @@ async function getsurah(surat = 1, nayah = "") {
   let re = await get(url + "Surah/" + surah + ".json");
   re = JSON.parse(re);
   surah_data = re;
-  console.log(re);
+  // console.log(re);
 
   let ayah = "",
     gotono = "";
@@ -286,14 +286,10 @@ async function getsurah(surat = 1, nayah = "") {
     let mark = surah + "_" + re[i]["no_ayat"];
     ayah += `<tr id="n${re[i]["no_ayat"]}">
             <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
-                <div class="star8" style="cursor:pointer;" data-label="${
-                  re[i]["no_ayat"]
-                }" onclick="showtafsir(${re[i]["id_ayat"]})"></div>
+                <div class="star8" style="cursor:pointer;" data-label="${re[i]["no_ayat"]}" onclick="showtafsir(${re[i]["id_ayat"]})"></div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="margin-left:8px;"></div>
             </td>
-            <td class="ayah" ondblclick="copylink(${surah},${
-      re[i]["no_ayat"]
-    })">
+            <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayat"]})">
                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
                     ${re[i]["teks_ayat"]}
                 </div>
