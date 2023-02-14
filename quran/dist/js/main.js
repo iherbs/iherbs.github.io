@@ -1,7 +1,7 @@
 var xmlhttp,
   surah = 0,
   markno = "";
-  url = "https://raw.githubusercontent.com/iherbs/quran-json/main/"
+url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {},
   surah_data = [];
 function _(id) {
@@ -137,9 +137,7 @@ async function getqlist() {
   _(
     "#list"
   ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
-  let re = await get(
-    url+"surah_list.json"
-  );
+  let re = await get(url + "surah_list.json");
   re = JSON.parse(re);
   surah_list = re;
   // console.log(re);
@@ -193,11 +191,7 @@ async function carikata(qry = "") {
       "#wload"
     ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
-      let re = await get(
-        url+"Surah/" +
-          q +
-          ".json"
-      );
+      let re = await get(url + "Surah/" + q + ".json");
       let arr = JSON.parse(re);
 
       for (r in arr) {
@@ -279,14 +273,10 @@ async function getsurah(surat = 1, nayah = "") {
   _("#wrapmenu").style.display = "block";
   _("#tsurah").innerHTML = surah + ") " + srh["surat_name"];
 
-  let re = await get(
-    url+"Surah/" +
-      surah +
-      ".json"
-  );
+  let re = await get(url + "Surah/" + surah + ".json");
   re = JSON.parse(re);
   surah_data = re;
-  // console.log(re);
+  console.log(re);
 
   let ayah = "",
     gotono = "";
@@ -298,10 +288,12 @@ async function getsurah(surat = 1, nayah = "") {
             <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
                 <div class="star8" style="cursor:pointer;" data-label="${
                   re[i]["no_ayat"]
-                }" onclick="copylink(${surah},${re[i]["no_ayat"]})"></div>
+                }" onclick="showtafsir(${re[i]["id_ayat"]})"></div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="margin-left:8px;"></div>
             </td>
-            <td class="ayah">
+            <td class="ayah" ondblclick="copylink(${surah},${
+      re[i]["no_ayat"]
+    })">
                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
                     ${re[i]["teks_ayat"]}
                 </div>
@@ -373,34 +365,34 @@ async function getayah(surat = 1, nayah = 1) {
   _("#lnav").style.display = "none";
   _("#rnav").style.display = "none";
 
-  let resl = await get(
-    url+"surah_list.json"
-  );
+  let resl = await get(url + "surah_list.json");
 
   surah_list = JSON.parse(resl);
   let srh = surah_list[surat];
 
-  let re = await get(
-    url+"Surah/" +
-      surat +
-      ".json"
-  );
+  let re = await get(url + "Surah/" + surat + ".json");
   re = JSON.parse(re);
   surah_data = re;
   // console.log(re);
 
-  let ayah = `<tr id="n${re[nayah-1]["no_ayat"]}" style="background:var(--color-content);">
-              <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
-                  <div class="star8" data-label="${re[nayah-1]["no_ayat"]}"></div>
+  let ayah = `<tr id="n${
+    re[nayah - 1]["no_ayat"]
+  }" style="background:var(--color-content);">
+              <td style="cursor:pointer;text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
+                  <div class="star8" data-label="${
+                    re[nayah - 1]["no_ayat"]
+                  }" onclick="showtafsir(${re[nayah - 1]["id_ayat"]})"></div>
               </td>
               <td class="ayah">
                   <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                      ${re[nayah-1]["teks_ayat"]}
+                      ${re[nayah - 1]["teks_ayat"]}
                   </div>
-                  <span class="artr"><i>${re[nayah-1]["bacaan"]}</i></span>
-                  <span class="arid">${re[nayah-1]["teks_terjemah"].replaceAll(
+                  <span class="artr"><i>${re[nayah - 1]["bacaan"]}</i></span>
+                  <span class="arid">${re[nayah - 1][
+                    "teks_terjemah"
+                  ].replaceAll(
                     "<sup>",
-                    `<sup class="fnote" onclick="showfnote(${nayah-1})">`
+                    `<sup class="fnote" onclick="showfnote(${nayah - 1})">`
                   )}</span>
               </td>
           </tr>`;
@@ -442,6 +434,21 @@ function showfnote(i = 0) {
   _("#widgetcontent").innerHTML =
     `<span class="widgettittle">Catatan</span>` +
     surah_data[i]["teks_fn"].replaceAll("</br>", "</br></br>");
+}
+
+async function showtafsir(id = 0) {
+  if (id != 0) {
+    _("#modalwidget").modal("show");
+    _("#widgetcontent").innerHTML = '<div class="loader"></div>';
+    let re = await get(url + "Tafsir/" + id + ".json");
+    re = JSON.parse(re);
+    _("#widgetcontent").innerHTML =
+      `<span class="widgettittle">Tafsir Wajiz</span><div class="arabic" style="text-align:justify;text-justify:inter-word;">` +
+      re["tafsir_wajiz"] +
+      `</div><br><br><span class="widgettittle">Tafsir Tahlili</span><div class="arabic" style="text-align:justify;text-justify:inter-word;">` +
+      re["tafsir_tahlili"] +
+      `</div>`;
+  }
 }
 
 function nextsurah() {
