@@ -439,9 +439,9 @@ async function showtafsir(id = 0) {
     let re = await get(url + "Tafsir/" + id + ".json");
     re = JSON.parse(re);
     _("#widgetcontent").innerHTML =
-      `<span class="widgettittle">Tafsir Wajiz</span><div class="arabic" style="text-align:justify;text-justify:inter-word;">` +
+      `<span class="widgettittle">Tafsir Wajiz</span><div class="arabic" style="text-align:justify;text-justify:inter-word;line-height:1.7;">` +
       re["tafsir_wajiz"] +
-      `</div><br><br><span class="widgettittle">Tafsir Tahlili</span><div class="arabic" style="text-align:justify;text-justify:inter-word;">` +
+      `</div><br><br><span class="widgettittle">Tafsir Tahlili</span><div class="arabic" style="text-align:justify;text-justify:inter-word;line-height:1.7;">` +
       re["tafsir_tahlili"] +
       `</div>`;
   }
