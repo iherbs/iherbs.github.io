@@ -177,6 +177,7 @@ async function carikata(qry = "") {
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   if (qry != "") {
+    let srlt = surah_list, adalist = false;
     _("#wload").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
       let re = await get(url + "Surah/" + q + ".json");
@@ -197,7 +198,7 @@ async function carikata(qry = "") {
           table += `<tr onclick="getsurah(${q},${n})">
                             <td class="ayah">
                                 <div style="color:var(--color-title-text);font-weight:bold;margin-bottom:5px;">
-                                ${surah_list[q]["surat_name"] + " (" + q + ":" + n + ")"}
+                                ${srlt[q]["name"] + " (" + q + ":" + n + ")"}
                                 </div>
                                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
                                     ${parse(arr[r]["text_ayah"])}
@@ -210,14 +211,13 @@ async function carikata(qry = "") {
       }
     }
 
-    let re = surah_list, adalist = false;
-    for (i in re) {
+    for (i in srlt) {
       if (
         qry == "" ||
-        re[i]["id"] == qry ||
-        re[i]["surat_name"].toLowerCase().includes(qry.toLowerCase()) ||
-        re[i]["surat_terjemahan"].toLowerCase().includes(qry.toLowerCase()) ||
-        re[i]["surat_rename"].toLowerCase().includes(qry.toLowerCase())
+        srlt[i]["id"] == qry ||
+        srlt[i]["name"].toLowerCase().includes(qry.toLowerCase()) ||
+        srlt[i]["text_id"].toLowerCase().includes(qry.toLowerCase()) ||
+        srlt[i]["altername"].toLowerCase().includes(qry.toLowerCase())
       ) {
         adalist = true;
       }
