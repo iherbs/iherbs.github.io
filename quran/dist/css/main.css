@@ -103,6 +103,33 @@ a {
   transform: rotate(-135deg);
 }
 
+.star8:before {
+  content: attr(data-label);
+  position: absolute;
+  text-align: center;
+  line-height: 1.8;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-textstar);
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background: var(--color-bgstar);
+  transform: rotate(135deg);
+}
+
+.star8:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  transform: rotate(135deg);
+  box-shadow: 0 0 0 3px var(--color-secondary);
+  mix-blend-mode: overlay;
+}
 
 .ham_wasl {
   color: #AAAAAA;
@@ -162,34 +189,6 @@ a {
 
 .ghn {
   color: #FF7E1E;
-}
-
-.star8:before {
-  content: attr(data-label);
-  position: absolute;
-  text-align: center;
-  line-height: 1.8;
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--color-textstar);
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  background: var(--color-bgstar);
-  transform: rotate(135deg);
-}
-
-.star8:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  transform: rotate(135deg);
-  box-shadow: 0 0 0 3px var(--color-secondary);
-  mix-blend-mode: overlay;
 }
 
 /* ================== */
