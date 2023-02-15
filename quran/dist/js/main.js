@@ -2,11 +2,9 @@ var xmlhttp,
   surah = 0,
   markno = "";
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
-let surah_list = {},
-  surah_data = [];
+let surah_list = {}, surah_data = [];
 function _(id) {
-  let el = {},
-    ismodal = false;
+  let el = {}, ismodal = false;
   if (id.substr(0, 1) == "#") {
     el = document.getElementById(id.substr(1, id.length));
     if (el.classList.contains("modal")) {
@@ -115,11 +113,11 @@ function setTheme() {
   }
 }
 
-function setTransliterasi() {
-  if (_("#btntransliterasi").checked == true) {
-    localStorage.setItem("transliterasi", "true");
+function setTransliteration() {
+  if (_("#btntransliteration").checked == true) {
+    localStorage.setItem("transliteration", "true");
   } else {
-    localStorage.setItem("transliterasi", "false");
+    localStorage.setItem("transliteration", "false");
   }
 }
 
@@ -134,9 +132,7 @@ function setTranslate() {
 //==============================================================================
 
 async function getqlist() {
-  _(
-    "#list"
-  ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
+  _("#list").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
   let re = await get(url + "surah_list.json");
   re = JSON.parse(re);
   surah_list = re;
@@ -151,24 +147,18 @@ function makeqlist(key = "") {
     if (
       key == "" ||
       re[i]["id"] == key ||
-      re[i]["surat_name"].toLowerCase().includes(key.toLowerCase()) ||
-      re[i]["surat_terjemahan"].toLowerCase().includes(key.toLowerCase()) ||
-      re[i]["surat_rename"].toLowerCase().includes(key.toLowerCase())
+      re[i]["name"].toLowerCase().includes(key.toLowerCase()) ||
+      re[i]["text_id"].toLowerCase().includes(key.toLowerCase()) ||
+      re[i]["altername"].toLowerCase().includes(key.toLowerCase())
     ) {
       table += `<div class="row listitem" onclick="getsurah(${re[i]["id"]})">
-            <div class="col"><div class="star8" style="top:5px;" data-label="${
-              re[i]["id"]
-            }"></div></div>
+            <div class="col"><div class="star8" style="top:5px;" data-label="${re[i]["id"]}"></div></div>
             <div class="col">
-                <span class="nmayah">${re[i]["surat_name"]}</span>
-                <small class="arti">(${re[i]["surat_terjemahan"]})</small>
-                <span class="type">${
-                  re[i]["type"] + ", " + re[i]["count_ayat"] + " Ayat"
-                }</span>
+                <span class="nmayah">${re[i]["name"]}</span>
+                <small class="arti">(${re[i]["text_id"]})</small>
+                <span class="type">${re[i]["type_id"] + ", " + re[i]["count"] + " Ayat"}</span>
             </div>
-            <div class="col arabic" style="text-align:right;float:right;font-size:18px;">${
-              re[i]["surat_text"]
-            }</div>
+            <div class="col arabic" style="text-align:right;float:right;font-size:18px;">${re[i]["text"]}</div>
         </div>`;
     }
   }
@@ -184,20 +174,18 @@ async function carikata(qry = "") {
   qry = qry.toLowerCase().trim();
   let table = "";
   let kw = qry.split(" ");
-  let transliterasi = localStorage.getItem("transliterasi");
+  let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   if (qry != "") {
-    _(
-      "#wload"
-    ).innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
+    _("#wload").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
       let re = await get(url + "Surah/" + q + ".json");
       let arr = JSON.parse(re);
 
       for (r in arr) {
         let n = parseInt(r) + parseInt(1);
-        // console.log(stem(arr[r]['teks_terjemah']));
-        let ayat = arr[r]["teks_terjemah"].toLowerCase();
+        // console.log(stem(arr[r]['text_id']));
+        let ayat = arr[r]["text_id"].toLowerCase();
         let ada = 0;
         for (w in kw) {
           if (ayat.includes(kw[w])) {
@@ -208,35 +196,21 @@ async function carikata(qry = "") {
           // console.log({ "no_surah": q, "no_ayah": n, "surah": surah_list[q], "ayah": arr[r] });
           table += `<tr onclick="getsurah(${q},${n})">
                             <td class="ayah">
-                                <div style="color:var(--color-title-text);font-weight:bold;margin-bottom:5px;">${
-                                  surah_list[q]["surat_name"] +
-                                  " (" +
-                                  q +
-                                  ":" +
-                                  n +
-                                  ")"
-                                }</div>
-                                <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                                    ${arr[r]["teks_ayat"]}
+                                <div style="color:var(--color-title-text);font-weight:bold;margin-bottom:5px;">
+                                ${surah_list[q]["surat_name"] + " (" + q + ":" + n + ")"}
                                 </div>
-                                ${
-                                  transliterasi == "true"
-                                    ? `<span class="artr"><i>${arr[r]["bacaan"]}</i></span>`
-                                    : ``
-                                }
-                                ${
-                                  translate == "true"
-                                    ? `<span class="arid">${arr[r]["teks_terjemah"]}</span>`
-                                    : ``
-                                }
+                                <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
+                                    ${parse(arr[r]["text_ayah"])}
+                                </div>
+                                ${transliteration == "true" ? `<span class="artr"><i>${arr[r]["transliteration"]}</i></span>` : ``}
+                                ${translate == "true" ? `<span class="arid">${arr[r]["text_id"]}</span>` : ``}
                             </td>
                         </tr>`;
         }
       }
     }
 
-    let re = surah_list,
-      adalist = false;
+    let re = surah_list, adalist = false;
     for (i in re) {
       if (
         qry == "" ||
@@ -271,52 +245,41 @@ async function getsurah(surat = 1, nayah = "") {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
   _("#wrapmenu").style.display = "block";
-  _("#tsurah").innerHTML = surah + ") " + srh["surat_name"];
+  _("#tsurah").innerHTML = surah + ") " + srh["name"];
 
   let re = await get(url + "Surah/" + surah + ".json");
   re = JSON.parse(re);
   surah_data = re;
   // console.log(re);
 
-  let ayah = "",
-    gotono = "";
-  let transliterasi = localStorage.getItem("transliterasi");
+  let ayah = "", gotono = "";
+  let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
+
   for (i in re) {
-    let mark = surah + "_" + re[i]["no_ayat"];
-    ayah += `<tr id="n${re[i]["no_ayat"]}">
+    let mark = surah + "_" + re[i]["no_ayah"];
+    ayah += `<tr id="n${re[i]["no_ayah"]}">
             <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
-                <div class="star8" style="cursor:pointer;" data-label="${re[i]["no_ayat"]}" onclick="showtafsir(${re[i]["id_ayat"]})"></div>
+                <div class="star8" style="cursor:pointer;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="margin-left:8px;"></div>
             </td>
-            <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayat"]})">
+            <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                    ${re[i]["teks_ayat"]}
+                    ${parse(re[i]["text_ayah"], true)}
                 </div>
-                ${
-                  transliterasi == "true"
-                    ? `<span class="artr"><i>${re[i]["bacaan"]}</i></span>`
-                    : ``
-                }
-                ${
-                  translate == "true"
-                    ? `<span class="arid">${re[i]["teks_terjemah"].replaceAll(
-                        "<sup>",
-                        `<sup class="fnote" onclick="showfnote(${i})">`
-                      )}</span>`
-                    : ``
-                }
+                ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
+                ${translate == "true" ?
+        `<span class="arid">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i}">`)}</span>` : ``}
             </td>
         </tr>`;
 
-    gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayat"]})">${re[i]["no_ayat"]}</div>`;
+    gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
   }
   _("#gotosurah").innerHTML = gotono;
 
   let bismillah = "";
   if (surah != 1) {
-    bismillah =
-      '<tr><td colspan="3"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
+    bismillah = '<tr><td colspan="3"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
   }
 
   _(
@@ -327,14 +290,13 @@ async function getsurah(surat = 1, nayah = "") {
             <i class="fa-solid fa-house"></i>
         </td>
         <td style="padding:10px;">
-            <span class="nmayah">${srh["id"]})&nbsp;${srh["surat_name"]}</span>
-            <small class="arti">(${srh["surat_terjemahan"]})</small>
-            <span class="type">${
-              srh["type"] + ", " + srh["count_ayat"] + " Ayat"
-            }</span>
+            <span class="nmayah">${srh["id"]})&nbsp;${srh["name"]}</span>
+            <small class="arti">(${srh["text_id"]})</small>
+            <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
         </td>
         <td style="vertical-align:middle;text-align:right;font-size:23px;padding:10px;">
-            <div class="arabic">${srh["surat_text"]}<div></td>
+            <div class="arabic">${srh["text"]}<div>
+        </td>
     </tr>
 </table>
 
@@ -352,9 +314,7 @@ async function getayah(surat = 1, nayah = 1) {
   _("#home").style.display = "none";
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
-  _(
-    "#tsurah"
-  ).innerHTML = `<span id="tohome" onclick="history.replaceState(null, null, ' ');window.location.reload();" class="icon-home" style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>`;
+  _("#tsurah").innerHTML = `<span id="tohome" onclick="history.replaceState(null, null, ' ');window.location.reload();" class="icon-home" style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>`;
   _("#wrapmenu").style.display = "block";
   _("#tohome").style.display = "none";
   _("#toayah").style.display = "none";
@@ -371,46 +331,33 @@ async function getayah(surat = 1, nayah = 1) {
   surah_data = re;
   // console.log(re);
 
-  let ayah = `<tr id="n${
-    re[nayah - 1]["no_ayat"]
-  }" style="background:var(--color-content);">
-              <td style="cursor:pointer;text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
-                  <div class="star8" data-label="${
-                    re[nayah - 1]["no_ayat"]
-                  }" onclick="showtafsir(${re[nayah - 1]["id_ayat"]})"></div>
+  let ayah = `<tr id="n${re[nayah - 1]["no_ayah"]}" style="background:var(--color-content);">
+              <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
+                  <div class="star8" data-label="${re[nayah - 1]["no_ayah"]}" onclick="showtafsir(${re[nayah - 1]["id"]})" style="cursor:pointer;"></div>
               </td>
               <td class="ayah">
                   <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                      ${re[nayah - 1]["teks_ayat"]}
+                      ${parse(re[nayah - 1]["text_ayah"])}
                   </div>
-                  <span class="artr"><i>${re[nayah - 1]["bacaan"]}</i></span>
-                  <span class="arid">${re[nayah - 1][
-                    "teks_terjemah"
-                  ].replaceAll(
-                    "<sup>",
-                    `<sup class="fnote" onclick="showfnote(${nayah - 1})">`
-                  )}</span>
+                  <span class="artr"><i>${re[nayah - 1]["transliteration"]}</i></span>
+                  <span class="arid">
+                  ${re[nayah - 1]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${nayah - 1})">`)}
+                  </span>
               </td>
           </tr>`;
 
-  _(
-    "#surah"
-  ).innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
+  _("#surah").innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
       <tr>
           <td style="vertical-align:middle;text-align:center;font-size:23px;">
               <i class="fa-solid fa-house"></i>
           </td>
           <td style="padding:10px;">
-              <span class="nmayah">${srh["id"]})&nbsp;${
-    srh["surat_name"]
-  }</span>
-              <small class="arti">(${srh["surat_terjemahan"]})</small>
-              <span class="type">${
-                srh["type"] + ", " + srh["count_ayat"] + " Ayat"
-              }</span>
+              <span class="nmayah">${srh["id"]})&nbsp;${srh["name"]}</span>
+              <small class="arti">(${srh["text_id"]})</small>
+              <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
           </td>
           <td style="vertical-align:middle;text-align:right;font-size:23px;padding:10px;">
-              <div class="arabic">${srh["surat_text"]}<div></td>
+              <div class="arabic">${srh["text"]}<div></td>
       </tr>
   </table>
 
@@ -482,13 +429,13 @@ function showpegon() {
 function copylink(surat = 1, ayat = 1) {
   navigator.clipboard.writeText(
     location.protocol +
-      "//" +
-      location.host +
-      location.pathname +
-      "#qs" +
-      surat +
-      "." +
-      ayat
+    "//" +
+    location.host +
+    location.pathname +
+    "#qs" +
+    surat +
+    "." +
+    ayat
   );
   toast("Copied");
 }
@@ -611,23 +558,18 @@ function dataBookmark() {
     let mark = JSON.parse(localStorage.getItem(book[g]));
     for (b in mark) {
       let bm = mark[b].split("_");
-      listbook += `<div class="listbook" id="blist${
-        mark[b]
-      }" style="margin-left:25px;padding-bottom:2px;">
-        <div class="delbook" style="float:right;" onclick="confdelBookmark('${
-          book[g]
+      listbook += `<div class="listbook" id="blist${mark[b]
+        }" style="margin-left:25px;padding-bottom:2px;">
+        <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]
         }','${mark[b]}')">&times;</div>
-        <div class="arabic" style="float:right;font-size:18px;">${
-          surah_list[bm[0]]["surat_text"]
+        <div class="arabic" style="float:right;font-size:18px;">${surah_list[bm[0]]["surat_text"]
         }</div>
-        <div onclick="gotoBookmark('${
-          mark[b]
+        <div onclick="gotoBookmark('${mark[b]
         }')" style="width:100%;height:100%;">
             <span class="nmayah" style="display:block;">
                 ${bm[0] + ") " + surah_list[bm[0]]["surat_name"]}
-            </span><small style="position:relative;top:-6px;">Ayat ${
-              bm[1]
-            }</small>
+            </span><small style="position:relative;top:-6px;">Ayat ${bm[1]
+        }</small>
         </div>
     </div>`;
     }
@@ -655,9 +597,8 @@ function confdelBookmark(book = "", mark = "") {
     notif = "";
   if (mark != "") {
     bm = mark.split("_");
-    notif = `bookmark <b>${book}, ${
-      surah_list[bm[0]]["surat_name"]
-    }</b>, Ayat ${bm[1]}?`;
+    notif = `bookmark <b>${book}, ${surah_list[bm[0]]["surat_name"]
+      }</b>, Ayat ${bm[1]}?`;
   } else {
     notif = `<b>${book}</b>?<br><small>(Menghapus nama bookmark akan menghapus seluruh daftar pada bookmark tersebut.)</small>`;
   }
@@ -759,8 +700,8 @@ window.onhashchange = function () {
 if (localStorage.getItem("theme") == null) {
   localStorage.setItem("theme", "auto");
 }
-if (localStorage.getItem("transliterasi") == null) {
-  localStorage.setItem("transliterasi", "true");
+if (localStorage.getItem("transliteration") == null) {
+  localStorage.setItem("transliteration", "true");
 }
 if (localStorage.getItem("translate") == null) {
   localStorage.setItem("translate", "true");
@@ -793,8 +734,8 @@ if (theme == "auto") {
   }
 }
 
-if (localStorage.getItem("transliterasi") == "true") {
-  _("#btntransliterasi").checked = true;
+if (localStorage.getItem("transliteration") == "true") {
+  _("#btntransliteration").checked = true;
 }
 if (localStorage.getItem("translate") == "true") {
   _("#btntranslate").checked = true;
