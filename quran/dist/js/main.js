@@ -269,7 +269,7 @@ async function getsurah(surat = 1, nayah = "") {
                 </div>
                 ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
                 ${translate == "true" ?
-        `<span class="arid">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i}">`)}</span>` : ``}
+        `<span class="arid">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>` : ``}
             </td>
         </tr>`;
 
@@ -376,7 +376,7 @@ function showfnote(i = 0) {
   _("#modalwidget").modal("show");
   _("#widgetcontent").innerHTML =
     `<span class="widgettittle">Catatan</span>` +
-    surah_data[i]["teks_fn"].replaceAll("</br>", "</br></br>");
+    surah_data[i]["text_fn"].replaceAll("</br>", "</br></br>");
 }
 
 async function showtafsir(id = 0) {
