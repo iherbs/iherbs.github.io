@@ -573,12 +573,12 @@ function dataBookmark() {
         }" style="margin-left:25px;padding-bottom:2px;">
         <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]
         }','${mark[b]}')">&times;</div>
-        <div class="arabic" style="float:right;font-size:18px;">${surah_list[bm[0]]["surat_text"]
+        <div class="arabic" style="float:right;font-size:18px;">${surah_list[bm[0]]["text"]
         }</div>
         <div onclick="gotoBookmark('${mark[b]
         }')" style="width:100%;height:100%;">
             <span class="nmayah" style="display:block;">
-                ${bm[0] + ") " + surah_list[bm[0]]["surat_name"]}
+                ${bm[0] + ") " + surah_list[bm[0]]["name"]}
             </span><small style="position:relative;top:-6px;">Ayat ${bm[1]
         }</small>
         </div>
@@ -608,7 +608,7 @@ function confdelBookmark(book = "", mark = "") {
     notif = "";
   if (mark != "") {
     bm = mark.split("_");
-    notif = `bookmark <b>${book}, ${surah_list[bm[0]]["surat_name"]
+    notif = `bookmark <b>${book}, ${surah_list[bm[0]]["name"]
       }</b>, Ayat ${bm[1]}?`;
   } else {
     notif = `<b>${book}</b>?<br><small>(Menghapus nama bookmark akan menghapus seluruh daftar pada bookmark tersebut.)</small>`;
