@@ -333,7 +333,6 @@ async function getayah(surat = 1, nayah = 1) {
   _("#rnav").style.display = "none";
 
   let resl = await get(url + "surah_list.json");
-  let tajweed = localStorage.getItem("tajweed");
 
   surah_list = JSON.parse(resl);
   let srh = surah_list[surat];
@@ -349,7 +348,7 @@ async function getayah(surat = 1, nayah = 1) {
               </td>
               <td class="ayah">
                   <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                      ${parseArabic(re[nayah - 1]["text_ayah"], tajweed)}
+                      ${parseArabic(re[nayah - 1]["text_ayah"])}
                   </div>
                   <span class="artr"><i>${re[nayah - 1]["transliteration"]}</i></span>
                   <span class="arid">
