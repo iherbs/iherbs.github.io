@@ -120,18 +120,18 @@ meta = [
     }
 ];
 
-function parse(text, fixWebkit = false) {
+function parseArabic(text, show = "true", fixWebkit = true) {
     if (fixWebkit) {
-        return this.webkitFix(this.closeParsing(this.parseTajweed(text)));
+        return this.webkitFix(this.closeParsing(this.parseTajweed(text, show)));
     }
 
     return this.closeParsing(this.parseTajweed(text));
 }
 
-function parseTajweed(text) {
+function parseTajweed(text, show = "true") {
     this.meta.forEach((meta) => {
         let _re = new RegExp("(\\" + meta.identifier + ")", "ig");
-        text = text.replace(_re, `<tajweed class="${meta.default_css_class}" data-type="${meta.type}" data-description="${meta.description}" data-tajweed="`)
+        text = text.replace(_re, `<tajweed class="${show == "true" ? meta.default_css_class : ''}" data-type="${meta.type}" data-description="${meta.description}" data-tajweed="`)
     })
 
     return text;

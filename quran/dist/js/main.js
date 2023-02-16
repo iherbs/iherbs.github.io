@@ -129,6 +129,14 @@ function setTranslate() {
   }
 }
 
+function setTajweed() {
+  if (_("#btntajweed").checked == true) {
+    localStorage.setItem("tajweed", "true");
+  } else {
+    localStorage.setItem("tajweed", "false");
+  }
+}
+
 //==============================================================================
 
 async function getqlist() {
@@ -176,6 +184,8 @@ async function carikata(qry = "") {
   let kw = qry.split(" ");
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
+  let tajweed = localStorage.getItem("tajweed");
+
   if (qry != "") {
     let srlt = surah_list, adalist = false;
     _("#wload").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
@@ -201,7 +211,7 @@ async function carikata(qry = "") {
                                 ${srlt[q]["name"] + " (" + q + ":" + n + ")"}
                                 </div>
                                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                                    ${parse(arr[r]["text_ayah"])}
+                                    ${parseArabic(arr[r]["text_ayah"], tajweed)}
                                 </div>
                                 ${transliteration == "true" ? `<span class="artr"><i>${arr[r]["transliteration"]}</i></span>` : ``}
                                 ${translate == "true" ? `<span class="arid">${arr[r]["text_id"]}</span>` : ``}
@@ -255,6 +265,7 @@ async function getsurah(surat = 1, nayah = "") {
   let ayah = "", gotono = "";
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
+  let tajweed = localStorage.getItem("tajweed");
 
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
@@ -265,7 +276,7 @@ async function getsurah(surat = 1, nayah = "") {
             </td>
             <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
                 <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                    ${parse(re[i]["text_ayah"], true)}
+                    ${parseArabic(re[i]["text_ayah"], tajweed)}
                 </div>
                 ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
                 ${translate == "true" ?
@@ -322,6 +333,7 @@ async function getayah(surat = 1, nayah = 1) {
   _("#rnav").style.display = "none";
 
   let resl = await get(url + "surah_list.json");
+  let tajweed = localStorage.getItem("tajweed");
 
   surah_list = JSON.parse(resl);
   let srh = surah_list[surat];
@@ -337,7 +349,7 @@ async function getayah(surat = 1, nayah = 1) {
               </td>
               <td class="ayah">
                   <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
-                      ${parse(re[nayah - 1]["text_ayah"])}
+                      ${parseArabic(re[nayah - 1]["text_ayah"], tajweed)}
                   </div>
                   <span class="artr"><i>${re[nayah - 1]["transliteration"]}</i></span>
                   <span class="arid">
@@ -706,6 +718,9 @@ if (localStorage.getItem("transliteration") == null) {
 if (localStorage.getItem("translate") == null) {
   localStorage.setItem("translate", "true");
 }
+if (localStorage.getItem("tajweed") == null) {
+  localStorage.setItem("tajweed", "true");
+}
 if (localStorage.getItem("terakhirbaca") == null) {
   localStorage.setItem("terakhirbaca", "1_1");
 }
@@ -739,6 +754,9 @@ if (localStorage.getItem("transliteration") == "true") {
 }
 if (localStorage.getItem("translate") == "true") {
   _("#btntranslate").checked = true;
+}
+if (localStorage.getItem("tajweed") == "true") {
+  _("#btntajweed").checked = true;
 }
 
 let pg = window.location.hash;
