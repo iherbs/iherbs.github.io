@@ -286,7 +286,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
   }
-  _("#gotosurah").innerHTML = gotono;
+  _("#gotoayah").innerHTML = gotono;
 
   let bismillah = "";
   if (surah != 1) {
@@ -313,7 +313,6 @@ async function getsurah(surat = 1, nayah = "") {
 
 <table class="surah">${bismillah + ayah}</table>`;
   window.scrollTo({ top: 0 });
-
   if (nayah != "") {
     let dims = _("#n" + nayah).getBoundingClientRect();
     window.scrollTo(window.scrollX, dims.top - 40);
@@ -696,7 +695,7 @@ window.onhashchange = function () {
     _("#surah").innerHTML = "";
     _("#tsurah").innerHTML = "";
     _("#wrapmenu").style.display = "none";
-    _("#gotosurah").innerHTML = "";
+    _("#gotoayah").innerHTML = "";
     bataladdBookmark();
 
     document.getElementsByTagName("body")[0].removeAttribute("style");
