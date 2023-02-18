@@ -210,7 +210,7 @@ async function carikata(qry = "") {
                                 <div style="color:var(--color-title-text);font-weight:bold;margin-bottom:5px;">
                                 ${srlt[q]["name"] + " (" + q + ":" + n + ")"}
                                 </div>
-                                <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
+                                <div class="arabic" style="width:100%;text-align:right;font-size:24px;line-height:2;margin-bottom:10px;">
                                     ${parseArabic(arr[r]["text_ayah"], tajweed)}
                                 </div>
                                 ${transliteration == "true" ? `<span class="artr"><i>${arr[r]["transliteration"]}</i></span>` : ``}
@@ -275,7 +275,7 @@ async function getsurah(surat = 1, nayah = "") {
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="margin-left:8px;"></div>
             </td>
             <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
-                <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
+                <div class="arabic" style="width:100%;text-align:right;font-size:24px;line-height:2;margin-bottom:10px;">
                     ${parseArabic(re[i]["text_ayah"], tajweed)}
                 </div>
                 ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
@@ -346,7 +346,7 @@ async function getayah(surat = 1, nayah = 1) {
                   <div class="star8" data-label="${re[nayah - 1]["no_ayah"]}" onclick="showtafsir(${re[nayah - 1]["id"]})" style="cursor:pointer;"></div>
               </td>
               <td class="ayah">
-                  <div class="arabic" style="width:100%;text-align:right;font-size:23px;line-height:2.3;margin-bottom:10px;">
+                  <div class="arabic" style="width:100%;text-align:right;font-size:24px;line-height:2;margin-bottom:10px;">
                       ${parseArabic(re[nayah - 1]["text_ayah"])}
                   </div>
                   <span class="artr"><i>${re[nayah - 1]["transliteration"]}</i></span>
