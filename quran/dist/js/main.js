@@ -166,7 +166,7 @@ function makeqlist(key = "") {
                 <small class="arti">(${re[i]["text_id"]})</small>
                 <span class="type">${re[i]["type_id"] + ", " + re[i]["count"] + " Ayat"}</span>
             </div>
-            <div class="col arabic" style="text-align:right;float:right;font-size:18px;">${re[i]["text"]}</div>
+            <div class="col arabic" style="text-align:right;float:right;font-size:20px;">${re[i]["text"]}</div>
         </div>`;
     }
   }
@@ -572,7 +572,7 @@ function dataBookmark() {
         }" style="margin-left:25px;padding-bottom:2px;">
         <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]
         }','${mark[b]}')">&times;</div>
-        <div class="arabic" style="float:right;font-size:18px;">${surah_list[bm[0]]["text"]
+        <div class="arabic" style="float:right;font-size:20px;">${surah_list[bm[0]]["text"]
         }</div>
         <div onclick="gotoBookmark('${mark[b]
         }')" style="width:100%;height:100%;">
