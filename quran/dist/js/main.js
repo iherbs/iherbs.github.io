@@ -297,7 +297,7 @@ async function getsurah(surat = 1, nayah = "") {
     "#surah"
   ).innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
     <tr>
-        <td style="vertical-align:middle;text-align:center;font-size:23px;">
+        <td style="vertical-align:middle;text-align:center;font-size:24px;">
             <i class="fa-solid fa-house"></i>
         </td>
         <td style="padding:10px;">
@@ -305,7 +305,7 @@ async function getsurah(surat = 1, nayah = "") {
             <small class="arti">(${srh["text_id"]})</small>
             <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
         </td>
-        <td style="vertical-align:middle;text-align:right;font-size:23px;padding:10px;">
+        <td style="vertical-align:middle;text-align:right;font-size:24px;padding:10px;">
             <div class="arabic">${srh["text"]}<div>
         </td>
     </tr>
@@ -358,7 +358,7 @@ async function getayah(surat = 1, nayah = 1) {
 
   _("#surah").innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
       <tr>
-          <td style="vertical-align:middle;text-align:center;font-size:23px;">
+          <td style="vertical-align:middle;text-align:center;font-size:24px;">
               <i class="fa-solid fa-house"></i>
           </td>
           <td style="padding:10px;">
@@ -366,7 +366,7 @@ async function getayah(surat = 1, nayah = 1) {
               <small class="arti">(${srh["text_id"]})</small>
               <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
           </td>
-          <td style="vertical-align:middle;text-align:right;font-size:23px;padding:10px;">
+          <td style="vertical-align:middle;text-align:right;font-size:24px;padding:10px;">
               <div class="arabic">${srh["text"]}<div></td>
       </tr>
   </table>
