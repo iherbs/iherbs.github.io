@@ -52,39 +52,44 @@
         <div id="sidenavoverlay" onclick="closeNav()" style="display:none;"></div>
         <div id="mySidenav" class="sidenav">
             <div id="sidenavmenu" style="z-index:3;">
-                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <span class="closebtn" onclick="closeNav()">&times;</span>
                 <br>
-                <a href="#">
+                <span>
                     Theme
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntheme" onclick="setTheme()">
                         <span class="slider slider-theme round"></span>
                     </label>
-                </a>
-                <a href="#">
+                </span>
+                <span>
                     Transliteration
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntransliteration" onclick="setTransliteration()">
                         <span class="slider round"></span>
                     </label>
-                </a>
-                <a href="#">
+                </span>
+                <span>
                     Translate
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntranslate" onclick="setTranslate()">
                         <span class="slider round"></span>
                     </label>
-                </a>
-                <a href="#">
+                </span>
+                <span>
                     Tajweed
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntajweed" onclick="setTajweed()">
                         <span class="slider round"></span>
                     </label>
-                </a>
-                <a href="javascript:showpegon();">
+                </span>
+                <span>
+                    <button type="button" class="btn btnzoom" onclick="zoompage(-10)">-</button>
+                    &nbsp;&nbsp;&nbsp;<label id="zoomlevel"></label>&nbsp;&nbsp;&nbsp;
+                    <button type="button" class="btn btnzoom" onclick="zoompage(10)">+</button>
+                </span>
+                <span onclick="showpegon()" style="cursor:pointer;">
                     Pegon
-                </a>
+                </span>
             </div>
         </div>
     </div>

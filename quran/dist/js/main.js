@@ -1,6 +1,5 @@
 var xmlhttp,
-  surah = 0,
-  markno = "";
+  surah = 0, markno = "", zoomlevel = 0;
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {}, surah_data = [];
 function _(id) {
@@ -20,10 +19,10 @@ function _(id) {
         el.style.display = "block";
         document
           .getElementsByTagName("body")[0]
-          .setAttribute("style", "overflow:hidden;");
+          .style.overflow = "hidden";
       } else if (opt == "hide") {
         el.style.display = "none";
-        document.getElementsByTagName("body")[0].removeAttribute("style");
+        document.getElementsByTagName("body")[0].style.overflow = null;
       }
     };
   }
@@ -43,7 +42,7 @@ _(".modaloverlay").forEach((el) =>
       }
     }
     if (mop) {
-      document.getElementsByTagName("body")[0].removeAttribute("style");
+      document.getElementsByTagName("body")[0].style.overflow = null;
     }
   })
 );
@@ -60,7 +59,7 @@ _(".modalclose").forEach((el) =>
       }
     }
     if (mop) {
-      document.getElementsByTagName("body")[0].removeAttribute("style");
+      document.getElementsByTagName("body")[0].style.overflow = null;
     }
   })
 );
@@ -420,6 +419,17 @@ function prevsurah() {
   getsurah(surah);
 }
 
+function zoompage(num = 0) {
+  if (num == 'r') {
+    zoomlevel = 100;
+  } else {
+    zoomlevel = parseInt(zoomlevel) + parseInt(num);
+  }
+  localStorage.setItem("zoomlevel", zoomlevel);
+  _("#zoomlevel").innerHTML = zoomlevel + "%";
+  document.getElementsByTagName("body")[0].style.zoom = zoomlevel + "%";
+}
+
 function pegon(me, t = "") {
   if (t == "l") {
     _("#txtar").value = latara(me.value);
@@ -698,7 +708,7 @@ window.onhashchange = function () {
     _("#gotoayah").innerHTML = "";
     bataladdBookmark();
 
-    document.getElementsByTagName("body")[0].removeAttribute("style");
+    document.getElementsByTagName("body")[0].style.overflow = null;
     for (m in _(".modal")) {
       if (!isNaN(m)) {
         _(".modal")[m].style.display = "none";
@@ -724,6 +734,9 @@ if (localStorage.getItem("terakhirbaca") == null) {
 }
 if (localStorage.getItem("bookmark") == null) {
   localStorage.setItem("bookmark", "[]");
+}
+if (localStorage.getItem("zoomlevel") == null) {
+  localStorage.setItem("zoomlevel", 100);
 }
 
 let theme = localStorage.getItem("theme");
@@ -762,5 +775,6 @@ if (pg.substring(0, 3) == "#qs") {
   let qs = pg.substring(3, pg.length).split(".");
   getayah(qs[0], qs[1]);
 } else {
+  zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
 }

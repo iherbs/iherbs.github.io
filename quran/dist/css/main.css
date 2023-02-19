@@ -797,6 +797,7 @@ a {
   z-index: 10;
 }
 
+.sidenav span,
 .sidenav a {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
@@ -808,10 +809,16 @@ a {
 
 .sidenav .closebtn {
   position: absolute;
+  cursor: pointer;
   top: 0;
   right: 25px;
   font-size: 36px;
   margin-left: 50px;
+}
+
+.sidenav .btnzoom {
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .switch {
