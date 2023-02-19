@@ -819,6 +819,8 @@ a {
 .sidenav .btnzoom {
   font-size: 20px;
   cursor: pointer;
+  width:35px;
+  height:35px;
 }
 
 .switch {
