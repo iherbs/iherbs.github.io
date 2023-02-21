@@ -35,7 +35,7 @@
 @font-face {
   font-family: "Arabic";
   font-style: "normal";
-  src: url("../../dist/font/Arabic-LPMQ.ttf") format("truetype");
+  src: url("../../dist/font/Arabic.ttf") format("truetype");
 }
 
 @font-face {
@@ -43,6 +43,7 @@
   font-style: "normal";
   src: url("../../dist/font/Poppins-Regular.ttf") format("truetype");
 }
+
 
 * {
   padding: 0px;
@@ -131,64 +132,46 @@ a {
   mix-blend-mode: overlay;
 }
 
-.ham_wasl {
-  color: #AAAAAA;
+
+
+.gunnah {
+  color: #8036cf;
 }
 
-.slnt {
-  color: #AAAAAA;
+.qalqala {
+  color: #dda200;
 }
 
-.madda_normal {
-  color: #537FFF;
-}
-
-.madda_permissible {
-  color: #4050FF;
-}
-
-.madda_necessary {
-  color: #000EBC;
-}
-
-.qlq {
-  color: #DD0008;
-}
-
-.madda_pbligatory {
-  color: #2144C1;
-}
-
-.ikhf_shfw {
-  color: #D500B7;
-}
-
-.ikhf {
-  color: #9400A8;
-}
-
-.idghm_shfw {
-  color: #58B800;
-}
-
-.iqlb {
+.iqlab {
   color: #26BFFD;
 }
 
-.idgh_ghn {
+.idhgham {
+  color: #1098C0;
+}
+
+.idhghamnoghunnah {
   color: #169200;
 }
 
-.idgh_w_ghn {
-  color: #169200;
+.ikhfa {
+  color: #30a5ca;
 }
 
-.idgh_mus {
-  color: #A1A1A1;
+.ikhfasya {
+  color: #037496;
 }
 
-.ghn {
-  color: #FF7E1E;
+.idhghammimi {
+  color: #58B800;
+}
+
+.madda {
+  color: #9270c6;
+}
+
+.ham_wasl {
+  color: #AAAAAA;
 }
 
 /* ================== */
@@ -370,7 +353,7 @@ a {
   padding-top: 20px;
   padding-right: 15px;
   padding-left: 15px;
-  font-size: 24px;
+  font-size: 27px;
 }
 
 .listayah {
@@ -434,6 +417,11 @@ a {
 
 .arid {
   color: var(--color-text);
+}
+
+.smark {
+  float: right;
+  margin-left: 5px;
 }
 
 .surah {
@@ -819,8 +807,6 @@ a {
 .sidenav .btnzoom {
   font-size: 20px;
   cursor: pointer;
-  width: 35px;
-  height: 35px;
 }
 
 .switch {
