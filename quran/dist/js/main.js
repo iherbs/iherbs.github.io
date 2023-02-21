@@ -104,11 +104,13 @@ function setTheme() {
   if (_("#btntheme").checked == true) {
     document.getElementsByTagName("body")[0].setAttribute("data-theme", "dark");
     localStorage.setItem("theme", "dark");
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#1f2125");
   } else {
     document
       .getElementsByTagName("body")[0]
       .setAttribute("data-theme", "light");
     localStorage.setItem("theme", "light");
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#007070");
   }
 }
 
