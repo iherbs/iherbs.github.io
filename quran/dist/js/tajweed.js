@@ -13,20 +13,22 @@ var hamzawaslmatcher = /([ن|م]ّ)/g; //
 
 function parseArabic(text, show = "true") {
 
-    // &zwj;
-    // console.log(text);
-    // text = text.replace(gunnahmatcher, (text.substr((text.indexOf('$&') + 1), 2) == "ال" ? '&zwj;' : '') + '<tajweed class="gunnah">$&</tajweed>');
-    text = text.replace(gunnahmatcher, '<tajweed class="gunnah">$&</tajweed>');
-    text = text.replace(qalqalamatcher, '<tajweed class="qalqala">$&</tajweed>');
-    text = text.replace(iqlabmmatcher, '<tajweed class="iqlab">$&</tajweed>');
-    text = text.replace(idhghammatcher, '<tajweed class="idhgham">$&</tajweed>');
-    text = text.replace(idhghammatcherwihtoutgunnah, '<tajweed class="idhghamnoghunnah">$&</tajweed>');
-    text = text.replace(ikhfamatcher, '<tajweed class="ikhfa">$&</tajweed>');
-    text = text.replace(ikhfasyamatcher, '<tajweed class="ikhfasya">$&</tajweed>');
-    text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
-    text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
-    // text = text.replace(hamzawaslmatcher, '<tajweed class="ham_wasl">$&</tajweed>');
+    if (show == "true") {
+        // &zwj;
+        // console.log(text);
+        // text = text.replace(gunnahmatcher, (text.substr((text.indexOf('$&') + 1), 2) == "ال" ? '&zwj;' : '') + '<tajweed class="gunnah">$&</tajweed>');
+        text = text.replace(gunnahmatcher, '<tajweed class="gunnah">$&</tajweed>');
+        text = text.replace(qalqalamatcher, '<tajweed class="qalqala">$&</tajweed>');
+        text = text.replace(iqlabmmatcher, '<tajweed class="iqlab">$&</tajweed>');
+        text = text.replace(idhghammatcher, '<tajweed class="idhgham">$&</tajweed>');
+        text = text.replace(idhghammatcherwihtoutgunnah, '<tajweed class="idhghamnoghunnah">$&</tajweed>');
+        text = text.replace(ikhfamatcher, '<tajweed class="ikhfa">$&</tajweed>');
+        text = text.replace(ikhfasyamatcher, '<tajweed class="ikhfasya">$&</tajweed>');
+        text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
+        text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
+        // text = text.replace(hamzawaslmatcher, '<tajweed class="ham_wasl">$&</tajweed>');
 
-    text = text.replaceAll('\u06dE', '<span class="smark">\u06dE</span>');
+        text = text.replaceAll('\u06dE', '<span class="smark">\u06dE</span>');
+    }
     return text;
 }
