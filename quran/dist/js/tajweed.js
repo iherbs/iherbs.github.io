@@ -13,6 +13,10 @@ var hamzawaslmatcher = /([ن|م]ّ)/g; //
 
 function parseArabic(text, show = "true") {
 
+    text = text.replaceAll('\u06d6', '\u06d6 &zwj;'); // ۖ
+    text = text.replaceAll('\u06d7', '\u06d7 &zwj;'); // ۗ
+    text = text.replaceAll('\u06da', '\u06da &zwj;'); // ۚ
+
     if (show == "true") {
         // &zwj;
         // console.log(text);
@@ -27,8 +31,7 @@ function parseArabic(text, show = "true") {
         text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
         text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
         // text = text.replace(hamzawaslmatcher, '<tajweed class="ham_wasl">$&</tajweed>');
-
-        text = text.replaceAll('\u06dE', '<span class="smark">\u06dE</span>');
     }
+    text = text.replaceAll('\u06dE', '<span class="smark">\u06dE</span>');
     return text;
 }
