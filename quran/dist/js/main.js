@@ -270,9 +270,15 @@ async function getsurah(surat = 1, nayah = "") {
 
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
+    let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
+    let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}">
+            <audio id="track${re[i]["no_ayah"]}" class="tracks">
+              <source src="https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3" type="audio/mpeg" />
+            </audio>
             <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
+                <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioControl('${re[i]["no_ayah"]}')"></label>
                 <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                 <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;">
                     ${parseArabic(re[i]["text_ayah"], tajweed)}
@@ -458,6 +464,35 @@ function copylink(surat = 1, ayat = 1) {
   toast("Copied");
 }
 
+function audioControl(id = "") {
+  for (m in _(".tracks")) {
+    if (!isNaN(m)) {
+      if (_(".tracks")[m].id != "track" + id) {
+        _(".tracks")[m].pause();
+        _(".tracks")[m].currentTime = 0;
+        _(".btnaudio")[m].classList.remove("pause-button");
+        _(".btnaudio")[m].classList.add("play-button");
+      }
+    }
+  }
+
+  let track = document.getElementById("track" + id);
+  if (track.paused) {
+    track.play();
+    _("#bplps" + id).classList.remove("play-button");
+    _("#bplps" + id).classList.add("pause-button");
+  } else {
+    track.pause();
+    track.currentTime = 0;
+    _("#bplps" + id).classList.remove("pause-button");
+    _("#bplps" + id).classList.add("play-button");
+  }
+  track.onended = function () {
+    track.currentTime = 0;
+    _("#bplps" + id).classList.remove("pause-button");
+    _("#bplps" + id).classList.add("play-button");
+  };
+}
 //==============================================================================
 
 function addfrmBookmark() {

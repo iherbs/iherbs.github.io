@@ -217,6 +217,33 @@ a {
   width: 20px;
 }
 
+.btnaudio {
+  margin-left: 56px;
+}
+
+.play-button {
+  cursor: pointer;
+  position: absolute;
+  margin-top: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 15px solid #c3c4c5;
+}
+
+.pause-button {
+  cursor: pointer;
+  position: absolute;
+  margin-top: 8px;
+  width: 10px;
+  height: 16px;
+  border-color: transparent transparent transparent #c3c4c5;
+  border-style: double;
+  border-width: 0px 0 0px 14px;
+}
+
 .form-control {
   font-family: Arial;
   padding-top: 6px;
