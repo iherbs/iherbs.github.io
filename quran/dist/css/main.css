@@ -444,7 +444,7 @@ a {
   padding-top: 15px;
   padding-bottom: 15px;
   padding-right: 15px;
-  padding-left: 10px;
+  padding-left: 15px;
   font-size: 14px;
 }
 
@@ -542,8 +542,6 @@ a {
 
 .bookmark {
   cursor: pointer;
-  margin-top: 0px;
-  margin-left: 0px;
   width: 0px;
   height: 25px;
   box-sizing: border-box;

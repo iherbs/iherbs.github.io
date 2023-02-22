@@ -271,12 +271,10 @@ async function getsurah(surat = 1, nayah = "") {
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
     ayah += `<tr id="n${re[i]["no_ayah"]}">
-            <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
-                <div class="star8" style="cursor:pointer;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
-                <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="margin-left:8px;"></div>
-            </td>
-            <td class="ayah" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
-                <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-bottom:10px;">
+            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
+                <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
+                <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
+                <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;">
                     ${parseArabic(re[i]["text_ayah"], tajweed)}
                 </div>
                 ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
@@ -343,11 +341,9 @@ async function getayah(surat = 1, nayah = 1) {
   // console.log(re);
 
   let ayah = `<tr id="n${re[nayah - 1]["no_ayah"]}" style="background:var(--color-content);">
-              <td style="text-align:center;vertical-align:top;padding-top:15px;padding-left:15px;width:55px;">
+              <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
                   <div class="star8" data-label="${re[nayah - 1]["no_ayah"]}" onclick="showtafsir(${re[nayah - 1]["id"]})" style="cursor:pointer;"></div>
-              </td>
-              <td class="ayah">
-                  <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-bottom:10px;">
+                  <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;">
                       ${parseArabic(re[nayah - 1]["text_ayah"])}
                   </div>
                   <span class="artr"><i>${re[nayah - 1]["transliteration"]}</i></span>
