@@ -218,28 +218,27 @@ a {
 }
 
 .btnaudio {
-  margin-left: 56px;
+  margin-top: -3px;
+  right: 60px;
 }
 
 .play-button {
   cursor: pointer;
   position: absolute;
-  margin-top: 7px;
   width: 10px;
   height: 10px;
   border-radius: 3px;
   border-top: 9px solid transparent;
   border-bottom: 9px solid transparent;
-  border-left: 15px solid #c3c4c5;
+  border-left: 15px solid #dfdfdf;
 }
 
 .pause-button {
   cursor: pointer;
   position: absolute;
-  margin-top: 8px;
   width: 10px;
   height: 15px;
-  border-color: transparent transparent transparent #c3c4c5;
+  border-color: transparent transparent transparent #dfdfdf;
   border-style: double;
   border-width: 0px 0 0px 14px;
 }
