@@ -217,6 +217,10 @@ a {
   width: 20px;
 }
 
+.tracks {
+  display: none;
+}
+
 .btnaudio {
   margin-top: -3px;
   right: 60px;

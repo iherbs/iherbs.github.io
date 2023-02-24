@@ -273,10 +273,10 @@ async function getsurah(surat = 1, nayah = "") {
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}">
-            <audio id="track${re[i]["no_ayah"]}" class="tracks">
-              <source src="https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3" type="audio/mpeg" />
-            </audio>
             <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
+                <audio id="track${re[i]["no_ayah"]}" class="tracks">
+                  <source src="https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3" type="audio/mpeg" />
+                </audio>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
                 <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioControl('${re[i]["no_ayah"]}')"></label>
                 <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
