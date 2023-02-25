@@ -272,7 +272,7 @@ async function getsurah(surat = 1, nayah = "") {
     let mark = surah + "_" + re[i]["no_ayah"];
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
-    ayah += `<tr id="n${re[i]["no_ayah"]}">
+    ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
             <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
                 <audio id="track${re[i]["no_ayah"]}" class="tracks">
                   <source src="https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3" type="audio/mpeg" />
@@ -319,8 +319,7 @@ async function getsurah(surat = 1, nayah = "") {
 <table class="surah">${bismillah + ayah}</table>`;
   window.scrollTo({ top: 0 });
   if (nayah != "") {
-    let dims = _("#n" + nayah).getBoundingClientRect();
-    window.scrollTo(window.scrollX, dims.top - 40);
+    gotoayah(nayah);
   }
 }
 
@@ -378,11 +377,13 @@ async function getayah(surat = 1, nayah = 1) {
   window.scrollTo({ top: 0 });
 }
 
-function gotoayah(i = 1) {
-  window.scrollTo({ top: 0 });
-  let dims = _("#n" + i).getBoundingClientRect();
-  window.scrollTo(window.scrollX, dims.top - 40);
+function gotoayah(i = 1, smoth = false) {
   _("#modalgotoayah").modal("hide");
+  if (smoth) {
+    _("#n" + i).scrollIntoView({ behavior: "smooth" });
+  } else {
+    _("#n" + i).scrollIntoView();
+  }
 }
 
 function showfnote(i = 0) {
@@ -491,6 +492,13 @@ function audioControl(id = "") {
     track.currentTime = 0;
     _("#bplps" + id).classList.remove("pause-button");
     _("#bplps" + id).classList.add("play-button");
+    id = parseInt(id) + 1;
+    if (id <= surah_data.length) {
+      setTimeout(() => {
+        gotoayah(id, true);
+        audioControl(id);
+      }, 1000);
+    }
   };
 }
 //==============================================================================
