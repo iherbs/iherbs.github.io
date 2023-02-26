@@ -135,7 +135,7 @@ a {
 
 
 .ghunnah {
-  color: #9c3fff;
+  color: #8036cf;
 }
 
 .qalqala {
@@ -146,14 +146,6 @@ a {
   color: #26BFFD;
 }
 
-.idhgham {
-  color: #1098C0;
-}
-
-.idhghamnoghunnah {
-  color: #169200;
-}
-
 .ikhfa {
   color: #30a5ca;
 }
@@ -162,16 +154,25 @@ a {
   color: #037496;
 }
 
+.idhgham {
+  color: #10c082;
+}
+
 .idhghammimi {
   color: #58B800;
 }
 
+.idhghamnoghunnah {
+  color: #169200;
+}
+
+
 .madda {
-  color: #7c037c;
+  color: #AAAAAA;
 }
 
 .ham_wasl {
-  color: #AAAAAA;
+  color: #cacaca;
 }
 
 /* ================== */
