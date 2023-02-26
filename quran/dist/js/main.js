@@ -428,16 +428,16 @@ function showtajweedinfo() {
   closeNav();
   _("#modalwidget").modal("show");
   _("#widgetcontent").innerHTML = `<div style="line-height:1.7;">
-    <div style="font-weight:bold;font-size:20px;margin-bottom:5px;">Tajweed<hr></div>
-    <label class="ghunnah">Ghunnah</label><br>
-    <label class="qalqala">Qalqala</label><br>
-    <label class="iqlab">Iqlab</label><br>
-    <label class="ikhfa">Ikhfa</label><br>
-    <label class="ikhfasya">Ikhfa Syafawi</label><br>
-    <label class="idhgham">Idhgham</label><br>
-    <label class="idhghammimi">Idhgham Mimi</label><br>
-    <label class="idhghamnoghunnah">Idhgham Without Ghunnah</label>
-    </p>
+      <div style="font-weight:bold;font-size:20px;margin-bottom:5px;">Tajweed<hr></div>
+      <label class="ghunnah">Ghunnah</label><br>
+      <label class="madda">Maddah</label><br>
+      <label class="qalqala">Qalqala</label><br>
+      <label class="iqlab">Iqlab</label><br>
+      <label class="ikhfa">Ikhfa</label><br>
+      <label class="ikhfasya">Ikhfa Syafawi</label><br>
+      <label class="idhgham">Idhgham</label><br>
+      <label class="idhghammimi">Idhgham Mimi</label><br>
+      <label class="idhghamnoghunnah">Idhgham Without Ghunnah</label>
     </div>`;
 }
 
