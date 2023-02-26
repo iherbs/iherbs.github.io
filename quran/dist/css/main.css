@@ -134,8 +134,8 @@ a {
 
 
 
-.gunnah {
-  color: #8036cf;
+.ghunnah {
+  color: #9c3fff;
 }
 
 .qalqala {
@@ -167,7 +167,7 @@ a {
 }
 
 .madda {
-  color: #9270c6;
+  color: #7c037c;
 }
 
 .ham_wasl {
@@ -830,6 +830,24 @@ a {
   right: 25px;
   font-size: 36px;
   margin-left: 50px;
+}
+
+#btntajinfo {
+  position: relative;
+  cursor: pointer;
+  font-style: italic;
+  display: inline-block;
+  margin-left: 5px;
+  padding-left: 5px;
+  border-radius: 50%;
+  line-height: 0.3;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  width: 20px;
+  height: 20px;
+  user-select: none;
+  border: 1px solid var(--color-text);
 }
 
 .sidenav .btnzoom {

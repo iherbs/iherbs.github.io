@@ -424,15 +424,21 @@ function prevsurah() {
   getsurah(surah);
 }
 
-function zoompage(num = 0) {
-  if (num == 'r') {
-    zoomlevel = 100;
-  } else {
-    zoomlevel = parseInt(zoomlevel) + parseInt(num);
-  }
-  localStorage.setItem("zoomlevel", zoomlevel);
-  _("#zoomlevel").innerHTML = zoomlevel + "%";
-  document.getElementsByTagName("body")[0].style.zoom = zoomlevel + "%";
+function showtajweedinfo() {
+  closeNav();
+  _("#modalwidget").modal("show");
+  _("#widgetcontent").innerHTML = `<div style="line-height:1.7;">
+    <div style="font-weight:bold;font-size:20px;margin-bottom:5px;">Tajweed<hr></div>
+    <label class="ghunnah" style="font-weight:bold;">Ghunnah</label><br>
+    <label class="qalqala" style="font-weight:bold;">Qalqala</label><br>
+    <label class="iqlab" style="font-weight:bold;">Iqlab</label><br>
+    <label class="ikhfa" style="font-weight:bold;">Ikhfa</label><br>
+    <label class="ikhfasya" style="font-weight:bold;">Ikhfa Syafawi</label><br>
+    <label class="idhgham" style="font-weight:bold;">Idhgham</label><br>
+    <label class="idhghammimi" style="font-weight:bold;">Idhgham Mimi</label><br>
+    <label class="idhghamnoghunnah" style="font-weight:bold;">Idhgham Without Ghunnah</label>
+    </p>
+    </div>`;
 }
 
 function pegon(me, t = "") {
@@ -449,6 +455,17 @@ function showpegon() {
   _("#widgetcontent").innerHTML = `<span class="widgettittle">Pegon</span>
     <textarea placeholder="Teks latin" id="txtla" class="form-control" style="height:70px;font-size:16px;" onkeyup="pegon(this,'l')"></textarea>
     <textarea placeholder="Teks Arab" id="txtar" class="form-control" style="height:70px;font-size:16px;text-align:right;font-family:'Arabic';" onkeyup="pegon(this,'a')"></textarea>`;
+}
+
+function zoompage(num = 0) {
+  if (num == 'r') {
+    zoomlevel = 100;
+  } else {
+    zoomlevel = parseInt(zoomlevel) + parseInt(num);
+  }
+  localStorage.setItem("zoomlevel", zoomlevel);
+  _("#zoomlevel").innerHTML = zoomlevel + "%";
+  document.getElementsByTagName("body")[0].style.zoom = zoomlevel + "%";
 }
 
 function copylink(surat = 1, ayat = 1) {
