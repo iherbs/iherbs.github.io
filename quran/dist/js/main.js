@@ -735,8 +735,10 @@ _("#cari").addEventListener("keyup", () => {
 });
 
 _("#clearsrc").addEventListener("click", () => {
-  _("#clearsrc").style.display = "none";
   _("#cari").value = "";
+  _("#wload").innerHTML = "";
+  _("#clearsrc").style.display = "none";
+  xmlhttp.abort();
   makeqlist();
 });
 
