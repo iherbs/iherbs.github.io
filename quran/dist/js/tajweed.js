@@ -26,7 +26,10 @@ function parseArabic(text, show = "true") {
         text = text.replace(iqlabmmatcher, '<tajweed class="iqlab">$&</tajweed>');
         text = text.replace(idhghammatcher, '<tajweed class="idhgham">$&</tajweed>');
         text = text.replace(idhghammatcherwihtoutghunnah, '<tajweed class="idhghamnoghunnah">$&</tajweed>');
-        text = text.replace(ikhfamatcher, '<tajweed class="ikhfa">$&</tajweed>');
+        // text = text.replace(ikhfamatcher, '<tajweed class="ikhfa">$&</tajweed>');
+        text = text.replace(ikhfamatcher, function (match, capture) {
+            return '<tajweed class="ikhfa">' + match.replace(' ', '</tajweed> <tajweed class="ikhfa">') + '</tajweed>';
+        });
         text = text.replace(ikhfasyamatcher, '<tajweed class="ikhfasya">$&</tajweed>');
         text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
         text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
