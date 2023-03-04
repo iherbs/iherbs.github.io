@@ -93,6 +93,7 @@ a {
 .arabic {
   font-family: "Arabic";
   color: var(--color-arabic);
+  word-break: break-word;
 }
 
 .star8 {
