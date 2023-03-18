@@ -470,6 +470,11 @@ a {
   background: var(--color-odd-ayah);
 }
 
+.surah .artr,
+.surah .arid {
+  font-size: 16px;
+}
+
 .ayah {
   vertical-align: top;
   border-top: none;
