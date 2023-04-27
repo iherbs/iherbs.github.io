@@ -396,7 +396,7 @@ async function getasmaulhusna() {
                 <td>
                     <span class="nmayah">${as[i]['latin']}</span>
                     <span class="type">${as[i]['terjemah']}</span>
-                    <div class="arabic" style="text-align:right;float:right;font-size:20px;padding-top:10px;">${as[i]['arab']}</div>
+                    <div class="arabic" style="text-align:right;float:right;font-size:25px;padding-top:5px;">${as[i]['arab']}</div>
                 </td>
             </tr>`;
   }
