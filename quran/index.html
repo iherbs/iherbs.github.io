@@ -85,6 +85,9 @@
                 <span onclick="showpegon()" style="cursor:pointer;">
                     Pegon
                 </span>
+                <span onclick="getasmaulhusna()" style="cursor:pointer;">
+                    Asmaul Husna
+                </span>
                 <span>
                     <button type="button" class="btn btnzoom" onclick="zoompage(-10)">-</button>
                     &nbsp;&nbsp;&nbsp;<label id="zoomlevel"></label>&nbsp;&nbsp;&nbsp;
@@ -101,7 +104,7 @@
                 <div id="menubookmark" onclick="dataBookmark()">
                     <div class="bookmark-active" style="margin-left:8px;width:17px;"></div>
                 </div>
-                <div id="titleq">Al-Qur'an</div>
+                <div class="titleq">Al-Qur'an</div>
                 <div style="padding:5px;">
                     <div class="findfield">
                         <input type="text" id="cari" class="form-control txtfind" placeholder="Cari" />
@@ -111,7 +114,7 @@
                 <div id="list" style="overflow:hidden;"></div>
                 <div id="wload"></div>
             </div>
-            <div id="surah"></div>
+            <div id="surah" style="display:none;"></div>
         </div>
     </div>
 

@@ -377,6 +377,33 @@ async function getayah(surat = 1, nayah = 1) {
   window.scrollTo({ top: 0 });
 }
 
+async function getasmaulhusna() {
+  closeNav();
+  window.location.hash = "#asmaulhusna";
+  _("#home").style.display = "none";
+  _("#surah").style.display = "block";
+  _("#surah").innerHTML = `<div class="loader"></div>`;
+
+  let reas = await get(url + "asmaul_husna.json");
+  let as = JSON.parse(reas);
+  // console.log(as);
+
+  let asma = `<div class="titleq">Asmaul Husna</div>
+          <table class="tablecont">`;
+  for (i in as) {
+    asma += `<tr class="listitem">
+                <td style="width:30px;"><span style="display:block;height:31.55px;color:var(--color-text);">${as[i]['no']}</span></td>
+                <td>
+                    <span class="nmayah">${as[i]['latin']}</span>
+                    <span class="type">${as[i]['terjemah']}</span>
+                    <div class="arabic" style="text-align:right;float:right;font-size:20px;padding-top:10px;">${as[i]['arab']}</div>
+                </td>
+            </tr>`;
+  }
+  asma += `</table>`;
+  _("#surah").innerHTML = asma;
+}
+
 function gotoayah(i = 1, smoth = false) {
   _("#modalgotoayah").modal("hide");
   if (smoth) {
