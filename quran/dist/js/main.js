@@ -861,6 +861,8 @@ let pg = window.location.hash;
 if (pg.substring(0, 3) == "#qs") {
   let qs = pg.substring(3, pg.length).split(".");
   getayah(qs[0], qs[1]);
+} else if (pg == "#asmaulhusna") {
+  getasmaulhusna();
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
