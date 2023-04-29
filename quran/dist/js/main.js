@@ -154,11 +154,12 @@ function makeqlist(key = "") {
     table = "";
   for (i in re) {
     if (
-      key == "" ||
-      re[i]["id"] == key ||
-      re[i]["name"].toLowerCase().includes(key.toLowerCase()) ||
-      re[i]["text_id"].toLowerCase().includes(key.toLowerCase()) ||
-      re[i]["altername"].toLowerCase().includes(key.toLowerCase())
+      (key == "" ||
+        re[i]["id"] == key ||
+        re[i]["name"].toLowerCase().includes(key.toLowerCase()) ||
+        re[i]["text_id"].toLowerCase().includes(key.toLowerCase()) ||
+        re[i]["altername"].toLowerCase().includes(key.toLowerCase())) ||
+      (key.toLowerCase() == "juz amma" && parseInt(re[i]["id"]) >= 78)
     ) {
       table += `<div class="row listitem" onclick="getsurah(${re[i]["id"]})">
             <div class="col"><div class="star8" style="top:5px;" data-label="${re[i]["id"]}"></div></div>
@@ -187,7 +188,7 @@ async function carikata(qry = "") {
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
 
-  if (qry != "") {
+  if (qry != "" && qry != 'juz amma') {
     let srlt = surah_list, adalist = false;
     _("#wload").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
@@ -245,6 +246,8 @@ async function carikata(qry = "") {
         table +
         "</table>";
     }
+  } else {
+    _("#wload").innerHTML = "";
   }
 }
 
@@ -402,6 +405,12 @@ async function getasmaulhusna() {
   }
   asma += `</table>`;
   _("#surah").innerHTML = asma;
+}
+
+function getjuzamma() {
+  _("#cari").value = "Juz Amma";
+  _("#cari").dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13 }));
+  closeNav();
 }
 
 function gotoayah(i = 1, smoth = false) {
@@ -755,6 +764,7 @@ _("#cari").addEventListener("keyup", () => {
   } else {
     _("#clearsrc").style.display = "none";
   }
+
   makeqlist(key);
   if (key.length > 2) {
     cari(key);
