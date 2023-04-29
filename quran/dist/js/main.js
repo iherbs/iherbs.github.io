@@ -394,9 +394,9 @@ async function getasmaulhusna() {
     asma += `<tr class="listitem">
                 <td style="width:30px;"><span style="display:block;height:31.55px;color:var(--color-text);">${as[i]['no']}</span></td>
                 <td>
-                    <span class="nmayah">${as[i]['latin']}</span>
-                    <span class="type">${as[i]['terjemah']}</span>
-                    <div class="arabic" style="text-align:right;float:right;font-size:25px;padding-top:5px;">${as[i]['arab']}</div>
+                    <span class="nmayah">${as[i]['transliteration']}</span>
+                    <span class="type">${as[i]['text_id']}</span>
+                    <div class="arabic" style="text-align:right;float:right;font-size:25px;padding-top:5px;">${as[i]['text_ayah']}</div>
                 </td>
             </tr>`;
   }
