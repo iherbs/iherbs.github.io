@@ -39,7 +39,7 @@
                 <div style="display:inline-block;">
                     <span id="tohome" onclick="history.back()" class="icon-home"
                         style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>
-                    <span id="tsurah" onclick="openNav()" style="cursor:pointer;"></span>
+                    <span id="tsurah" onclick="openNav('m')" style="cursor:pointer;"></span>
                     <span id="toayah" onclick="_('#modalgotoayah').modal('show')" class="icon-turn-down"
                         style="position:relative;top:2px;margin-left:5px;cursor:pointer;"></span>
                 </div>
@@ -54,44 +54,44 @@
             <div id="sidenavmenu" style="z-index:3;">
                 <span class="closebtn" onclick="closeNav()">&times;</span>
                 <br>
-                <span>
+                <span id="navtheme">
                     Theme
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntheme" onclick="setTheme()">
                         <span class="slider slider-theme round"></span>
                     </label>
                 </span>
-                <span>
+                <span id="navliter">
                     Transliteration
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntransliteration" onclick="setTransliteration()">
                         <span class="slider round"></span>
                     </label>
                 </span>
-                <span>
+                <span id="navtrans">
                     Translate
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntranslate" onclick="setTranslate()">
                         <span class="slider round"></span>
                     </label>
                 </span>
-                <span>
+                <span id="navtajweed">
                     Tajweed <span id="btntajinfo" onclick="showtajweedinfo()">i</span>
                     <label class="switch" style="float: right;">
                         <input type="checkbox" id="btntajweed" onclick="setTajweed()">
                         <span class="slider round"></span>
                     </label>
                 </span>
-                <span onclick="showpegon()" style="cursor:pointer;">
+                <span id="navpegon" onclick="showpegon()" style="cursor:pointer;">
                     Pegon
                 </span>
-                <span onclick="getjuzamma()" style="cursor:pointer;">
+                <span id="navjuzamma" onclick="getjuzamma()" style="cursor:pointer;">
                     Juz Amma
                 </span>
-                <span onclick="getasmaulhusna()" style="cursor:pointer;">
+                <span id="navhusna" onclick="getasmaulhusna()" style="cursor:pointer;">
                     Asmaul Husna
                 </span>
-                <span>
+                <span id="navzoom">
                     <button type="button" class="btn btnzoom" onclick="zoompage(-10)">-</button>
                     &nbsp;&nbsp;&nbsp;<label id="zoomlevel"></label>&nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btnzoom" onclick="zoompage(10)">+</button>

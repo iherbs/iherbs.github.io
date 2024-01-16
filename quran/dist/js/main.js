@@ -90,9 +90,14 @@ async function get(file = "") {
 
 //==============================================================================
 
-function openNav() {
+function openNav(m = '') {
   _("#sidenavoverlay").style.display = "block";
   document.getElementById("mySidenav").style.width = "250px";
+  if (m != '') {
+    _("#navjuzamma").style.display = "none";
+  } else {
+    _("#navjuzamma").style.display = "block";
+  }
 }
 
 function closeNav() {
@@ -117,16 +122,28 @@ function setTheme() {
 function setTransliteration() {
   if (_("#btntransliteration").checked == true) {
     localStorage.setItem("transliteration", "true");
+    _(".artr").forEach(function (el) {
+      el.style.display = "block";
+    });
   } else {
     localStorage.setItem("transliteration", "false");
+    _(".artr").forEach(function (el) {
+      el.style.display = "none";
+    });
   }
 }
 
 function setTranslate() {
   if (_("#btntranslate").checked == true) {
     localStorage.setItem("translate", "true");
+    _(".arid").forEach(function (el) {
+      el.style.display = "block";
+    });
   } else {
     localStorage.setItem("translate", "false");
+    _(".arid").forEach(function (el) {
+      el.style.display = "none";
+    });
   }
 }
 
@@ -135,6 +152,10 @@ function setTajweed() {
     localStorage.setItem("tajweed", "true");
   } else {
     localStorage.setItem("tajweed", "false");
+  }
+
+  if (surah != 0) {
+    getsurah(surah);
   }
 }
 
@@ -215,8 +236,8 @@ async function carikata(qry = "") {
                                 <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-bottom:10px;direction:rtl;">
                                     ${parseArabic(arr[r]["text_ayah"], tajweed)}
                                 </div>
-                                ${transliteration == "true" ? `<span class="artr"><i>${arr[r]["transliteration"]}</i></span>` : ``}
-                                ${translate == "true" ? `<span class="arid">${arr[r]["text_id"]}</span>` : ``}
+                                <span class="artr" style="display:${transliteration == "true" ? 'block' : 'none'}"><i>${arr[r]["transliteration"]}</i></span>
+                                <span class="arid" style="display:${translate == "true" ? 'block' : 'none'}">${arr[r]["text_id"]}</span>
                             </td>
                         </tr>`;
         }
@@ -286,9 +307,8 @@ async function getsurah(surat = 1, nayah = "") {
                 <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
                     ${parseArabic(re[i]["text_ayah"], tajweed)}
                 </div>
-                ${transliteration == "true" ? `<span class="artr"><i>${re[i]["transliteration"]}</i></span>` : ``}
-                ${translate == "true" ?
-        `<span class="arid">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>` : ``}
+                <span class="artr" style="display:${transliteration == "true" ? 'block' : 'none'}"><i>${re[i]["transliteration"]}</i></span>
+                <span class="arid" style="display:${translate == "true" ? 'block' : 'none'}">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>
             </td>
         </tr>`;
 
@@ -382,7 +402,12 @@ async function getayah(surat = 1, nayah = 1) {
 
 async function getasmaulhusna() {
   closeNav();
-  window.location.hash = "#asmaulhusna";
+  if (window.location.hash == '') {
+    window.location.hash = "#asmaulhusna";
+  } else {
+    window.location.replace("#asmaulhusna");
+  }
+  _("#wrapmenu").style.display = "none";
   _("#home").style.display = "none";
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
