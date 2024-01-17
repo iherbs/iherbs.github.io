@@ -6,8 +6,10 @@ function _(id) {
   let el = {}, ismodal = false;
   if (id.substr(0, 1) == "#") {
     el = document.getElementById(id.substr(1, id.length));
-    if (el.classList.contains("modal")) {
-      ismodal = true;
+    if (el != null) {
+      if (el.classList.contains("modal")) {
+        ismodal = true;
+      }
     }
   } else if (id.substr(0, 1) == ".") {
     el = document.querySelectorAll(id);
@@ -298,11 +300,9 @@ async function getsurah(surat = 1, nayah = "") {
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
             <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
-                <audio id="track${re[i]["no_ayah"]}" class="tracks">
-                  <source src="https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3" type="audio/mpeg" />
-                </audio>
+                <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
-                <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioControl('${re[i]["no_ayah"]}')"></label>
+                <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
                 <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                 <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
                     ${parseArabic(re[i]["text_ayah"], tajweed)}
@@ -543,20 +543,21 @@ function copylink(surat = 1, ayat = 1) {
   toast("Copied");
 }
 
-function audioControl(id = "") {
+function audioPlay(id = "") {
+  let track = _("#track");
+  let sound = _("#track" + id).innerHTML;
+  track.setAttribute("controls", "true");
+  _("#player").style.display = "block";
+
   for (m in _(".tracks")) {
     if (!isNaN(m)) {
-      if (_(".tracks")[m].id != "track" + id) {
-        _(".tracks")[m].pause();
-        _(".tracks")[m].currentTime = 0;
-        _(".btnaudio")[m].classList.remove("pause-button");
-        _(".btnaudio")[m].classList.add("play-button");
-      }
+      _(".btnaudio")[m].classList.remove("pause-button");
+      _(".btnaudio")[m].classList.add("play-button");
     }
   }
 
-  let track = document.getElementById("track" + id);
-  if (track.paused) {
+  if (track.paused || _("#track").src != sound) {
+    track.src = sound;
     track.play();
     _("#bplps" + id).classList.remove("play-button");
     _("#bplps" + id).classList.add("pause-button");
@@ -566,18 +567,47 @@ function audioControl(id = "") {
     _("#bplps" + id).classList.remove("pause-button");
     _("#bplps" + id).classList.add("play-button");
   }
+
+
+  track.onplaying = function () {
+    if (_("#bplps" + id) != null) {
+      _("#bplps" + id).classList.remove("play-button");
+      _("#bplps" + id).classList.add("pause-button");
+    }
+  };
+  track.onpause = function () {
+    if (_("#bplps" + id) != null) {
+      _("#bplps" + id).classList.remove("pause-button");
+      _("#bplps" + id).classList.add("play-button");
+    }
+  };
+
   track.onended = function () {
     track.currentTime = 0;
-    _("#bplps" + id).classList.remove("pause-button");
-    _("#bplps" + id).classList.add("play-button");
+    // track.src = "";
+    // track.removeAttribute("controls");
+    if (_("#bplps" + id) != null) {
+      _("#bplps" + id).classList.remove("pause-button");
+      _("#bplps" + id).classList.add("play-button");
+    }
     id = parseInt(id) + 1;
     if (id <= surah_data.length) {
       setTimeout(() => {
         gotoayah(id, true);
-        audioControl(id);
+        audioPlay(id);
       }, 1000);
+    } else {
+      id = surah_data.length;
     }
   };
+}
+
+function closeTrack() {
+  let track = _("#track");
+  track.currentTime = 0;
+  track.src = "";
+  track.removeAttribute("controls");
+  _("#player").style.display = "none";
 }
 //==============================================================================
 
@@ -816,6 +846,7 @@ window.addEventListener("scroll", function () {
 window.onhashchange = function () {
   // console.log(window.location.hash);
   // history.replaceState(null, null, ' '); // remove hash
+  closeTrack();
   let pg = window.location.hash;
   if (pg == "") {
     history.replaceState(null, null, " ");
