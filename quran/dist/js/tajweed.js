@@ -27,8 +27,8 @@ function parseArabic(text, show = "true") {
         text = text.replace(iqlabmmatcher, '<tajweed class="iqlab">$&</tajweed>');
         // text = text.replace(idhghammatcher, '<tajweed class="idhgham">$&</tajweed>');
         text = text.replace(idhghammatcher, function (match, capture) {
-            if (match.includes('\u064B')) {
-                match = match.replace('\u064B', '');
+            if (match.includes('\u064B ')) {
+                match = match.replace('\u064B ', '');
                 return '\u064B <tajweed class="idhgham">' + match + '</tajweed>';
             } else {
                 return '<tajweed class="idhgham">' + match.replace(' ', '</tajweed> <tajweed class="idhgham">') + '</tajweed>';
