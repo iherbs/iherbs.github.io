@@ -594,8 +594,10 @@ function audioPlay(id = "") {
     if (id <= surah_data.length) {
       setTimeout(() => {
         gotoayah(id, true);
-        audioPlay(id);
       }, 1000);
+      setTimeout(() => {
+        audioPlay(id);
+      }, 1500);
     } else {
       id = surah_data.length;
     }
@@ -608,6 +610,12 @@ function closeTrack() {
   track.src = "";
   track.removeAttribute("controls");
   _("#player").style.display = "none";
+  for (m in _(".tracks")) {
+    if (!isNaN(m)) {
+      _(".btnaudio")[m].classList.remove("pause-button");
+      _(".btnaudio")[m].classList.add("play-button");
+    }
+  }
 }
 //==============================================================================
 
