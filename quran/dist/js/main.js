@@ -597,7 +597,7 @@ function audioPlay(id = "") {
       }, 1000);
       setTimeout(() => {
         audioPlay(id);
-      }, 1500);
+      }, 2000);
     } else {
       id = surah_data.length;
     }
