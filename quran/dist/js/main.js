@@ -557,6 +557,8 @@ seekbar.addEventListener("mousedown", () => {
 seekbar.addEventListener("mouseup", () => {
   mouseDownOnSlider = false;
   track.play();
+  _("#btnplayaudio").classList.remove("play-button");
+  _("#btnplayaudio").classList.add("pause-button");
 });
 seekbar.oninput = function () {
   setslider();
