@@ -1093,4 +1093,8 @@ input:checked+.slider:before {
   .page {
     width: 100%;
   }
+
+  #audiotime {
+    font-size: 12px;
+  }
 }

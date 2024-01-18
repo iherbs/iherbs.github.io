@@ -554,12 +554,24 @@ seekbar.addEventListener("mousedown", () => {
   mouseDownOnSlider = true;
   track.pause();
 });
+seekbar.addEventListener("touchstart", () => {
+  mouseDownOnSlider = true;
+  track.pause();
+});
+
 seekbar.addEventListener("mouseup", () => {
   mouseDownOnSlider = false;
   track.play();
   _("#btnplayaudio").classList.remove("play-button");
   _("#btnplayaudio").classList.add("pause-button");
 });
+seekbar.addEventListener("touchend", () => {
+  mouseDownOnSlider = false;
+  track.play();
+  _("#btnplayaudio").classList.remove("play-button");
+  _("#btnplayaudio").classList.add("pause-button");
+});
+
 seekbar.oninput = function () {
   setslider();
 };
@@ -602,12 +614,16 @@ function audioPlay(id = "") {
     if (_("#bplps" + id) != null) {
       _("#bplps" + id).classList.remove("play-button");
       _("#bplps" + id).classList.add("pause-button");
+      _("#btnplayaudio").classList.remove("play-button");
+      _("#btnplayaudio").classList.add("pause-button");
     }
   };
   track.onpause = function () {
     if (_("#bplps" + id) != null) {
       _("#bplps" + id).classList.remove("pause-button");
       _("#bplps" + id).classList.add("play-button");
+      _("#btnplayaudio").classList.remove("pause-button");
+      _("#btnplayaudio").classList.add("play-button");
     }
   };
 
@@ -675,12 +691,14 @@ function playprev() {
   let notrack = parseInt(_("#notrack").innerHTML) - 1;
   if (notrack > 0) {
     audioPlay(notrack);
+    gotoayah(notrack, true);
   }
 }
 function playnext() {
   let notrack = parseInt(_("#notrack").innerHTML) + 1;
   if (notrack <= surah_data.length) {
     audioPlay(notrack);
+    gotoayah(notrack, true);
   }
 }
 
