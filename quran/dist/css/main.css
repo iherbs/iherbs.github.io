@@ -266,6 +266,114 @@ a {
   border-color: transparent transparent transparent var(--color-title-text) !important;
 }
 
+.playermenu {
+  position: absolute;
+}
+
+.dropdown {
+  display: inline-block;
+}
+
+.dropbtn {
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--color-even-ayah);
+  min-width: 160px;
+  bottom: 25px;
+  right: -6px;
+  overflow: auto;
+  border-radius: 5px;
+  box-shadow: 0px 8px 16px 0px rgb(var(--color-shadow-rgb));
+}
+
+.dropdown-content .dropitem {
+  cursor: pointer;
+  padding: 10px 15px;
+  text-decoration: none;
+  display: block;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: var(--color-text);
+  background: var(--color-even-ayah);
+}
+
+.horizontal-dots {
+  display: block;
+  cursor: pointer;
+  width: 25px;
+  height: 14px;
+  background-image: radial-gradient(circle, var(--color-title-text) 2.2px, transparent 2px);
+  background-size: 8px 18px;
+}
+
+.check {
+  display: inline-block;
+  transform: rotate(45deg);
+  height: 12px;
+  width: 7px;
+  border-bottom: 3px solid var(--color-text);
+  border-right: 3px solid var(--color-text);
+}
+
+/* Checkmark ========= */
+.contentmark {
+  display: block;
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.contentmark input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 100%;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 25px;
+  width: 25px;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.contentmark input:checked~.checkmark:after {
+  display: block;
+}
+
+.contentmark .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid #333;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+/* End Checkmark ===== */
+
 #scrolltop {
   display: none;
   position: fixed;

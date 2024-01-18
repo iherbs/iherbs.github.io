@@ -1,5 +1,5 @@
 var xmlhttp,
-  surah = 0, markno = "", zoomlevel = 0;
+  surah = 0, markno = "", zoomlevel = 0, trackrate = 1;
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {}, surah_data = [];
 function _(id) {
@@ -62,6 +62,17 @@ _(".modalclose").forEach((el) =>
     }
     if (mop) {
       document.getElementsByTagName("body")[0].style.overflow = null;
+    }
+  })
+);
+
+_(".dropbtn").forEach((el) =>
+  el.addEventListener("click", (event) => {
+    // console.log(window.getComputedStyle(el.nextElementSibling).display == "none");
+    if (window.getComputedStyle(el.nextElementSibling).display === "none") {
+      el.nextElementSibling.style.display = "block";
+    } else {
+      el.nextElementSibling.style.display = "none";
     }
   })
 );
@@ -596,6 +607,7 @@ function audioPlay(id = "") {
 
   if (track.paused || track.src != sound) {
     track.src = sound;
+    track.playbackRate = trackrate;
     track.play();
     _("#btnplayaudio").classList.remove("play-button");
     _("#btnplayaudio").classList.add("pause-button");
@@ -700,6 +712,11 @@ function playnext() {
     audioPlay(notrack);
     gotoayah(notrack, true);
   }
+}
+
+function audiorate(rate = 1) {
+  track.playbackRate = rate;
+  trackrate = rate;
 }
 
 function closeTrack() {
@@ -1045,4 +1062,15 @@ if (pg.substring(0, 3) == "#qs") {
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
+}
+
+window.onclick = function (event) {
+  // Close the dropdown if the user clicks outside of it
+  // console.log(event.target);
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for (var i = 0; i < dropdowns.length; i++) {
+      dropdowns[i].style.display = "none";
+    }
+  }
 }
