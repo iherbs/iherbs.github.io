@@ -1,5 +1,5 @@
 var xmlhttp,
-  surah = 0, markno = "", zoomlevel = 0, trackrate = 1;
+  surah = 0, markno = "", zoomlevel = 0, trackrate = 1, trackmode = 'A';
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {}, surah_data = [];
 function _(id) {
@@ -673,16 +673,18 @@ function audioPlay(id = "") {
         _("#bplps" + id).classList.remove("pause-button");
         _("#bplps" + id).classList.add("play-button");
       }
-      id = parseInt(id) + 1;
-      if (id <= surah_data.length) {
-        setTimeout(() => {
-          gotoayah(id, true);
-        }, 1000);
-        setTimeout(() => {
-          audioPlay(id);
-        }, 2000);
-      } else {
-        id = surah_data.length;
+      if (trackmode == 'A') {
+        id = parseInt(id) + 1;
+        if (id <= surah_data.length) {
+          setTimeout(() => {
+            gotoayah(id, true);
+          }, 1000);
+          setTimeout(() => {
+            audioPlay(id);
+          }, 2000);
+        } else {
+          id = surah_data.length;
+        }
       }
     }
   };
@@ -717,6 +719,10 @@ function playnext() {
 function audiorate(rate = 1) {
   track.playbackRate = rate;
   trackrate = rate;
+}
+
+function onceauto(param = 'A') {
+  trackmode = param;
 }
 
 function closeTrack() {
@@ -1067,7 +1073,7 @@ if (pg.substring(0, 3) == "#qs") {
 window.onclick = function (event) {
   // Close the dropdown if the user clicks outside of it
   // console.log(event.target);
-  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem')) {
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem') && !event.target.matches('.onceauto') && !event.target.matches('.checklbl') && !event.target.matches('.markoa')) {
     var dropdowns = document.getElementsByClassName("dropdown-content");
     for (var i = 0; i < dropdowns.length; i++) {
       dropdowns[i].style.display = "none";

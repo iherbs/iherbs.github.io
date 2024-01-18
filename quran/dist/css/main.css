@@ -365,11 +365,37 @@ a {
   top: 5px;
   width: 5px;
   height: 10px;
-  border: solid #333;
+  border: solid var(--color-text);
   border-width: 0 3px 3px 0;
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.markoa {
+  display: inline-block;
+  font-weight: bold;
+  width: 50%;
+  cursor: pointer;
+}
+
+.markoa input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 100%;
+}
+
+.markoa input:checked~.checklbl {
+  color: #ffffff;
+  background-color: var(--color-title-text);
+}
+
+.checklbl {
+  display: block;
+  padding: 2px 5px;
+  width: 100%;
 }
 
 /* End Checkmark ===== */
