@@ -543,11 +543,35 @@ function copylink(surat = 1, ayat = 1) {
   toast("Copied");
 }
 
+let track = _("#track");
+let mouseDownOnSlider = false;
+let seekbar = _("#seekbar");
+seekbar.addEventListener("change", () => {
+  const pct = seekbar.value / 100;
+  track.currentTime = (track.duration || 0) * pct;
+});
+seekbar.addEventListener("mousedown", () => {
+  mouseDownOnSlider = true;
+  track.pause();
+});
+seekbar.addEventListener("mouseup", () => {
+  mouseDownOnSlider = false;
+  track.play();
+});
+seekbar.oninput = function () {
+  setslider();
+};
+
+function setslider() {
+  var value = (seekbar.value - seekbar.min) / (seekbar.max - seekbar.min) * 100;
+  seekbar.style.background = 'linear-gradient(to right, var(--color-mint) 0%, var(--color-mint) ' + value + '%, #ddd ' + value + '%, #ddd 100%)';
+}
+
 function audioPlay(id = "") {
-  let track = _("#track");
   let sound = _("#track" + id).innerHTML;
-  track.setAttribute("controls", "true");
+  // track.setAttribute("controls", "true");
   _("#player").style.display = "block";
+  _("#notrack").innerHTML = id;
 
   for (m in _(".tracks")) {
     if (!isNaN(m)) {
@@ -556,9 +580,11 @@ function audioPlay(id = "") {
     }
   }
 
-  if (track.paused || _("#track").src != sound) {
+  if (track.paused || track.src != sound) {
     track.src = sound;
     track.play();
+    _("#btnplayaudio").classList.remove("play-button");
+    _("#btnplayaudio").classList.add("pause-button");
     _("#bplps" + id).classList.remove("play-button");
     _("#bplps" + id).classList.add("pause-button");
   } else {
@@ -566,8 +592,9 @@ function audioPlay(id = "") {
     track.currentTime = 0;
     _("#bplps" + id).classList.remove("pause-button");
     _("#bplps" + id).classList.add("play-button");
+    _("#btnplayaudio").classList.remove("pause-button");
+    _("#btnplayaudio").classList.add("play-button");
   }
-
 
   track.onplaying = function () {
     if (_("#bplps" + id) != null) {
@@ -582,30 +609,80 @@ function audioPlay(id = "") {
     }
   };
 
-  track.onended = function () {
-    track.currentTime = 0;
-    // track.src = "";
-    // track.removeAttribute("controls");
-    if (_("#bplps" + id) != null) {
-      _("#bplps" + id).classList.remove("pause-button");
-      _("#bplps" + id).classList.add("play-button");
+  track.onloadeddata = function () {
+    _("#seekbar").value = 0;
+    _("#currenttime").textContent = fmtTime(track.currentTime);
+    _("#duration").textContent = fmtTime(track.duration);
+    setslider();
+  };
+
+  track.ontimeupdate = function () {
+    if (!mouseDownOnSlider) {
+      _("#seekbar").value = (track.currentTime / track.duration * 100) || 0;
+      _("#currenttime").textContent = fmtTime(track.currentTime);
+      _("#duration").textContent = fmtTime(track.duration);
+      setslider();
     }
-    id = parseInt(id) + 1;
-    if (id <= surah_data.length) {
-      setTimeout(() => {
-        gotoayah(id, true);
-      }, 1000);
-      setTimeout(() => {
-        audioPlay(id);
-      }, 2000);
-    } else {
-      id = surah_data.length;
+  };
+
+  track.ondurationchange = function () {
+    _("#seekbar").value = 0;
+    setslider();
+  };
+
+  track.onended = function () {
+    if (!mouseDownOnSlider) {
+      track.currentTime = 0;
+      _("#seekbar").value = 0;
+      _("#btnplayaudio").classList.remove("pause-button");
+      _("#btnplayaudio").classList.add("play-button");
+      setslider();
+      // track.src = "";
+      // track.removeAttribute("controls");
+      if (_("#bplps" + id) != null) {
+        _("#bplps" + id).classList.remove("pause-button");
+        _("#bplps" + id).classList.add("play-button");
+      }
+      id = parseInt(id) + 1;
+      if (id <= surah_data.length) {
+        setTimeout(() => {
+          gotoayah(id, true);
+        }, 1000);
+        setTimeout(() => {
+          audioPlay(id);
+        }, 2000);
+      } else {
+        id = surah_data.length;
+      }
     }
   };
 }
 
+function playaudio() {
+  if (track.paused) {
+    track.play();
+    _("#btnplayaudio").classList.remove("play-button");
+    _("#btnplayaudio").classList.add("pause-button");
+  } else {
+    track.pause();
+    _("#btnplayaudio").classList.remove("pause-button");
+    _("#btnplayaudio").classList.add("play-button");
+  }
+}
+function playprev() {
+  let notrack = parseInt(_("#notrack").innerHTML) - 1;
+  if (notrack > 0) {
+    audioPlay(notrack);
+  }
+}
+function playnext() {
+  let notrack = parseInt(_("#notrack").innerHTML) + 1;
+  if (notrack <= surah_data.length) {
+    audioPlay(notrack);
+  }
+}
+
 function closeTrack() {
-  let track = _("#track");
   track.currentTime = 0;
   track.src = "";
   track.removeAttribute("controls");
@@ -617,6 +694,14 @@ function closeTrack() {
     }
   }
 }
+const fmtTime = s => {
+  const d = new Date(0);
+  if (s > 0) {
+    d.setSeconds(s % 60);
+    d.setMinutes(s / 60);
+  }
+  return d.toISOString().slice(14, 19);
+};
 //==============================================================================
 
 function addfrmBookmark() {
