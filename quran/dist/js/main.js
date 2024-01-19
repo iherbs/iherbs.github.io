@@ -1055,17 +1055,20 @@ if (theme == "auto") {
     window.matchMedia("(prefers-color-scheme: dark)").matches
   ) {
     document.getElementsByTagName("body")[0].setAttribute("data-theme", "dark");
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#1f2125");
     _("#btntheme").checked = true;
   } else {
-    document
-      .getElementsByTagName("body")[0]
-      .setAttribute("data-theme", "light");
+    document.getElementsByTagName("body")[0].setAttribute("data-theme", "light");
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#007070");
     _("#btntheme").checked = false;
   }
 } else {
   document.getElementsByTagName("body")[0].setAttribute("data-theme", theme);
   if (theme == "dark") {
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#1f2125");
     _("#btntheme").checked = true;
+  } else {
+    document.querySelector("meta[name=theme-color]").setAttribute("content", "#007070");
   }
 }
 
