@@ -592,6 +592,8 @@ function setslider() {
   seekbar.style.background = 'linear-gradient(to right, var(--color-mint) 0%, var(--color-mint) ' + value + '%, #ddd ' + value + '%, #ddd 100%)';
 }
 
+let timrsc = setTimeout(() => { }, 100);
+let timrpl = setTimeout(() => { }, 100);
 function audioPlay(id = "") {
   let sound = _("#track" + id).innerHTML;
   // track.setAttribute("controls", "true");
@@ -676,10 +678,10 @@ function audioPlay(id = "") {
       if (trackmode == 'A') {
         id = parseInt(id) + 1;
         if (id <= surah_data.length) {
-          setTimeout(() => {
+          timrsc = setTimeout(() => {
             gotoayah(id, true);
           }, 1000);
-          setTimeout(() => {
+          timrpl = setTimeout(() => {
             audioPlay(id);
           }, 2000);
         } else {
@@ -726,10 +728,16 @@ function onceauto(param = 'A') {
 }
 
 function closeTrack() {
+  clearTimeout(timrsc);
+  clearTimeout(timrpl);
+  track.pause();
   track.currentTime = 0;
   track.src = "";
   track.removeAttribute("controls");
+  _("#seekbar").value = 0;
   _("#player").style.display = "none";
+  _("#btnplayaudio").classList.remove("pause-button");
+  _("#btnplayaudio").classList.add("play-button");
   for (m in _(".tracks")) {
     if (!isNaN(m)) {
       _(".btnaudio")[m].classList.remove("pause-button");
@@ -737,6 +745,7 @@ function closeTrack() {
     }
   }
 }
+
 const fmtTime = s => {
   const d = new Date(0);
   if (s > 0) {
@@ -1006,6 +1015,17 @@ window.onhashchange = function () {
   }
 };
 
+window.onclick = function (event) {
+  // Close the dropdown if the user clicks outside of it
+  // console.log(event.target);
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem') && !event.target.matches('.onceauto') && !event.target.matches('.checklbl') && !event.target.matches('.markoa')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for (var i = 0; i < dropdowns.length; i++) {
+      dropdowns[i].style.display = "none";
+    }
+  }
+};
+
 if (localStorage.getItem("theme") == null) {
   localStorage.setItem("theme", "auto");
 }
@@ -1068,15 +1088,4 @@ if (pg.substring(0, 3) == "#qs") {
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
-}
-
-window.onclick = function (event) {
-  // Close the dropdown if the user clicks outside of it
-  // console.log(event.target);
-  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem') && !event.target.matches('.onceauto') && !event.target.matches('.checklbl') && !event.target.matches('.markoa')) {
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    for (var i = 0; i < dropdowns.length; i++) {
-      dropdowns[i].style.display = "none";
-    }
-  }
 }
