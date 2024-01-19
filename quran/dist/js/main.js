@@ -1,5 +1,5 @@
 var xmlhttp,
-  surah = 0, markno = "", zoomlevel = 0, trackrate = 1, trackmode = 'A';
+  surah = 0, markno = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false;
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {}, surah_data = [];
 function _(id) {
@@ -1023,6 +1023,10 @@ window.onclick = function (event) {
     for (var i = 0; i < dropdowns.length; i++) {
       dropdowns[i].style.display = "none";
     }
+  }
+  if(!isAwake){
+    isAwake = true;
+    awakeEnable();
   }
 };
 
