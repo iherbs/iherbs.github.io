@@ -310,7 +310,7 @@ async function getsurah(surat = 1, nayah = "") {
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
-            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" ondblclick="copylink(${surah},${re[i]["no_ayah"]})">
+            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" onclick="copylink(${surah},${re[i]["no_ayah"]})">
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
                 <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
@@ -540,18 +540,29 @@ function zoompage(num = 0) {
   document.getElementsByTagName("body")[0].style.zoom = zoomlevel + "%";
 }
 
+let touchtime = 0;
 function copylink(surat = 1, ayat = 1) {
-  navigator.clipboard.writeText(
-    location.protocol +
-    "//" +
-    location.host +
-    location.pathname +
-    "#qs" +
-    surat +
-    "." +
-    ayat
-  );
-  toast("Copied");
+  if (touchtime == 0) {
+    touchtime = new Date().getTime();
+  } else {
+    if (((new Date().getTime()) - touchtime) < 800) {
+      touchtime = 0;
+
+      navigator.clipboard.writeText(
+        location.protocol +
+        "//" +
+        location.host +
+        location.pathname +
+        "#qs" +
+        surat +
+        "." +
+        ayat
+      );
+      toast("Copied");
+    } else {
+      touchtime = new Date().getTime();
+    }
+  }
 }
 
 let track = _("#track");
@@ -1024,7 +1035,7 @@ window.onclick = function (event) {
       dropdowns[i].style.display = "none";
     }
   }
-  if(!isAwake){
+  if (!isAwake) {
     isAwake = true;
     awakeEnable();
   }
