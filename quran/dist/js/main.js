@@ -460,6 +460,7 @@ function imagemaker_show() {
   document.getElementsByTagName("body")[0].style.overflow = "hidden";
   setSize(18);
   resize(345, 110);
+  repositionElement(50, 20, "%");
   closeOptions();
 }
 
