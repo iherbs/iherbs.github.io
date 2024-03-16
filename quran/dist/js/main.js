@@ -449,9 +449,11 @@ function imagemaker_show() {
 
   let state = _("#state").innerHTML;
   let qs = state.split(".");
-  let txt = '<div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + surah_data[qs[1] - 1]["text_ayah"]
-    + '</div>' + surah_data[qs[1] - 1]["text_id"]
-    + '<br>(QS. ' + surah_list[qs[0]]["altername"] + ' : ' + qs[1] + ')';
+  let surah_text = surah_data[qs[1] - 1]["text_id"].replace(/<(.|\n)*?>*<(.|\n)*?>/g, '');
+
+  let txt = '<div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + surah_data[qs[1] - 1]["text_ayah"] +
+    '</div>' + surah_text +
+    '<br>(QS. ' + surah_list[qs[0]]["altername"] + ' : ' + qs[1] + ')';
 
   _("#caption").innerHTML = txt;
   _("#imageker").style.display = "block";
@@ -601,8 +603,9 @@ function copylink() {
 function copytext() {
   let state = _("#state").innerHTML;
   let qs = state.split(".");
-  let txt = surah_data[qs[1]]["text_ayah"] + "\n\n" +
-    surah_data[qs[1]]["text_id"] + "\n(QS. " + surah_list[qs[0]]["altername"] + " : " + qs[1] + ")";
+  let surah_text = surah_data[qs[1] - 1]["text_id"].replace(/<(.|\n)*?>*<(.|\n)*?>/g, '');
+  let txt = surah_data[qs[1] - 1]["text_ayah"] + "\n\n" +
+    surah_text + "\n(QS. " + surah_list[qs[0]]["altername"] + " : " + qs[1] + ")";
   navigator.clipboard.writeText(txt);
   toast("Copied");
   closeOptions();

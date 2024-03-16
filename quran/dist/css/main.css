@@ -1116,6 +1116,7 @@ a {
   display: none;
   bottom: 0px;
   width: 100%;
+  padding-bottom: 7px;
   background: var(--color-even-ayah);
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
