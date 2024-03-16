@@ -434,6 +434,9 @@ function generate() {
         dpi: 144,
         allowTaint: true,
         useCORS: true,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        scale: 1,
     }).then(function (canvas) {
 
         boxWrapper.style.top = boxt + "px";
