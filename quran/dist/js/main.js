@@ -310,7 +310,7 @@ async function getsurah(surat = 1, nayah = "") {
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
-            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" onclick="copylink(${surah},${re[i]["no_ayah"]})">
+            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" onclick="moreoption(${surah},${re[i]["no_ayah"]})">
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
                 <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
@@ -443,6 +443,30 @@ async function getasmaulhusna() {
   _("#surah").innerHTML = asma;
 }
 
+
+function imagemaker_show() {
+  closeNav();
+
+  let state = _("#state").innerHTML;
+  let qs = state.split(".");
+  let txt = '<div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + surah_data[qs[1] - 1]["text_ayah"]
+    + '</div>' + surah_data[qs[1] - 1]["text_id"]
+    + '<br>(QS. ' + surah_list[qs[0]]["altername"] + ' : ' + qs[1] + ')';
+
+  _("#caption").innerHTML = txt;
+  _("#imageker").style.display = "block";
+  document.getElementsByTagName("body")[0].style.overflow = "hidden";
+  setSize(18);
+  resize(345, 110);
+  closeOptions();
+}
+
+function imagemaker_hide() {
+  _("#caption").innerHTML = "Quran Word";
+  _("#imageker").style.display = "none";
+  document.getElementsByTagName("body")[0].style.overflow = "";
+}
+
 function getjuzamma() {
   _("#cari").value = "Juz Amma";
   _("#cari").dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13 }));
@@ -541,28 +565,47 @@ function zoompage(num = 0) {
 }
 
 let touchtime = 0;
-function copylink(surat = 1, ayat = 1) {
+function moreoption(surat = 1, ayat = 1) {
   if (touchtime == 0) {
     touchtime = new Date().getTime();
   } else {
     if (((new Date().getTime()) - touchtime) < 800) {
       touchtime = 0;
-
-      navigator.clipboard.writeText(
-        location.protocol +
-        "//" +
-        location.host +
-        location.pathname +
-        "#qs" +
-        surat +
-        "." +
-        ayat
-      );
-      toast("Copied");
+      _("#state").innerHTML = surat + '.' + ayat;
+      _("#previewsurah").innerHTML = '<div class="previewsurah arabic">' + surah_data[ayat - 1]["text_ayah"] + '</div>';
+      _("#options").style.display = "block";
     } else {
       touchtime = new Date().getTime();
     }
   }
+}
+function closeOptions() {
+  _("#state").innerHTML = "";
+  _("#previewsurah").innerHTML = "";
+  _("#options").style.display = "none";
+}
+
+function copylink() {
+  let state = _("#state").innerHTML;
+  let qs = state.split(".");
+  navigator.clipboard.writeText(
+    "https://iherbs.github.io/quran/#qs" +
+    qs[0] +
+    "." +
+    qs[1]
+  );
+  toast("Copied");
+  closeOptions();
+}
+
+function copytext() {
+  let state = _("#state").innerHTML;
+  let qs = state.split(".");
+  let txt = surah_data[qs[1]]["text_ayah"] + "\n\n" +
+    surah_data[qs[1]]["text_id"] + "\n(QS. " + surah_list[qs[0]]["altername"] + " : " + qs[1] + ")";
+  navigator.clipboard.writeText(txt);
+  toast("Copied");
+  closeOptions();
 }
 
 let track = _("#track");
@@ -1003,6 +1046,8 @@ window.onhashchange = function () {
   // console.log(window.location.hash);
   // history.replaceState(null, null, ' '); // remove hash
   closeTrack();
+  closeOptions();
+  imagemaker_hide();
   let pg = window.location.hash;
   if (pg == "") {
     history.replaceState(null, null, " ");

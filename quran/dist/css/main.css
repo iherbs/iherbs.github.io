@@ -181,6 +181,7 @@ a {
 /* ================== */
 #player {
   position: fixed;
+  display: none;
   width: 100%;
   height: 58px;
   bottom: 0px;
@@ -892,6 +893,20 @@ a {
   background-repeat: no-repeat;
 }
 
+/* ==== IMAGEKER ===== */
+#imageker {
+  display: none;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  box-shadow: 0px 0px 3px 1px #aaa;
+  z-index: 10;
+}
+
 /* LOADER / LOADING ================== */
 .loader {
   border: 5px solid #f3f3f3;
@@ -1073,6 +1088,65 @@ a {
   border-radius: 5px;
   border: 2px solid var(--color-secondary);
   box-shadow: 0px 7px var(--color-secondary), 0px 14px var(--color-secondary);
+}
+
+.btnst {
+  border: none;
+  padding: 4px 10px;
+  border-radius: 5px;
+  margin-left: 3px;
+  background: var(--color-title-text);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.btnop {
+  border: none;
+  width: 100%;
+  color: var(--color-text);
+  text-align: left;
+  padding: 8px;
+  background: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#options {
+  position: fixed;
+  display: none;
+  bottom: 0px;
+  width: 100%;
+  background: var(--color-even-ayah);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0px 0px 5px 0px #555;
+}
+
+#closeopt {
+  position: absolute;
+  font-size: 25px;
+  right: 10px;
+  top: -5px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+#previewsurah {
+  width: 100%;
+}
+
+.previewsurah {
+  width: 100%;
+  text-align: right;
+  font-size: 22px;
+  line-height: 2.3;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  direction: rtl;
+  background: var(--color-odd-ayah);
+  padding: 10px 18px;
+  max-height: 214px;
+  overflow-y: auto;
 }
 
 /*=====================*/

@@ -23,6 +23,7 @@
         content="https://raw.githubusercontent.com/iherbs/iherbs.github.io/main/quran/quran-book.png">
 
     <link rel="stylesheet" href="dist/css/main.css">
+    <link rel="stylesheet" href="dist/css/imageker.css">
 </head>
 
 <body data-theme="light">
@@ -170,7 +171,7 @@
         </div>
     </div>
 
-    <div id="player" style="display:none;">
+    <div id="player">
         <input type="range" id="seekbar" value="0" min="0" max="100" step="1" />
         <div id="audiocontrol">
             <label class="play-prev-button" style="margin-left:-55px;" onclick="playprev()"></label>
@@ -246,15 +247,127 @@
         <span id="closetrack" onclick="closeTrack()">&times;</span>
     </div>
 
+    <div id="options">
+        <div id="closeopt" onclick="closeOptions()">&times;</div>
+        <div id="state" style="display:none;"></div>
+        <div id="previewsurah"></div>
+        <table width="100%" cellspacing="5">
+            <tr>
+                <td><button type="button" class="btnop" onclick="copylink()">Copy Link</button></td>
+            </tr>
+            <tr>
+                <td><button type="button" class="btnop" onclick="copytext()">Copy Text</button></td>
+            </tr>
+            <tr>
+                <td><button type="button" class="btnop" onclick="imagemaker_show()">Create Image</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="imageker">
+        <div id="wrapimage">
+            <div class="box-wrapper" id="box-wrapper" onclick="showboxder()">
+                <div class="box" id="box">
+                    <div class="dot rotate" id="rotate"></div>
+                    <div class="dot left-top" id="left-top"></div>
+                    <div class="dot left-bottom" id="left-bottom"></div>
+                    <div class="dot top-mid" id="top-mid"></div>
+                    <div class="dot bottom-mid" id="bottom-mid"></div>
+                    <div class="dot left-mid" id="left-mid"></div>
+                    <div class="dot right-mid" id="right-mid"></div>
+                    <div class="dot right-bottom" id="right-bottom"></div>
+                    <div class="dot right-top" id="right-top"></div>
+                    <div class="rotate-link"></div>
+                    <span id="caption">Quran Word</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="previewImage" style="display:none;"></div>
+
+        <div id="controlimage" onclick="hideboxder()">
+            <div style="padding-top:1px;padding-left:15px;padding-right:15px;">
+                <table width="100%" cellspacing="5">
+                    <tr>
+                        <td colspan="2"><label class="titlestyle"><b>Text</b></label></td>
+                    </tr>
+                    <tr>
+                        <td class="subttl">Size</td>
+                        <td align="right"><input type="number" id="tsize" value="20" onkeyup="setSize()"
+                                onchange="setSize()" /></td>
+                    </tr>
+                    <tr>
+                        <td class="subttl">Color</td>
+                        <td align="right"><input type="color" id="tcolor" class="colorpick" onchange="setColor()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subttl">Highlight</td>
+                        <td align="right">
+                            <button type="button" id="rehl" onclick="removeHL()">&times;</button>
+                            <input type="color" id="hcolor" class="colorpick" onchange="setHColor()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subttl">Style</td>
+                        <td align="right">
+                            <button type="button" class="btnst" onclick="setStyle('n')">N</button>
+                            <button type="button" class="btnst" onclick="setStyle('b')">B</button>
+                            <button type="button" class="btnst" onclick="setStyle('i')"><i>I</i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="subttl">Aligment</td>
+                        <td align="right">
+                            <button type="button" class="btnst" onclick="setAlign('L')" style="height:26px;">
+                                <span class="ic-align align-left"></span>
+                            </button>
+                            <button type="button" class="btnst" onclick="setAlign('C')" style="height:26px;">
+                                <span class="ic-align align-center"></span>
+                            </button>
+                            <button type="button" class="btnst" onclick="setAlign('R')" style="height:26px;">
+                                <span class="ic-align align-right"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Background</td>
+                        <td align="right">
+                            <input type="color" id="bcolor" value="#f0f8ff" class="colorpick" onchange="setBgColor()" />
+                            <label id="slcimg">
+                                <input type="file" id="bgimage" accept="image/png,image/jpeg"
+                                    onchange="checkfile('bgimage')" style="visibility:hidden;width:0px;">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label class="titlestyle">
+                                <button type="button" class="btnst" style="padding:6px 15px;margin-right:20px;"
+                                    onclick="imagemaker_hide()">Close</button>
+                                <button type="button" id="downloadimg" class="btnst" style="padding:6px 15px;"
+                                    onclick="generate()">Save</button>
+                                <a href="#" id="generatedownload" style="display:none;"></a>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <button id="scrolltop">
         <span class="arrow arrow-up" style="margin-top:6px;"></span>
     </button>
 
     <div id="toast"></div>
+    <script src="dist/js/html2canvas.js"></script>
     <script src="dist/js/laconv.js"></script>
     <script src="dist/js/awake.js"></script>
     <script src="dist/js/tajweed.js"></script>
     <script src="dist/js/main.js"></script>
+    <script src="dist/js/imageker.js"></script>
 </body>
 
 </html>
