@@ -446,6 +446,7 @@ async function getasmaulhusna() {
 
 function imagemaker_show() {
   closeNav();
+  closeTrack();
 
   let state = _("#state").innerHTML;
   let qs = state.split(".");
@@ -508,6 +509,8 @@ async function showtafsir(id = 0) {
 }
 
 function nextsurah() {
+  closeTrack();
+  closeOptions();
   surah = parseInt(surah) + parseInt(1);
   if (surah > 114) {
     surah = 1;
@@ -516,6 +519,8 @@ function nextsurah() {
 }
 
 function prevsurah() {
+  closeTrack();
+  closeOptions();
   surah = parseInt(surah) - parseInt(1);
   if (surah < 1) {
     surah = 114;
