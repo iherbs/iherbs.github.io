@@ -408,6 +408,7 @@ function setAlign(par = 'L') {
 
 function generate() {
     hideboxder();
+    toast("Processing");
 
     var boxt = boxWrapper.offsetTop;
     var boxl = boxWrapper.offsetLeft;
@@ -436,7 +437,7 @@ function generate() {
         useCORS: true,
         width: element.offsetWidth,
         height: element.offsetHeight,
-        scale: 1,
+        scale: 3,
     }).then(function (canvas) {
 
         boxWrapper.style.top = boxt + "px";
