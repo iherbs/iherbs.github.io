@@ -821,6 +821,7 @@ const fmtTime = s => {
 
 function addfrmBookmark() {
   _("#ttladdbook").innerHTML = "Tambah Bookmark";
+  _("#grupbookmark").value = "";
   _("#addfrmbook").style.display = "none";
   _("#bookmarkfolder").style.display = "none";
   _("#terakhirbaca").style.display = "none";
@@ -829,6 +830,7 @@ function addfrmBookmark() {
 
 function bataladdBookmark() {
   _("#ttladdbook").innerHTML = "Bookmark";
+  _("#grupbookmark").value = "";
   _("#addfrmbook").style.display = "inline-block";
   _("#bookmarkfolder").style.display = "block";
   _("#terakhirbaca").style.display = "block";
@@ -839,6 +841,7 @@ function bataladdBookmark() {
 function addmdlBookmark(mark = "") {
   markno = mark;
   _("#ttladdbook").innerHTML = "Bookmark";
+  _("#grupbookmark").value = "";
   _("#bookmarkpage").modal("show");
   _("#addfrmbook").style.display = "inline-block";
   _("#bookmarkfolder").style.display = "block";
@@ -872,27 +875,42 @@ function setterakhirbaca(mark) {
 }
 
 function newBookmark() {
+  let ttladdbook = _("#ttladdbook").innerHTML;
   let name = _("#grupbookmark").value;
   let book = JSON.parse(localStorage.getItem("bookmark"));
-  if (localStorage.getItem(name) == null) {
-    book.unshift(name);
+  if (ttladdbook.includes("Rename Bookmark")) {
+    let bmid = _("#bookmarkid").innerHTML;
+    let bookidold = book[bmid];
+    let bookold = localStorage.getItem(bookidold);
+
+    book[bmid] = name;
     localStorage.setItem("bookmark", JSON.stringify(book));
-    if (markno != "") {
-      localStorage.setItem(name, '["' + markno + '"]');
-      markno = "";
-      _("#bookmarkpage").modal("hide");
-    } else {
-      localStorage.setItem(name, "[]");
-      bataladdBookmark();
-      dataBookmark();
-    }
+
+    localStorage.setItem(name, bookold);
+    localStorage.removeItem(bookidold);
+    bataladdBookmark();
+    dataBookmark();
   } else {
-    // bookmark sudah ada
-    if (markno != "") {
-      addmdlBookmark(markno);
+    if (localStorage.getItem(name) == null) {
+      book.unshift(name);
+      localStorage.setItem("bookmark", JSON.stringify(book));
+      if (markno != "") {
+        localStorage.setItem(name, '["' + markno + '"]');
+        markno = "";
+        _("#bookmarkpage").modal("hide");
+      } else {
+        localStorage.setItem(name, "[]");
+        bataladdBookmark();
+        dataBookmark();
+      }
     } else {
-      bataladdBookmark();
-      dataBookmark();
+      // bookmark sudah ada
+      if (markno != "") {
+        addmdlBookmark(markno);
+      } else {
+        bataladdBookmark();
+        dataBookmark();
+      }
     }
   }
   _("#grupbookmark").value = "";
@@ -929,7 +947,7 @@ function dataBookmark() {
     listbook += `<div style="margin-bottom:15px;">
             <div class="listbooktitle">
                 <div class="bookmark" style="display:inline-block;position:relative;width:16px;"></div>
-                <span class="nmayah" style="position:relative;display:inline-block;top:-6px;">${book[g]}</span>
+                <span class="nmayah" style="position:relative;display:inline-block;top:-6px;cursor:pointer;" onclick="renameBookmark(${g})">${book[g]}</span>
                 <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]}')">&times;</div>
             </div>`;
     let mark = JSON.parse(localStorage.getItem(book[g]));
@@ -1009,6 +1027,17 @@ function delBookmark(book = "", mark = "") {
     dataBookmark();
   }
   _("#confirmbox").modal("hide");
+}
+
+
+function renameBookmark(idx = 0) {
+  let book = JSON.parse(localStorage.getItem("bookmark"));
+  _("#ttladdbook").innerHTML = 'Rename Bookmark<div style="display:none;" id="bookmarkid">' + idx + '</div>';
+  _("#grupbookmark").value = book[idx];
+  _("#addfrmbook").style.display = "none";
+  _("#bookmarkfolder").style.display = "none";
+  _("#terakhirbaca").style.display = "none";
+  _("#bookmarkadd").style.display = "block";
 }
 
 //==============================================================================
