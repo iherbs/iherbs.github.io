@@ -926,6 +926,7 @@ function addBookmark(book = "", mark = "") {
     }
   }
   _("#bookmarkpage").modal("hide");
+  setterakhirbaca(mark);
 }
 
 function dataBookmark() {
