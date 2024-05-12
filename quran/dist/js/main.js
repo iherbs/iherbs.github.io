@@ -186,6 +186,10 @@ async function getqlist() {
 function makeqlist(key = "") {
   let re = surah_list,
     table = "";
+
+  let keyjuz = key.split(" ");
+  keyjuz = keyjuz[1];
+
   for (i in re) {
     if (
       (key == "" ||
@@ -193,16 +197,18 @@ function makeqlist(key = "") {
         re[i]["name"].toLowerCase().includes(key.toLowerCase()) ||
         re[i]["text_id"].toLowerCase().includes(key.toLowerCase()) ||
         re[i]["altername"].toLowerCase().includes(key.toLowerCase())) ||
-      (key.toLowerCase() == "juz amma" && parseInt(re[i]["id"]) >= 78)
+      (key.toLowerCase() == "juz amma" && (parseInt(re[i]["id"]) == 1 || parseInt(re[i]["id"]) >= 78)) ||
+      (key.toLowerCase().substring(0, 4) == "juz " && re[i]["juz"].includes(keyjuz))
     ) {
+      let juz = re[i]["juz"].toString().replaceAll(",", ", ");
       table += `<div class="row listitem" onclick="getsurah(${re[i]["id"]})">
-            <div class="col"><div class="star8" style="top:5px;" data-label="${re[i]["id"]}"></div></div>
+            <div class="col listnum"><div class="star8" style="top:5px;" data-label="${re[i]["id"]}"></div></div>
             <div class="col">
                 <span class="nmayah">${re[i]["name"]}</span>
                 <small class="arti">(${re[i]["text_id"]})</small>
                 <span class="type">${re[i]["type_id"] + ", " + re[i]["count"] + " Ayat"}</span>
             </div>
-            <div class="col arabic" style="text-align:right;float:right;font-size:20px;">${re[i]["text"]}</div>
+            <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
         </div>`;
     }
   }
@@ -222,7 +228,7 @@ async function carikata(qry = "") {
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
 
-  if (qry != "" && qry != 'juz amma') {
+  if (qry != "" && qry.substring(0, 4) != 'juz ') {
     let srlt = surah_list, adalist = false;
     _("#wload").innerHTML = `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
     for (let q = 1; q <= 114; q++) {
@@ -459,6 +465,7 @@ function imagemaker_show() {
   _("#caption").innerHTML = txt;
   _("#imageker").style.display = "block";
   document.getElementsByTagName("body")[0].style.overflow = "hidden";
+  document.getElementById("tsize").value = "18";
   setSize(18);
   resize(345, 110);
   repositionElement(50, 20, "%");
@@ -475,6 +482,19 @@ function getjuzamma() {
   _("#cari").value = "Juz Amma";
   _("#cari").dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13 }));
   closeNav();
+}
+
+async function getjuz() {
+  closeNav();
+  _("#modalwidget").modal("show");
+  _("#widgetcontent").innerHTML = '<div class="loader"></div>';
+  let reas = await get(url + "juz_list.json");
+  let juz = JSON.parse(reas);
+
+  _("#widgetcontent").innerHTML = `<span class="widgettittle">Juz</span>`;
+  for (let i = 1; i <= 30; i++) {
+    _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="gotoBookmark('${juz[i]["start"]["no_surah"] + "_" + juz[i]["start"]["ayah"]}');_('#modalwidget').modal('hide');"><b>Juz ${i}</b> (${juz[i]["start"]["nm_surah"] + ", " + juz[i]["start"]["ayah"]} / ${juz[i]["end"]["nm_surah"] + ", " + juz[i]["end"]["ayah"]})</div>`;
+  }
 }
 
 function gotoayah(i = 1, smoth = false) {

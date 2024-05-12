@@ -30,6 +30,9 @@ function parseArabic(text, show = "true") {
             if (match.includes('\u064B ')) {
                 match = match.replace('\u064B ', '');
                 return '\u064B <tajweed class="idhgham">' + match + '</tajweed>';
+            } else if (match.includes('\u064C ')) {
+                match = match.replace('\u064C ', '');
+                return '\u064C <tajweed class="idhgham">' + match + '</tajweed>';
             } else {
                 return '<tajweed class="idhgham">' + match.replace(' ', '</tajweed> <tajweed class="idhgham">') + '</tajweed>';
             }
