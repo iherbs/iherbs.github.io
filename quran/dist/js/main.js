@@ -200,7 +200,7 @@ function makeqlist(key = "") {
       (key.toLowerCase() == "juz amma" && (parseInt(re[i]["id"]) == 1 || parseInt(re[i]["id"]) >= 78)) ||
       (key.toLowerCase().substring(0, 4) == "juz " && re[i]["juz"].includes(keyjuz))
     ) {
-      let juz = re[i]["juz"].toString().replaceAll(",", ", ");
+      // let juz = re[i]["juz"].toString().replaceAll(",", ", ");
       table += `<div class="row listitem" onclick="getsurah(${re[i]["id"]})">
             <div class="col listnum"><div class="star8" style="top:5px;" data-label="${re[i]["id"]}"></div></div>
             <div class="col">
@@ -369,6 +369,7 @@ async function getayah(surat = 1, nayah = 1) {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
   _("#tsurah").innerHTML = `<span id="tohome" onclick="history.replaceState(null, null, ' ');window.location.reload();" class="icon-home" style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>`;
+  _("#tsurah").removeAttribute("onclick");
   _("#wrapmenu").style.display = "block";
   _("#tohome").style.display = "none";
   _("#toayah").style.display = "none";
@@ -449,7 +450,6 @@ async function getasmaulhusna() {
   _("#surah").innerHTML = asma;
 }
 
-
 function imagemaker_show() {
   closeNav();
   closeTrack();
@@ -491,9 +491,9 @@ async function getjuz() {
   let reas = await get(url + "juz_list.json");
   let juz = JSON.parse(reas);
 
-  _("#widgetcontent").innerHTML = `<span class="widgettittle">Juz</span>`;
+  _("#widgetcontent").innerHTML = `<span class="widgettittle">JUZ</span>`;
   for (let i = 1; i <= 30; i++) {
-    _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="gotoBookmark('${juz[i]["start"]["no_surah"] + "_" + juz[i]["start"]["ayah"]}');_('#modalwidget').modal('hide');"><b>Juz ${i}</b> (${juz[i]["start"]["nm_surah"] + ", " + juz[i]["start"]["ayah"]} / ${juz[i]["end"]["nm_surah"] + ", " + juz[i]["end"]["ayah"]})</div>`;
+    _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="gotoBookmark('${juz[i]["start"]["no_surah"] + "_" + juz[i]["start"]["ayah"]}');_('#modalwidget').modal('hide');"><b>Juz ${i}</b><br>(${juz[i]["start"]["nm_surah"] + ", " + juz[i]["start"]["ayah"]} ~ ${juz[i]["end"]["nm_surah"] + ", " + juz[i]["end"]["ayah"]})</div>`;
   }
 }
 
