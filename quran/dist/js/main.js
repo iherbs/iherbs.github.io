@@ -450,6 +450,77 @@ async function getasmaulhusna() {
   _("#surah").innerHTML = asma;
 }
 
+async function doaharian() {
+  closeNav();
+  if (window.location.hash == '') {
+    window.location.hash = "#doaharian";
+  } else {
+    window.location.replace("#doaharian");
+  }
+  _("#wrapmenu").style.display = "none";
+  _("#home").style.display = "none";
+  _("#surah").style.display = "block";
+  _("#surah").innerHTML = `<div class="loader"></div>`;
+
+  let list = `<div class="titleq">Doa Harian</div>
+          <div style="padding:5px;">
+              <div class="findfield">
+                  <input type="text" id="caridoa" class="form-control txtfind" placeholder="Cari Doa" onkeyup="caridoa()" />
+                  <div class="fndclear" id="clearsrcdoa" onclick="clearsrcdoa()">×</div>
+              </div>
+          </div>
+          <div id="listdoa"></div>`;
+  _("#surah").innerHTML = list;
+  listdoa();
+}
+
+async function listdoa(key = "") {
+  let redoa = await get(url + "doa_harian.json");
+  let doa = JSON.parse(redoa);
+  // console.log(doa);
+
+  let list = `<table class="tablecont">`;
+  for (i in doa) {
+    if (
+      key == "" ||
+      doa[i]['name'].toLowerCase().includes(key.toLowerCase()) ||
+      doa[i]['transliteration'].toLowerCase().includes(key.toLowerCase()) ||
+      doa[i]['text_id'].toLowerCase().includes(key.toLowerCase())
+    ) {
+      list += `<tr class="listitem">
+                <td>
+                    <span style="display:block;height:31.55px;color:var(--color-textstar);font-weight:bold;">
+                      ${doa[i]['no'] + ". " + doa[i]['name']}
+                    </span>
+                    <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+                      ${doa[i]['text_ayah']}
+                    </div>
+                    <span class="artr"><i>${doa[i]['transliteration']}</i></span>
+                    <span class="arid">${doa[i]['text_id']}</span>
+                </td>
+            </tr>`;
+      // list += "]" + doa[i]['text_ayah'] + "<br><br>";
+    }
+  }
+  list += `</table>`;
+  _("#listdoa").innerHTML = list;
+}
+
+function caridoa() {
+  let key = _("#caridoa").value;
+  if (key != "") {
+    _("#clearsrcdoa").style.display = "block";
+  } else {
+    _("#clearsrcdoa").style.display = "none";
+  }
+  listdoa(key);
+}
+
+function clearsrcdoa() {
+  _("#caridoa").value = "";
+  listdoa();
+}
+
 function imagemaker_show() {
   closeNav();
   closeTrack();
