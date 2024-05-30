@@ -1,7 +1,7 @@
 var xmlhttp,
   surah = 0, markno = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false;
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
-let surah_list = {}, surah_data = [], doa_data = [];
+let surah_list = {}, surah_data = [], doa_data = [], asma = [];
 function _(id) {
   let el = {}, ismodal = false;
   if (id.substr(0, 1) == "#") {
@@ -432,13 +432,16 @@ async function getasmaulhusna() {
 
   let reas = await get(url + "asmaul_husna.json");
   let as = JSON.parse(reas);
+  asma = as;
   // console.log(as);
 
-  let asma = `<div class="titleq">Asmaul Husna</div>
+  let list = `<div class="titleq">Asmaul Husna</div>
           <table class="tablecont">`;
   for (i in as) {
-    asma += `<tr class="listitem">
-                <td style="width:30px;"><span style="display:block;height:31.55px;color:var(--color-text);">${as[i]['no']}</span></td>
+    list += `<tr class="listitem" onclick="moreOption(${i},'asma')">
+                <td style="width:30px;">
+                  <span style="display:block;height:31.55px;color:var(--color-text);">${as[i]['no']}</span>
+                </td>
                 <td>
                     <span class="nmayah">${as[i]['transliteration']}</span>
                     <span class="type">${as[i]['text_id']}</span>
@@ -446,8 +449,8 @@ async function getasmaulhusna() {
                 </td>
             </tr>`;
   }
-  asma += `</table>`;
-  _("#surah").innerHTML = asma;
+  list += `</table>`;
+  _("#surah").innerHTML = list;
 }
 
 async function doaharian() {
@@ -489,7 +492,7 @@ async function listdoa(key = "") {
       doa[i]['text_id'].toLowerCase().includes(key.toLowerCase())
     ) {
       list += `<tr class="listitem">
-                <td onclick="moreOption(${i},0)">
+                <td onclick="moreOption(${i},'doa')">
                     <span style="display:block;height:31.55px;color:var(--color-textstar);font-weight:bold;">
                       ${doa[i]['no'] + ". " + doa[i]['name']}
                     </span>
@@ -530,7 +533,7 @@ function imagemaker_show() {
   let qs = JSON.parse(state);
 
   let txt = "";
-  if (qs["ayah"] == 0) {
+  if (qs["ayah"] == "doa") {
     txt = '<div style="width:100%;line-height:2.3;padding:10px 18px;font-size:22px;">' + qs["name"] + '</div><div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + qs["ayah_text"] +
       '</div>' + qs["text"];
   } else {
@@ -680,11 +683,15 @@ function moreOption(surat = 1, ayat = 1) {
       let sayah = "";
       let sname = "";
 
-      if (ayat == 0) {
+      if (ayat == 'doa') {
         _("#btncopylink").style.display = "none";
         sayah = doa_data[surat]['text_ayah'];
         surah_text = doa_data[surat]['text_id'];
         sname = doa_data[surat]['name'];
+      } else if (ayat == 'asma') {
+        _("#btncopylink").style.display = "none";
+        sayah = asma[surat]['text_ayah'];
+        surah_text = asma[surat]['text_id'];
       } else {
         _("#btncopylink").style.display = "table-row";
         sayah = surah_data[ayat - 1]["text_ayah"];
@@ -723,7 +730,7 @@ function copytext() {
   let qs = JSON.parse(state);
   let txt = "";
 
-  if (qs["ayah"] == 0) {
+  if (qs["ayah"] == "doa") {
     txt = qs["name"] + "\n\n" + qs["ayah_text"] + "\n\n" +
       qs["text"];
   } else {
@@ -1305,6 +1312,8 @@ if (pg.substring(0, 3) == "#qs") {
   getayah(qs[0], qs[1]);
 } else if (pg == "#asmaulhusna") {
   getasmaulhusna();
+} else if (pg == "#doaharian") {
+  doaharian();
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
