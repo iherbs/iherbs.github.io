@@ -41,7 +41,9 @@ function parseArabic(text, show = "true") {
         text = text.replace(idhghammatcherwihtoutghunnah, '<tajweed class="idhghamnoghunnah">$&</tajweed>');
         // text = text.replace(ikhfamatcher, '<tajweed class="ikhfa">$&</tajweed>');
         text = text.replace(ikhfamatcher, function (match, capture) {
-            if (match.includes('\u0627 \u0642') || match.includes('\u064B\u0627')) {
+            if (match == '\u0646\u0652\u0641') {
+                return '<tajweed class="ikhfa">' + match + '</tajweed>';
+            } else if (match.includes('\u0627 \u0642') || match.includes('\u064B\u0627')) {
                 return '<tajweed class="ikhfa">' + match.replace(' ', '</tajweed> <tajweed class="ikhfa">') + '</tajweed>';
             } else if (match.includes('\u0627 \u0643')) {
                 match = match.replace('\u0627 \u0643', '\u0627\u0643');
