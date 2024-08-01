@@ -43,6 +43,8 @@ function parseArabic(text, show = "true") {
         text = text.replace(ikhfamatcher, function (match, capture) {
             if (match == '\u0646\u0652\u0641' || match == '\u0646\u0652\u0643') {
                 return '<tajweed class="ikhfa">' + match + '</tajweed>';
+            } else if (match == '\u064B\u0627 \u0643') {
+                return '<tajweed class="ikhfa">' + match + '\u064E</tajweed>';
             } else if (match.includes('\u0627 \u0642') || match.includes('\u064B\u0627')) {
                 return '<tajweed class="ikhfa">' + match.replace(' ', '</tajweed> <tajweed class="ikhfa">') + '</tajweed>';
             } else if (match.includes('\u0627 \u0643')) {
