@@ -801,13 +801,17 @@ function audioPlay(id = "") {
     track.play();
     _("#btnplayaudio").classList.remove("play-button");
     _("#btnplayaudio").classList.add("pause-button");
-    _("#bplps" + id).classList.remove("play-button");
-    _("#bplps" + id).classList.add("pause-button");
+    if (_("#bplps" + id) != null) {
+      _("#bplps" + id).classList.remove("play-button");
+      _("#bplps" + id).classList.add("pause-button");
+    }
   } else {
     track.pause();
     track.currentTime = 0;
-    _("#bplps" + id).classList.remove("pause-button");
-    _("#bplps" + id).classList.add("play-button");
+    if (_("#bplps" + id) != null) {
+      _("#bplps" + id).classList.remove("pause-button");
+      _("#bplps" + id).classList.add("play-button");
+    }
     _("#btnplayaudio").classList.remove("pause-button");
     _("#btnplayaudio").classList.add("play-button");
   }
@@ -863,7 +867,7 @@ function audioPlay(id = "") {
         _("#bplps" + id).classList.remove("pause-button");
         _("#bplps" + id).classList.add("play-button");
       }
-      if (trackmode == 'A') {
+      if (trackmode == 'A' || trackmode == 'O') {
         id = parseInt(id) + 1;
         if (id <= surah_data.length) {
           timrsc = setTimeout(() => {
@@ -874,6 +878,13 @@ function audioPlay(id = "") {
           }, 2000);
         } else {
           id = surah_data.length;
+          if (trackmode == 'O') {
+            nextsurah();
+            id = surah == 1 ? 1 : 0;
+            timrpl = setTimeout(() => {
+              audioPlay(id);
+            }, 2000);
+          }
         }
       }
     }
