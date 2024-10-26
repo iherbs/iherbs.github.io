@@ -311,21 +311,24 @@ async function getsurah(surat = 1, nayah = "") {
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
 
+  ayah += '<div id="track0" style="display:none;">https://github.com/iherbs/quran-json/raw/main/Audio/001/001.mp3</div>';
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
     ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
-            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;" onclick="moreOption(${surah},${re[i]["no_ayah"]})">
+            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
                 <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
-                <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
-                <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
-                    ${parseArabic(re[i]["text_ayah"], tajweed)}
+                <div onclick="moreOption(${surah},${re[i]["no_ayah"]})">
+                  <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
+                  <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+                      ${parseArabic(re[i]["text_ayah"], tajweed)}
+                  </div>
+                  <span class="artr" style="display:${transliteration == "true" ? 'block' : 'none'}"><i>${re[i]["transliteration"]}</i></span>
+                  <span class="arid" style="display:${translate == "true" ? 'block' : 'none'}">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>
                 </div>
-                <span class="artr" style="display:${transliteration == "true" ? 'block' : 'none'}"><i>${re[i]["transliteration"]}</i></span>
-                <span class="arid" style="display:${translate == "true" ? 'block' : 'none'}">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>
             </td>
         </tr>`;
 
