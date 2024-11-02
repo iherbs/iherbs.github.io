@@ -16,11 +16,12 @@
   <button onClick="StopSpeech()" style="padding: 5px 30px;">STOP</button>
   <div id="diftxt"></div>
   <script>
-    let harakat = ["\u0650", "\u0652", "\u0651", "\u064E", "\u0670", "\u064F", "\u06D9", "\u06D7", "\u08D6", "\u06D5", "\u06E4", "\u06DA", "\u06DB", "\u064B", "\u200D", "\u0653"];
+    let harakat = ["\u0650", "\u0652", "\u0651", "\u064E", "\u0670", "\u064F", "\u06D9", "\u06D7", "\u08D6", "\u06D5", "\u06E4", "\u06DA", "\u06DB", "\u064B", "\u200D", "\u0653", "\u06DE", "\u06D6", "\u06E9", "\u0656", "\u0657"];
 
     function removehar(text = "") {
       for (var i = 0; i < harakat.length; i++) {
         text = text.replaceAll(harakat[i], "").replaceAll("\u0629", "\u0647").replaceAll("\u0644\u0648", "\u0644\u0627")
+        // .replaceAll("\u0639\u0646", "\u0627\u0646")
       }
       return text;
     };
