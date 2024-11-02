@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speak</title>
+</head>
+
+<body>
+
+
+  <textarea id="txtspeak">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</textarea><br>
+  <button onClick="GetSpeech()" style="padding: 5px 30px;">MIC</button>
+  <button onClick="StopSpeech()" style="padding: 5px 30px;">STOP</button>
+  <div id="diftxt"></div>
+  <script>
+    let harakat = ["\u0650", "\u0652", "\u0651", "\u064E", "\u0670", "\u064F", "\u06D9", "\u06D7", "\u08D6", "\u06D5", "\u06E4", "\u06DA", "\u06DB", "\u064B", "\u200D", "\u0653"];
+
+    function removehar(text = "") {
+      for (var i = 0; i < harakat.length; i++) {
+        text = text.replaceAll(harakat[i], "").replaceAll("\u0629", "\u0647").replaceAll("\u0644\u0648", "\u0644\u0627")
+      }
+      return text;
+    };
+
+    var synth = window.speechSynthesis;
+    function speak(txt = "") {
+      if (synth.speaking) {
+        synth.cancel();
+      }
+      var spcsu = new SpeechSynthesisUtterance();
+      const voices = synth.getVoices();
+      for (let i = 0; i < voices.length; i++) {
+        if (voices[i].lang === 'id-ID') {
+          spcsu.voice = voices[i];
+        }
+      }
+      spcsu.lang = 'ar-SA';
+      spcsu.text = txt;
+      spcsu.rate = 1;
+      spcsu.pitch = 1.3;
+      synth.speak(spcsu);
+    }
+
+    function StopSpeech() {
+      recognition.stop();
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition, txtrecogn = "";
+
+    const GetSpeech = () => {
+      txtrecogn = "";
+      let final_transcript = "";
+      console.log("clicked microphone");
+
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'ar-SA';//'id-ID';//
+
+      recognition.onstart = () => {
+        document.getElementById("diftxt").innerHTML = "starting listening, speak in microphone";
+        console.log("starting listening, speak in microphone");
+      }
+      recognition.onspeechend = () => {
+        console.log("stopped listening");
+        recognition.stop();
+      }
+      recognition.onresult = (result) => {
+        for (var t = "",
+          n = result.resultIndex; n < result.results.length; ++n) {
+          if (result.results[n].isFinal) {
+            final_transcript += result.results[n][0].transcript;
+          } else {
+            t += result.results[n][0].transcript;
+          }
+        }
+
+        if (recognition.continuous && recognition.interimResults) {
+          txtrecogn = final_transcript + t;
+        } else {
+          txtrecogn = final_transcript;
+        }
+
+        console.log(txtrecogn);
+        diffme();
+      }
+
+      recognition.start();
+    }
+
+    function cleartxt(e) {
+      var t = e.replace(/[.,!?;":\(\)]/g, " "),
+        t = t.replace(/\s{2,}/g, " "),
+        t = t.trim();
+      return t
+    }
+
+    function diffme() {
+      let tr = cleartxt(txtrecogn);
+      e = tr.split(" ");
+
+      let o = cleartxt(removehar(document.getElementById("txtspeak").value));
+      t = o.split(" ");
+
+      var a = document.getElementById("diftxt"),
+        r, i,
+        idskip = [],
+        c = "",
+        s = e.length,
+        d = t.length,
+        u = 0,
+        l = 0,
+        g = !1;
+      for (r = 0; d > r; r++) {
+        g = !1;
+        for (i = 0; s > i; i++) {
+          if (e[i] !== undefined) {
+            // remove double
+            newe = "";
+            for (w = 0; t[r].length > w; w++) {
+              if (e[i][w] != undefined) {
+                if (e[i][w].toLowerCase() == t[r][w].toLowerCase()) {
+                  newe += t[r][w].toLowerCase();
+                } else {
+                  e[i] = e[i].substr(0, w - 1) + e[i].substr(w, e[i].length - 1);
+                  w--;
+                }
+              }
+            }
+
+            if (newe.toLowerCase() == t[r].toLowerCase()) {
+              g = !0;
+              l++;
+              break;
+            }
+          }
+        }
+        if (e[r] !== undefined) {
+          if (g) {
+            c += '<span style="color:#1a1;">' + t[r] + '</span> ';
+          } else {
+            c += '<span style="color:#f1a;">' + e[s - 1] + '</span> ';
+          }
+        }
+      }
+
+      let prosen = Math.round(100 * l / d);
+      if (prosen == 100) {
+        recognition.stop();
+      }
+      a.innerHTML = o + "<br><br>" + c + "<br><br>Percent of recognized words - " + prosen + "%"
+    }
+
+    window.onload = function () {
+      recognition = new SpeechRecognition();
+    }
+  </script>
+</body>
+
+</html>
