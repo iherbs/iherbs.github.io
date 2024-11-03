@@ -519,6 +519,56 @@ a {
   right: -15px;
 }
 
+.btnvoice {
+  margin-top: -3px;
+  right: 98px;
+  cursor: pointer;
+  position: absolute;
+}
+
+.voice-button {
+  width: 14px;
+  height: 16.7px;
+  border: 5px solid #dfdfdf;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+
+.voice-button-recog {
+  position: relative;
+  top: 5px;
+  left: 10px;
+  width: 20px;
+  height: 25px;
+  border: 6px solid var(--color-title-text);
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+
+#voiceresponse {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: right;
+  font-weight: bold;
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-left: 20px;
+  margin-right: 20px;
+  position: relative;
+  width: 100%;
+}
+
+#recayah {
+  display: inline-block;
+  margin-top: 7px;
+  margin-left: 10px;
+  font-weight: bold;
+  color: var(--color-text);
+  background: var(--color-odd-ayah);
+  padding: 2px 9px;
+  border-radius: 8px;
+}
+
 .form-control {
   font-family: Arial;
   padding-top: 6px;
@@ -1128,7 +1178,7 @@ a {
   cursor: pointer;
 }
 
-#options {
+.poupmore {
   position: fixed;
   display: none;
   bottom: 0px;
@@ -1324,5 +1374,69 @@ input:checked+.slider:before {
   #audiotime {
     margin-top: 9px;
     font-size: 12px;
+  }
+}
+
+/* Ripple loading */
+.lds-ripple {
+  color: var(--color-title-text);
+}
+
+.lds-ripple {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.lds-ripple::before {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  border: 4px solid currentColor;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.lds-ripple::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  border: 4px solid currentColor;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  animation-delay: -0.5s;
+}
+
+@keyframes lds-ripple {
+  0% {
+    width: 4px;
+    height: 4px;
+    opacity: 0;
+  }
+
+  4.9% {
+    top: 18px;
+    left: 18px;
+    width: 4px;
+    height: 4px;
+    opacity: 0;
+  }
+
+  5% {
+    top: 18px;
+    left: 18px;
+    width: 4px;
+    height: 4px;
+    opacity: 1;
+  }
+
+  100% {
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
   }
 }

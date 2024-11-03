@@ -256,7 +256,7 @@
         </div>
     </div>
 
-    <div id="options">
+    <div id="options" class="poupmore">
         <div id="closeopt" onclick="closeOptions()">&times;</div>
         <div id="state" style="display:none;"></div>
         <div id="previewsurah"></div>
@@ -271,6 +271,26 @@
                 <td><button type="button" class="btnop" onclick="imagemaker_show()">Create Image</button></td>
             </tr>
         </table>
+    </div>
+
+
+    <div id="recognizer" class="poupmore">
+        <div id="recayah"></div>
+        <span style="position: absolute;margin-left: 14px;margin-top: 14px;">
+            <label class="play-prev-button" onclick="vcplayprev()"></label>
+            <label class="play-button" id="btnplayaudio"
+                style="margin-left:45px;border-left:15px solid var(--color-title-text) !important;"
+                onclick="playaudio()"></label>
+            <label class="play-next-button" style="margin-left:95px;" onclick="vcplaynext()"></label>
+        </span>
+        <div id="closeopt" onclick="closeRecog()">&times;</div>
+        <div style="width:100%;display:flex;">
+            <div id="btnvcmd" style="position:relative;top:11px;left:10px;cursor:pointer;width:40px;"
+                onclick="ssrecog()">
+                <div class="voice-button-recog"></div>
+            </div>
+            <div id="voiceresponse" class="arabic"></div>
+        </div>
     </div>
 
     <div id="imageker">

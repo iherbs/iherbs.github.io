@@ -321,6 +321,7 @@ async function getsurah(surat = 1, nayah = "") {
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
                 <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
+                <label class="btnvoice voice-button" id="bvoice${re[i]["no_ayah"]}" onclick="GetSpeech('${re[i]["no_ayah"]}')"></label>
                 <div onclick="moreOption(${surah},${re[i]["no_ayah"]})">
                   <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                   <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
@@ -677,37 +678,39 @@ function zoompage(num = 0) {
 
 let touchtime = 0;
 function moreOption(surat = 1, ayat = 1) {
-  if (touchtime == 0) {
-    touchtime = new Date().getTime();
-  } else {
-    if (((new Date().getTime()) - touchtime) < 800) {
-      touchtime = 0;
-      let surah_text = "";
-      let sayah = "";
-      let sname = "";
-
-      if (ayat == 'doa') {
-        _("#btncopylink").style.display = "none";
-        sayah = doa_data[surat]['text_ayah'];
-        surah_text = doa_data[surat]['text_id'];
-        sname = doa_data[surat]['name'];
-      } else if (ayat == 'asma') {
-        _("#btncopylink").style.display = "none";
-        sayah = asma[surat]['text_ayah'];
-        surah_text = asma[surat]['text_id'];
-      } else {
-        _("#btncopylink").style.display = "table-row";
-        sayah = surah_data[ayat - 1]["text_ayah"];
-        surah_text = surah_data[ayat - 1]["text_id"].replace(/<(.|\n)*?>*<(.|\n)*?>/g, '');
-        sname = "(QS. " + surah_list[surat]["altername"] + " : " + ayat + ")";
-      }
-
-      _("#state").innerHTML = '{"surah":"' + surat + '","ayah":"' + ayat + '","ayah_text":"' + sayah + '","text":"' + surah_text + '","name":"' + sname + '"}';
-      // _("#state").innerHTML = surat + '.' + ayat;
-      _("#previewsurah").innerHTML = '<div class="previewsurah arabic">' + sayah + '</div>';
-      _("#options").style.display = "block";
-    } else {
+  if (_("#recognizer").style.display != "block") {
+    if (touchtime == 0) {
       touchtime = new Date().getTime();
+    } else {
+      if (((new Date().getTime()) - touchtime) < 800) {
+        touchtime = 0;
+        let surah_text = "";
+        let sayah = "";
+        let sname = "";
+
+        if (ayat == 'doa') {
+          _("#btncopylink").style.display = "none";
+          sayah = doa_data[surat]['text_ayah'];
+          surah_text = doa_data[surat]['text_id'];
+          sname = doa_data[surat]['name'];
+        } else if (ayat == 'asma') {
+          _("#btncopylink").style.display = "none";
+          sayah = asma[surat]['text_ayah'];
+          surah_text = asma[surat]['text_id'];
+        } else {
+          _("#btncopylink").style.display = "table-row";
+          sayah = surah_data[ayat - 1]["text_ayah"];
+          surah_text = surah_data[ayat - 1]["text_id"].replace(/<(.|\n)*?>*<(.|\n)*?>/g, '');
+          sname = "(QS. " + surah_list[surat]["altername"] + " : " + ayat + ")";
+        }
+
+        _("#state").innerHTML = '{"surah":"' + surat + '","ayah":"' + ayat + '","ayah_text":"' + sayah + '","text":"' + surah_text + '","name":"' + sname + '"}';
+        // _("#state").innerHTML = surat + '.' + ayat;
+        _("#previewsurah").innerHTML = '<div class="previewsurah arabic">' + sayah + '</div>';
+        _("#options").style.display = "block";
+      } else {
+        touchtime = new Date().getTime();
+      }
     }
   }
 }
@@ -715,6 +718,12 @@ function closeOptions() {
   _("#state").innerHTML = "";
   _("#previewsurah").innerHTML = "";
   _("#options").style.display = "none";
+}
+function closeRecog() {
+  _("#voiceresponse").innerHTML = "";
+  _("#recognizer").style.display = "none";
+  StopSpeech();
+  closeTrack();
 }
 
 function copylink() {
@@ -785,7 +794,7 @@ function setslider() {
 
 let timrsc = setTimeout(() => { }, 100);
 let timrpl = setTimeout(() => { }, 100);
-function audioPlay(id = "") {
+function audioPlay(id = "", recog = false) {
   let sound = _("#track" + id).innerHTML;
   // track.setAttribute("controls", "true");
   _("#player").style.display = "block";
@@ -801,12 +810,14 @@ function audioPlay(id = "") {
   if (track.paused || track.src != sound) {
     track.src = sound;
     track.playbackRate = trackrate;
-    track.play();
-    _("#btnplayaudio").classList.remove("play-button");
-    _("#btnplayaudio").classList.add("pause-button");
-    if (_("#bplps" + id) != null) {
-      _("#bplps" + id).classList.remove("play-button");
-      _("#bplps" + id).classList.add("pause-button");
+    if (!recog) {
+      track.play();
+      _("#btnplayaudio").classList.remove("play-button");
+      _("#btnplayaudio").classList.add("pause-button");
+      if (_("#bplps" + id) != null) {
+        _("#bplps" + id).classList.remove("play-button");
+        _("#bplps" + id).classList.add("pause-button");
+      }
     }
   } else {
     track.pause();
@@ -1331,4 +1342,222 @@ if (pg.substring(0, 3) == "#qs") {
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
+}
+
+// speech to text ======================================
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition, recognizing = false, txtrecogn = "";
+
+function normDiacritic(text = "") {
+  let harakat = ["\u0650", "\u0652", "\u0651", "\u064E", "\u0670", "\u064F", "\u06D9", "\u06D7", "\u08D6", "\u06D5", "\u06E4", "\u06DA", "\u06DB", "\u064B", "\u200D", "\u0653", "\u06DE", "\u06D6", "\u06E9", "\u0656", "\u0657", "\u064C", "\u06D8", "\u064D"];
+
+  for (var i = 0; i < harakat.length; i++) {
+    text = text.replaceAll(harakat[i], "").replaceAll("\u0629", "\u0647")
+      .replaceAll("\u0644\u0648\u0647", "\u0644\u0627\u0647")
+      .replaceAll("\u0649\u0655", "\u0626")
+      .replaceAll("\u0621\u0627", "\u0627\u0627")
+      .replaceAll("\u0641\u0649", "\u0641\u064A")
+    // .replaceAll("\u0639\u0646", "\u0627\u0646")
+    // .replaceAll("\u0645\u0639", "\u0645\u0627")
+    // .replaceAll("\u0639\u0644\u0649", "\u0627\u0644\u0627")
+    // .replaceAll("\u0644\u0648", "\u0644\u0627")
+    // .replaceAll("\u064A", "\u0649") yak
+  }
+  return text;
+};
+
+function ssrecog() {
+  if (recognizing) {
+    StopSpeech();
+    _("#voiceresponse").innerHTML = '|';
+    _("#btnvcmd").innerHTML = '<div class="voice-button-recog"></div>';
+  } else {
+    let ayn = parseInt(_("#recayah").innerHTML);
+    GetSpeech(ayn);
+    _("#btnvcmd").innerHTML = '<div class="lds-ripple"></div>';
+  }
+}
+
+function vcplayprev() {
+  let notrack = parseInt(_("#recayah").innerHTML) - 1;
+  if (notrack > 0) {
+    gotoayah(notrack, true);
+    GetSpeech(notrack);
+  }
+}
+function vcplaynext() {
+  let notrack = parseInt(_("#recayah").innerHTML) + 1;
+  if (notrack <= surah_data.length) {
+    gotoayah(notrack, true);
+    GetSpeech(notrack);
+  }
+}
+
+function StopSpeech() {
+  recognition.stop();
+  recognizing = false;
+}
+
+const GetSpeech = (ayat = 0) => {
+  closeOptions();
+  trackmode = '1';
+  _(".onceauto")[2].checked = true;
+
+  audioPlay(ayat, true);
+
+  _("#recognizer").style.display = "block";
+  _("#recayah").innerHTML = ayat;
+  _("#voiceresponse").innerHTML = "... .... ... .... ...";
+
+  txtrecogn = "";
+  let final_transcript = "";
+  if (recognizing) {
+    StopSpeech();
+  }
+
+  console.log("clicked microphone");
+
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'ar-AE';//'id-ID';//'ar-SA'
+
+  recognition.onstart = () => {
+    console.log("starting listening, speak in microphone");
+    _("#btnvcmd").innerHTML = '<div class="lds-ripple"></div>';
+  }
+  recognition.onspeechend = () => {
+    console.log("stopped listening");
+    _("#btnvcmd").innerHTML = '<div class="voice-button-recog"></div>';
+    recognition.stop();
+    recognizing = false;
+  }
+  recognition.onresult = (res) => {
+    for (var t = "",
+      n = res.resultIndex; n < res.results.length; ++n) {
+      if (res.results[n].isFinal) {
+        final_transcript += res.results[n][0].transcript;
+      } else {
+        t += res.results[n][0].transcript;
+      }
+    }
+
+    if (recognition.continuous && recognition.interimResults) {
+      txtrecogn = final_transcript + t;
+    } else {
+      txtrecogn = final_transcript;
+    }
+
+    console.log(txtrecogn);
+    if (recognizing) {
+      diffme(ayat);
+    }
+
+    // ================
+    const current = res.resultIndex;
+    let transcript = res.results[current][0].transcript;
+    let mobileRepeatBug = (current == 1 && transcript == res.results[0][0].transcript);
+
+    if (!mobileRepeatBug) {
+      if (transcript === 'next' || transcript === ' next') {
+        this.incrementStep();
+        res.results = {};
+      }
+
+      if (transcript === 'back' || transcript === ' back') {
+        this.decrementStep();
+        res.results = {};
+      }
+    }
+    setTimeout(() => {
+      if (!recognizing) {
+        recognition.start();
+        recognizing = true;
+      }
+    }, 350);
+  }
+
+  setTimeout(() => {
+    if (!recognizing) {
+      recognition.start();
+      recognizing = true;
+    }
+  }, 200);
+}
+
+function cleartxt(e) {
+  var t = e.replace(/[.,!?;":\(\)]/g, " "),
+    t = t.replace(/\s{2,}/g, " "),
+    t = t.trim();
+  return t
+}
+
+function diffme(ayat = 0) {
+  let tr = cleartxt(txtrecogn);
+  e = tr.split(" ");
+
+  let o = cleartxt(normDiacritic(surah_data[ayat - 1]['text_ayah']));
+  t = o.split(" ");
+
+  var a = document.getElementById("voiceresponse"),
+    r, i,
+    idskip = [],
+    c = "",
+    s = e.length,
+    d = t.length,
+    u = 0,
+    l = 0,
+    g = !1;
+  for (r = 0; d > r; r++) {
+    g = !1;
+    for (i = 0; s > i; i++) {
+      if (e[i] !== undefined) {
+        // remove double
+        newe = "";
+        for (w = 0; t[r].length > w; w++) {
+          if (e[i][w] != undefined) {
+            if (e[i][w].toLowerCase() == t[r][w].toLowerCase()) {
+              newe += t[r][w].toLowerCase();
+            } else {
+              e[i] = e[i].substr(0, w - 1) + e[i].substr(w, e[i].length - 1);
+              w--;
+            }
+          }
+        }
+
+        if (newe.toLowerCase() == t[r].toLowerCase()) {
+          g = !0;
+          l++;
+          break;
+        }
+      }
+    }
+    if (e[r] !== undefined) {
+      if (g) {
+        c += '<span style="color:var(--color-title-text);">' + t[r] + '</span> ';
+      } else {
+        c += '<span style="color:#f1a;">' + e[s - 1] + '</span> ';
+      }
+    }
+  }
+
+  let prosen = Math.round(100 * l / d);
+  if (prosen == 100) {
+    StopSpeech();
+    ayat = parseInt(ayat) + 1;
+    if (ayat <= surah_data.length) {
+      setTimeout(() => {
+        GetSpeech(ayat);
+        gotoayah(ayat, true);
+      }, 2000);
+    }
+  }
+
+  // a.innerHTML = o + "<br><br>" + c + "<br><br>Percent of recognized words - " + prosen + "%"
+  a.innerHTML = c.replaceAll('<span style="color:#f1a;"></span>', '').trim() == '' ? '... .... ... .... ...' : c;
+}
+
+
+// ======================================================
+window.onload = function () {
+  recognition = new SpeechRecognition();
 }
