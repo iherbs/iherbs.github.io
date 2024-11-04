@@ -1367,7 +1367,7 @@ function normDiacritic(text = "") {
 };
 
 function ssrecog() {
-  if (recognizing) {
+  if (recognizing || _("#btnvcmd").innerHTML == '<div class="lds-ripple"></div>') {
     StopSpeech();
     _("#voiceresponse").innerHTML = '|';
     _("#btnvcmd").innerHTML = '<div class="voice-button-recog"></div>';
@@ -1390,6 +1390,13 @@ function vcplaynext() {
   if (notrack <= surah_data.length) {
     gotoayah(notrack, true);
     GetSpeech(notrack);
+  }
+}
+
+function StartSpeech() {
+  if (!recognizing) {
+    recognition.start();
+    recognizing = true;
   }
 }
 
@@ -1467,22 +1474,18 @@ const GetSpeech = (ayat = 0) => {
         this.decrementStep();
         res.results = {};
       }
+      setTimeout(() => {
+        StartSpeech();
+      }, 450);
     }
-    setTimeout(() => {
-      if (!recognizing) {
-        recognition.start();
-        recognizing = true;
-      }
-    }, 350);
   }
 
   setTimeout(() => {
-    if (!recognizing) {
-      recognition.start();
-      recognizing = true;
-    }
+    StartSpeech();
   }, 200);
 }
+
+
 
 function cleartxt(e) {
   var t = e.replace(/[.,!?;":\(\)]/g, " "),
