@@ -615,6 +615,7 @@ async function showtafsir(id = 0) {
 function nextsurah() {
   closeTrack();
   closeOptions();
+  closeRecog();
   surah = parseInt(surah) + parseInt(1);
   if (surah > 114) {
     surah = 1;
@@ -625,6 +626,7 @@ function nextsurah() {
 function prevsurah() {
   closeTrack();
   closeOptions();
+  closeRecog();
   surah = parseInt(surah) - parseInt(1);
   if (surah < 1) {
     surah = 114;
@@ -722,6 +724,10 @@ function closeOptions() {
 function closeRecog() {
   _("#voiceresponse").innerHTML = "";
   _("#recognizer").style.display = "none";
+
+  trackmode = 'A';
+  txtrecogn = "";
+  _(".onceauto")[0].checked = true;
   StopSpeech();
   closeTrack();
 }
@@ -1346,7 +1352,7 @@ if (pg.substring(0, 3) == "#qs") {
 
 // speech to text ======================================
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition, recognizing = false, txtrecogn = "";
+let recognition, recognizing = false, txtrecogn = "", recogprosen = 0;
 
 function normDiacritic(text = "") {
   let harakat = ["\u0650", "\u0652", "\u0651", "\u064E", "\u0670", "\u064F", "\u06D9", "\u06D7", "\u08D6", "\u06D5", "\u06E4", "\u06DA", "\u06DB", "\u064B", "\u200D", "\u0653", "\u06DE", "\u06D6", "\u06E9", "\u0656", "\u0657", "\u064C", "\u06D8", "\u064D"];
@@ -1369,7 +1375,7 @@ function normDiacritic(text = "") {
 function ssrecog() {
   if (recognizing || _("#btnvcmd").innerHTML == '<div class="lds-ripple"></div>') {
     StopSpeech();
-    _("#voiceresponse").innerHTML = '|';
+    _("#voiceresponse").innerHTML = '<span style="color:var(--color-title-text);">✦</span>';
     _("#btnvcmd").innerHTML = '<div class="voice-button-recog"></div>';
   } else {
     let ayn = parseInt(_("#recayah").innerHTML);
@@ -1395,7 +1401,13 @@ function vcplaynext() {
 
 function StartSpeech() {
   if (!recognizing) {
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (err) {
+      setTimeout(() => {
+        recognition.start();
+      }, 1000);
+    }
     recognizing = true;
   }
 }
@@ -1414,7 +1426,7 @@ const GetSpeech = (ayat = 0) => {
 
   _("#recognizer").style.display = "block";
   _("#recayah").innerHTML = ayat;
-  _("#voiceresponse").innerHTML = "... .... ... .... ...";
+  _("#voiceresponse").innerHTML = '<div class="dotwave"></div>';
 
   txtrecogn = "";
   let final_transcript = "";
@@ -1434,9 +1446,18 @@ const GetSpeech = (ayat = 0) => {
   }
   recognition.onspeechend = () => {
     console.log("stopped listening");
+
     _("#btnvcmd").innerHTML = '<div class="voice-button-recog"></div>';
-    recognition.stop();
-    recognizing = false;
+    StopSpeech();
+
+
+    setTimeout(() => {
+      if (recogprosen == 100) {
+        StopSpeech();
+      } else {
+        StartSpeech();
+      }
+    }, 450);
   }
   recognition.onresult = (res) => {
     for (var t = "",
@@ -1474,10 +1495,10 @@ const GetSpeech = (ayat = 0) => {
         this.decrementStep();
         res.results = {};
       }
-      setTimeout(() => {
-        StartSpeech();
-      }, 450);
     }
+    setTimeout(() => {
+      StartSpeech();
+    }, 450);
   }
 
   setTimeout(() => {
@@ -1543,8 +1564,8 @@ function diffme(ayat = 0) {
     }
   }
 
-  let prosen = Math.round(100 * l / d);
-  if (prosen == 100) {
+  recogprosen = Math.round(100 * l / d);
+  if (recogprosen == 100) {
     StopSpeech();
     ayat = parseInt(ayat) + 1;
     if (ayat <= surah_data.length) {
@@ -1556,7 +1577,7 @@ function diffme(ayat = 0) {
   }
 
   // a.innerHTML = o + "<br><br>" + c + "<br><br>Percent of recognized words - " + prosen + "%"
-  a.innerHTML = c.replaceAll('<span style="color:#f1a;"></span>', '').trim() == '' ? '... .... ... .... ...' : c;
+  a.innerHTML = c.replaceAll('<span style="color:#f1a;"></span>', '').trim() == '' ? '<div class="dotwave"></div>' : c;
 }
 
 
