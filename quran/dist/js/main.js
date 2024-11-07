@@ -726,7 +726,6 @@ function closeRecog() {
   _("#recognizer").style.display = "none";
 
   txtrecogn = "";
-  _(".onceauto")[0].checked = true;
   StopSpeech();
   closeTrack();
 }
