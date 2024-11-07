@@ -1240,6 +1240,7 @@ window.onhashchange = function () {
   // history.replaceState(null, null, ' '); // remove hash
   closeTrack();
   closeOptions();
+  closeRecog();
   imagemaker_hide();
   let pg = window.location.hash;
   if (pg == "") {
