@@ -725,7 +725,6 @@ function closeRecog() {
   _("#voiceresponse").innerHTML = "";
   _("#recognizer").style.display = "none";
 
-  trackmode = 'A';
   txtrecogn = "";
   _(".onceauto")[0].checked = true;
   StopSpeech();
