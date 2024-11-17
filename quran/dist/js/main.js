@@ -1,5 +1,5 @@
 var xmlhttp,
-  surah = 0, markno = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false;
+  surah = 0, markno = "", viewbuku = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false;
 url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
 let surah_list = {}, surah_data = [], doa_data = [], asma = [];
 function _(id) {
@@ -13,6 +13,8 @@ function _(id) {
     }
   } else if (id.substr(0, 1) == ".") {
     el = document.querySelectorAll(id);
+  } else if (id.substr(0, 1) == "@") {
+    el = document.getElementsByName(id.substr(1, id.length));
   }
 
   if (ismodal) {
@@ -293,7 +295,9 @@ async function carikata(qry = "") {
 
 async function getsurah(surat = 1, nayah = "") {
   surah = surat;
-  window.location.hash = "#surah";
+  if (nayah != "-") {
+    window.location.hash = "#surah";
+  }
   let srh = surah_list[surah];
   _("#home").style.display = "none";
   _("#surah").style.display = "block";
@@ -310,7 +314,9 @@ async function getsurah(surat = 1, nayah = "") {
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
+  let viewmode = localStorage.getItem("viewmode");
 
+  viewbuku = '<span id="rn0" style="scroll-margin:40px;"></span>';
   ayah += '<div id="track0" style="display:none;">https://github.com/iherbs/quran-json/raw/main/Audio/001/001.mp3</div>';
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
@@ -334,6 +340,8 @@ async function getsurah(surat = 1, nayah = "") {
         </tr>`;
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
+
+    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
   }
   _("#gotoayah").innerHTML = gotono;
 
@@ -358,17 +366,35 @@ async function getsurah(surat = 1, nayah = "") {
             <div class="arabic">${srh["text"]}<div>
         </td>
     </tr>
-</table>
+    </table>
 
-<table class="surah">${bismillah + ayah}</table>`;
+    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;text-align:${surat == 1 ? "center" : "justify"};font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;padding-left:20px;padding-right:20px;">${viewbuku}</div>
+    <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};">${bismillah + ayah}</table>`;
   window.scrollTo({ top: 0 });
-  if (nayah != "") {
+  if (nayah != "" && nayah != "-") {
     gotoayah(nayah);
   }
 }
 
-async function getayah(surat = 1, nayah = 1) {
-  window.location.hash = "#qs" + surat + "." + nayah;
+function viewmode() {
+  let vwmd = localStorage.getItem("viewmode");
+  if (vwmd == "line") {
+    if (surah != 0) {
+      _("#rawsurah").style.display = "block";
+      _("#datasurah").style.display = "none";
+    }
+    localStorage.setItem("viewmode", "book");
+  } else {
+    if (surah != 0) {
+      _("#datasurah").style.display = "block";
+      _("#rawsurah").style.display = "none";
+    }
+    localStorage.setItem("viewmode", "line");
+  }
+}
+
+async function getayah(surat = 1, nayah = 0) {
+  // window.location.hash = "#qs" + surat + "." + nayah;
   _("#home").style.display = "none";
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
@@ -385,12 +411,15 @@ async function getayah(surat = 1, nayah = 1) {
   surah_list = JSON.parse(resl);
   let srh = surah_list[surat];
 
-  let re = await get(url + "Surah/" + surat + ".json");
-  re = JSON.parse(re);
-  surah_data = re;
-  // console.log(re);
+  if (nayah == 0) {
+    getsurah(surat, '-');
+  } else {
+    let re = await get(url + "Surah/" + surat + ".json");
+    re = JSON.parse(re);
+    surah_data = re;
+    // console.log(re);
 
-  let ayah = `<tr id="n${re[nayah - 1]["no_ayah"]}" style="background:var(--color-content);">
+    let ayah = `<tr id="n${re[nayah - 1]["no_ayah"]}" style="background:var(--color-content);">
               <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
                   <div class="star8" data-label="${re[nayah - 1]["no_ayah"]}" onclick="showtafsir(${re[nayah - 1]["id"]})" style="cursor:pointer;"></div>
                   <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
@@ -403,22 +432,23 @@ async function getayah(surat = 1, nayah = 1) {
               </td>
           </tr>`;
 
-  _("#surah").innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
-      <tr>
-          <td style="vertical-align:middle;text-align:center;font-size:24px;">
-              <i class="fa-solid fa-house"></i>
-          </td>
-          <td style="padding:10px;">
-              <span class="nmayah">${srh["id"]})&nbsp;${srh["name"]}</span>
-              <small class="arti">(${srh["text_id"]})</small>
-              <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
-          </td>
-          <td style="vertical-align:middle;text-align:right;font-size:24px;padding:10px;">
-              <div class="arabic">${srh["text"]}<div></td>
-      </tr>
-  </table>
+    _("#surah").innerHTML = `<table style="width:100%;padding-bottom:10px;margin-top:10px;border-bottom:2px solid #8d6e63;">
+        <tr>
+            <td style="vertical-align:middle;text-align:center;font-size:24px;">
+                <i class="fa-solid fa-house"></i>
+            </td>
+            <td style="padding:10px;">
+                <span class="nmayah">${srh["id"]})&nbsp;${srh["name"]}</span>
+                <small class="arti">(${srh["text_id"]})</small>
+                <span class="type">${srh["type_id"] + ", " + srh["count"] + " Ayat"}</span>
+            </td>
+            <td style="vertical-align:middle;text-align:right;font-size:24px;padding:10px;">
+                <div class="arabic">${srh["text"]}<div></td>
+        </tr>
+    </table>
 
-  <table class="surah">${ayah}</table>`;
+    <table class="surah">${ayah}</table>`;
+  }
   window.scrollTo({ top: 0 });
 }
 
@@ -584,9 +614,19 @@ async function getjuz() {
 function gotoayah(i = 1, smoth = false) {
   _("#modalgotoayah").modal("hide");
   if (smoth) {
-    _("#n" + i).scrollIntoView({ behavior: "smooth" });
+    if (_("#rawsurah").style.display == "none") {
+      _("#n" + i).scrollIntoView({ behavior: "smooth" });
+    } else {
+      i = i - 1;
+      _("#rn" + i).scrollIntoView({ behavior: "smooth" });
+    }
   } else {
-    _("#n" + i).scrollIntoView();
+    if (_("#rawsurah").style.display == "none") {
+      _("#n" + i).scrollIntoView();
+    } else {
+      i = i - 1;
+      _("#rn" + i).scrollIntoView();
+    }
   }
 }
 
@@ -727,6 +767,9 @@ function closeRecog() {
 
   txtrecogn = "";
   StopSpeech();
+  setTimeout(() => {
+    StopSpeech();
+  }, 1500);
   closeTrack();
 }
 
@@ -1247,6 +1290,7 @@ window.onhashchange = function () {
     history.replaceState(null, null, " ");
     surah = 0;
     markno = "";
+    viewbuku = "";
     surah_data = [];
     _("#home").style.display = "block";
     _("#surah").style.display = "none";
@@ -1301,6 +1345,10 @@ if (localStorage.getItem("bookmark") == null) {
 if (localStorage.getItem("zoomlevel") == null) {
   localStorage.setItem("zoomlevel", 100);
 }
+if (localStorage.getItem("viewmode") == null) {
+  localStorage.setItem("viewmode", "line");
+}
+
 
 let theme = localStorage.getItem("theme");
 if (theme == "auto") {
@@ -1335,6 +1383,11 @@ if (localStorage.getItem("translate") == "true") {
 if (localStorage.getItem("tajweed") == "true") {
   _("#btntajweed").checked = true;
 }
+if (localStorage.getItem("viewmode") == "book") {
+  _("@viewmode")[1].checked = true;
+} else {
+  _("@viewmode")[0].checked = true;
+}
 
 let pg = window.location.hash;
 if (pg.substring(0, 3) == "#qs") {
@@ -1347,6 +1400,11 @@ if (pg.substring(0, 3) == "#qs") {
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
+}
+
+const arabicNumbers = (num) => {
+  const arabic_numbers = '\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669';
+  return new String(num).replace(/[0123456789]/g, (d) => { return arabic_numbers[d] });
 }
 
 // speech to text ======================================
@@ -1404,6 +1462,7 @@ function StartSpeech() {
       recognition.start();
     } catch (err) {
       setTimeout(() => {
+        console.log("recognizing ", recognizing);
         recognition.start();
       }, 1000);
     }
@@ -1419,7 +1478,7 @@ function StopSpeech() {
 const GetSpeech = (ayat = 0) => {
   closeOptions();
   trackmode = '1';
-  _(".onceauto")[2].checked = true;
+  _("@onceauto")[2].checked = true;
 
   audioPlay(ayat, true);
 
@@ -1518,65 +1577,70 @@ function diffme(ayat = 0) {
   let tr = cleartxt(txtrecogn);
   e = tr.split(" ");
 
-  let o = cleartxt(normDiacritic(surah_data[ayat - 1]['text_ayah']));
-  t = o.split(" ");
+  if (surah_data[ayat - 1]['text_ayah'] != undefined) {
+    let o = cleartxt(normDiacritic(surah_data[ayat - 1]['text_ayah']));
+    t = o.split(" ");
 
-  var a = document.getElementById("voiceresponse"),
-    r, i,
-    idskip = [],
-    c = "",
-    s = e.length,
-    d = t.length,
-    u = 0,
-    l = 0,
-    g = !1;
-  for (r = 0; d > r; r++) {
-    g = !1;
-    for (i = 0; s > i; i++) {
-      if (e[i] !== undefined) {
-        // remove double
-        newe = "";
-        for (w = 0; t[r].length > w; w++) {
-          if (e[i][w] != undefined) {
-            if (e[i][w].toLowerCase() == t[r][w].toLowerCase()) {
-              newe += t[r][w].toLowerCase();
-            } else {
-              e[i] = e[i].substr(0, w - 1) + e[i].substr(w, e[i].length - 1);
-              w--;
+    var a = document.getElementById("voiceresponse"),
+      r, i,
+      idskip = [],
+      c = "",
+      s = e.length,
+      d = t.length,
+      u = 0,
+      l = 0,
+      g = !1;
+    for (r = 0; d > r; r++) {
+      g = !1;
+      for (i = 0; s > i; i++) {
+        if (e[i] !== undefined) {
+          // remove double
+          newe = "";
+          for (w = 0; t[r].length > w; w++) {
+            if (e[i][w] != undefined) {
+              if (e[i][w].toLowerCase() == t[r][w].toLowerCase()) {
+                newe += t[r][w].toLowerCase();
+              } else {
+                e[i] = e[i].substr(0, w - 1) + e[i].substr(w, e[i].length - 1);
+                w--;
+              }
             }
           }
-        }
 
-        if (newe.toLowerCase() == t[r].toLowerCase()) {
-          g = !0;
-          l++;
-          break;
+          if (newe.toLowerCase() == t[r].toLowerCase()) {
+            g = !0;
+            l++;
+            break;
+          }
+        }
+      }
+      if (e[r] !== undefined) {
+        if (g) {
+          c += '<span style="color:var(--color-title-text);">' + t[r] + '</span> ';
+        } else {
+          c += '<span style="color:#f1a;">' + e[s - 1] + '</span> ';
         }
       }
     }
-    if (e[r] !== undefined) {
-      if (g) {
-        c += '<span style="color:var(--color-title-text);">' + t[r] + '</span> ';
-      } else {
-        c += '<span style="color:#f1a;">' + e[s - 1] + '</span> ';
+
+    recogprosen = Math.round(100 * l / d);
+    if (recogprosen == 100) {
+      StopSpeech();
+      ayat = parseInt(ayat) + 1;
+      if (ayat <= surah_data.length) {
+        setTimeout(() => {
+          recogprosen = 0;
+          GetSpeech(ayat);
+          gotoayah(ayat, true);
+        }, 2000);
       }
     }
-  }
 
-  recogprosen = Math.round(100 * l / d);
-  if (recogprosen == 100) {
+    // a.innerHTML = o + "<br><br>" + c + "<br><br>Percent of recognized words - " + prosen + "%"
+    a.innerHTML = c.replaceAll('<span style="color:#f1a;"></span>', '').trim() == '' ? '<div class="dotwave"></div>' : c;
+  } else {
     StopSpeech();
-    ayat = parseInt(ayat) + 1;
-    if (ayat <= surah_data.length) {
-      setTimeout(() => {
-        GetSpeech(ayat);
-        gotoayah(ayat, true);
-      }, 2000);
-    }
   }
-
-  // a.innerHTML = o + "<br><br>" + c + "<br><br>Percent of recognized words - " + prosen + "%"
-  a.innerHTML = c.replaceAll('<span style="color:#f1a;"></span>', '').trim() == '' ? '<div class="dotwave"></div>' : c;
 }
 
 
