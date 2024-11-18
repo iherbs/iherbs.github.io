@@ -336,7 +336,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
+    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="addmdlBookmark(' + mark + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
   }
   _("#gotoayah").innerHTML = gotono;
 
@@ -363,7 +363,7 @@ async function getsurah(surat = 1, nayah = "") {
     </tr>
     </table>
 
-    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;text-align:${surat == 1 ? "center" : "justify"};font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;padding-left:20px;padding-right:20px;">${viewbuku}</div>
+    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;text-align:${surat == 1 ? "center" : "justify"};font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
     <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};">${bismillah + ayah}</table>`;
   window.scrollTo({ top: 0 });
   if (nayah != "" && nayah != "-") {
@@ -371,20 +371,22 @@ async function getsurah(surat = 1, nayah = "") {
   }
 }
 
-function viewmode() {
-  let vwmd = localStorage.getItem("viewmode");
+function viewmode(vwmd = "") {
+  if (vwmd == "") {
+    vwmd = localStorage.getItem("viewmode");
+  }
   if (vwmd == "line") {
-    if (surah != 0) {
-      _("#rawsurah").style.display = "block";
-      _("#datasurah").style.display = "none";
-    }
-    localStorage.setItem("viewmode", "book");
-  } else {
     if (surah != 0) {
       _("#datasurah").style.display = "block";
       _("#rawsurah").style.display = "none";
     }
     localStorage.setItem("viewmode", "line");
+  } else {
+    if (surah != 0) {
+      _("#rawsurah").style.display = "block";
+      _("#datasurah").style.display = "none";
+    }
+    localStorage.setItem("viewmode", "book");
   }
 }
 
@@ -1469,7 +1471,6 @@ function StartSpeech() {
       recognition.start();
     } catch (err) {
       setTimeout(() => {
-        console.log("recognizing ", recognizing);
         recognition.start();
       }, 1000);
     }
