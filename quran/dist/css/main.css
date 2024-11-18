@@ -421,9 +421,9 @@ a {
   content: '';
   position: absolute;
   left: 45%;
-  top: 7px;
+  top: 6px;
   width: 20px;
-  height: 20px;
+  height: 21px;
   border-radius: 3px;
   border: 2px solid var(--color-title-text);
 }
@@ -432,7 +432,7 @@ a {
   content: '';
   position: absolute;
   left: 45%;
-  top: 12px;
+  top: 11px;
   width: 10px;
   margin-left: 5px;
   border-radius: 5px;

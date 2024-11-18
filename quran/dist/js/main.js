@@ -108,11 +108,6 @@ async function get(file = "") {
 function openNav(m = '') {
   _("#sidenavoverlay").style.display = "block";
   document.getElementById("mySidenav").style.width = "250px";
-  if (m != '') {
-    _("#navjuzamma").style.display = "none";
-  } else {
-    _("#navjuzamma").style.display = "block";
-  }
 }
 
 function closeNav() {
@@ -593,9 +588,21 @@ function imagemaker_hide() {
 }
 
 function getjuzamma() {
-  _("#cari").value = "Juz Amma";
-  _("#cari").dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13 }));
   closeNav();
+  _("#modalwidget").modal("show");
+  _("#widgetcontent").innerHTML = '<div class="loader"></div>';;
+  let re = surah_list;
+
+  _("#widgetcontent").innerHTML = `<span class="widgettittle">JUZ AMMA</span>`;
+  for (i in re) {
+    if (parseInt(re[i]["id"]) == 1 || parseInt(re[i]["id"]) >= 78) {
+      _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="getsurah(${re[i]["id"]});_('#modalwidget').modal('hide');">
+      <b>${re[i]["id"] + '. ' + re[i]["name"]}</b>
+      <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
+      <br>${re[i]["text_id"]}
+      </div>`;
+    }
+  }
 }
 
 async function getjuz() {

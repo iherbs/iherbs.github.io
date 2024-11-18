@@ -40,7 +40,7 @@
                 <div style="display:inline-block;">
                     <span id="tohome" onclick="history.back()" class="icon-home"
                         style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>
-                    <span id="tsurah" onclick="openNav('m')" style="cursor:pointer;"></span>
+                    <span id="tsurah" onclick="openNav()" style="cursor:pointer;"></span>
                     <span id="toayah" onclick="_('#modalgotoayah').modal('show')" class="icon-turn-down"
                         style="position:relative;top:2px;margin-left:5px;cursor:pointer;"></span>
                 </div>
@@ -103,12 +103,14 @@
                         style="display:flex;width:100%;border:2px solid var(--color-title-text);background:var(--color-content);border-radius:10px;">
                         <label class="markoa">
                             <input type="radio" name="viewmode" class="onceauto" checked="checked">
-                            <span id="vmline" class="checklbl" style="position:relative;padding:2px 8px 3px 32px;"
+                            <span id="vmline" class="checklbl"
+                                style="position:relative;padding:2px 8px 3px 32px;border-top-left-radius: 5px;border-bottom-left-radius: 5px;"
                                 onclick="viewmode()">&nbsp;</span>
                         </label>
                         <label class="markoa">
                             <input type="radio" name="viewmode" class="onceauto">
-                            <span id="vmbook" class="checklbl" style="position:relative;padding:2px 8px 3px 32px;"
+                            <span id="vmbook" class="checklbl"
+                                style="position:relative;padding:2px 8px 3px 32px;border-top-right-radius: 5px;border-bottom-right-radius: 5px;"
                                 onclick="viewmode()">&nbsp;</span>
                         </label>
                     </div>
