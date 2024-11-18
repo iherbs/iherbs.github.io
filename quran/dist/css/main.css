@@ -34,6 +34,10 @@
   --color-shadow-rgb: 0, 0, 0;
 }
 
+/* ::-webkit-scrollbar {
+  width: 0px;
+} */
+
 @font-face {
   font-family: "Arabic";
   font-style: "normal";

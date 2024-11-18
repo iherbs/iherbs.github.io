@@ -336,7 +336,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="addmdlBookmark(' + mark + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
+    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="addmdlBookmark(\'' + mark + '\')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
   }
   _("#gotoayah").innerHTML = gotono;
 
