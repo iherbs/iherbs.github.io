@@ -105,7 +105,7 @@ async function get(file = "") {
 
 //==============================================================================
 
-function openNav(m = '') {
+function openNav() {
   _("#sidenavoverlay").style.display = "block";
   document.getElementById("mySidenav").style.width = "250px";
 }
