@@ -320,9 +320,11 @@ async function getsurah(surat = 1, nayah = "") {
     ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
             <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
-                <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')" style="position:absolute;right:22px;margin-top:-15px;"></div>
-                <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
-                <label class="btnvoice voice-button" id="bvoice${re[i]["no_ayah"]}" onclick="GetSpeech('${re[i]["no_ayah"]}')"></label>
+                <div id="actmore${re[i]["no_ayah"]}">
+                  <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')"></div>
+                  <label class="btnaudio play-button" id="bplps${re[i]["no_ayah"]}" onclick="audioPlay('${re[i]["no_ayah"]}')"></label>
+                  <label class="btnvoice voice-button" id="bvoice${re[i]["no_ayah"]}" onclick="GetSpeech('${re[i]["no_ayah"]}')"></label>
+                </div>
                 <div onclick="moreOption(${surah},${re[i]["no_ayah"]})">
                   <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                   <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
@@ -336,7 +338,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += re[i]["text_ayah"] + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="addmdlBookmark(\'' + mark + '\')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
+    viewbuku += parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
   }
   _("#gotoayah").innerHTML = gotono;
 
@@ -729,11 +731,15 @@ function zoompage(num = 0) {
 
 let touchtime = 0;
 function moreOption(surat = 1, ayat = 1) {
+  let vwmd = localStorage.getItem("viewmode");
   if (_("#recognizer").style.display != "block") {
-    if (touchtime == 0) {
+    if (touchtime == 0 && vwmd == "line") {
       touchtime = new Date().getTime();
     } else {
-      if (((new Date().getTime()) - touchtime) < 800) {
+      if (((new Date().getTime()) - touchtime) < 800 || vwmd == "book") {
+        if (vwmd == "book") {
+          _("#btnmore").innerHTML = _("#actmore" + surat).innerHTML;
+        }
         touchtime = 0;
         let surah_text = "";
         let sayah = "";
@@ -768,6 +774,7 @@ function moreOption(surat = 1, ayat = 1) {
 function closeOptions() {
   _("#state").innerHTML = "";
   _("#previewsurah").innerHTML = "";
+  _("#btnmore").innerHTML = "";
   _("#options").style.display = "none";
 }
 function closeRecog() {
@@ -1153,7 +1160,7 @@ function dataBookmark() {
   for (g in book) {
     listbook += `<div style="margin-bottom:15px;">
             <div class="listbooktitle">
-                <div class="bookmark" style="display:inline-block;position:relative;width:16px;"></div>
+                <div class="bookmark" style="display:inline-block;position:relative;width:16px;right:auto;margin-top:auto;"></div>
                 <span class="nmayah" style="position:relative;display:inline-block;top:-6px;cursor:pointer;" onclick="renameBookmark(${g})">${book[g]}</span>
                 <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]}')">&times;</div>
             </div>`;
@@ -1392,10 +1399,10 @@ if (localStorage.getItem("translate") == "true") {
 if (localStorage.getItem("tajweed") == "true") {
   _("#btntajweed").checked = true;
 }
-if (localStorage.getItem("viewmode") == "book") {
-  _("@viewmode")[1].checked = true;
-} else {
+if (localStorage.getItem("viewmode") == "line") {
   _("@viewmode")[0].checked = true;
+} else {
+  _("@viewmode")[1].checked = true;
 }
 
 let pg = window.location.hash;
