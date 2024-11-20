@@ -338,7 +338,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span> ';
+    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:7px;padding-right:7px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span>';
   }
   _("#gotoayah").innerHTML = gotono;
 
@@ -374,6 +374,7 @@ async function getsurah(surat = 1, nayah = "") {
 }
 
 function viewmode(vwmd = "") {
+  closeOptions();
   if (vwmd == "") {
     vwmd = localStorage.getItem("viewmode");
   }
@@ -737,9 +738,6 @@ function moreOption(surat = 1, ayat = 1) {
       touchtime = new Date().getTime();
     } else {
       if (((new Date().getTime()) - touchtime) < 800 || vwmd == "book") {
-        if (vwmd == "book") {
-          _("#btnmore").innerHTML = _("#actmore" + surat).innerHTML;
-        }
         touchtime = 0;
         let surah_text = "";
         let sayah = "";
@@ -755,6 +753,9 @@ function moreOption(surat = 1, ayat = 1) {
           sayah = asma[surat]['text_ayah'];
           surah_text = asma[surat]['text_id'];
         } else {
+          if (vwmd == "book") {
+            _("#btnmore").innerHTML = _("#actmore" + ayat).innerHTML;
+          }
           _("#btncopylink").style.display = "table-row";
           sayah = surah_data[ayat - 1]["text_ayah"];
           surah_text = surah_data[ayat - 1]["text_id"].replace(/<(.|\n)*?>*<(.|\n)*?>/g, '');
@@ -858,10 +859,16 @@ function setslider() {
 let timrsc = setTimeout(() => { }, 100);
 let timrpl = setTimeout(() => { }, 100);
 function audioPlay(id = "", recog = false) {
+  closeOptions();
   let sound = _("#track" + id).innerHTML;
   // track.setAttribute("controls", "true");
   _("#player").style.display = "block";
   _("#notrack").innerHTML = id;
+
+  _(".vwbkayah").forEach((el) => {
+    el.style.background = "none";
+  });
+  _("#rnayah" + id).style.background = "rgb(var(--color-shadow-rgb-ayah))";
 
   for (m in _(".tracks")) {
     if (!isNaN(m)) {
@@ -1020,6 +1027,9 @@ function closeTrack() {
       _(".btnaudio")[m].classList.add("play-button");
     }
   }
+  _(".vwbkayah").forEach((el) => {
+    el.style.background = "none";
+  });
 }
 
 const fmtTime = s => {
@@ -1052,6 +1062,7 @@ function bataladdBookmark() {
 }
 
 function addmdlBookmark(mark = "") {
+  closeOptions();
   markno = mark;
   _("#ttladdbook").innerHTML = "Bookmark";
   _("#grupbookmark").value = "";
