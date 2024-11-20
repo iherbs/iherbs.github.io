@@ -846,6 +846,10 @@ a {
   margin-left: 5px;
 }
 
+#rawsurah .smark {
+  float: none;
+}
+
 .surah {
   width: 100%;
   border-spacing: 0px;
