@@ -500,7 +500,7 @@ async function gettasbih() {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
 
-  let reas = await get("zikir.json");
+  let reas = await get(url + "zikir.json");
   let re = JSON.parse(reas);
   tasbih["sum"] = 0;
   tasbih["counter"] = 0;
