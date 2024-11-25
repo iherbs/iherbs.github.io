@@ -1,6 +1,7 @@
 var xmlhttp,
-  surah = 0, markno = "", viewbuku = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false;
-url = "https://raw.githubusercontent.com/iherbs/quran-json/main/";
+  surah = 0, markno = "", viewbuku = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false,
+  url = "https://raw.githubusercontent.com/iherbs/quran-json/main/",
+  tasbih = { sum: 0, counter: 0, target: 0, ayah: "", zikirnum: "n", history: {} };
 let surah_list = {}, surah_data = [], doa_data = [], asma = [];
 function _(id) {
   let el = {}, ismodal = false;
@@ -338,7 +339,7 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:7px;padding-right:7px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span>';
+    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:11px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ';
   }
   _("#gotoayah").innerHTML = gotono;
 
@@ -365,7 +366,7 @@ async function getsurah(surat = 1, nayah = "") {
     </tr>
     </table>
 
-    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;text-align:${surat == 1 ? "center" : "justify"};font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
+    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;text-align:${surat == 1 ? "center" : "justify"};text-align-last:center;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
     <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};">${bismillah + ayah}</table>`;
   window.scrollTo({ top: 0 });
   if (nayah != "" && nayah != "-") {
@@ -485,6 +486,184 @@ async function getasmaulhusna() {
   }
   list += `</table>`;
   _("#surah").innerHTML = list;
+}
+
+async function gettasbih() {
+  closeNav();
+  if (window.location.hash == '') {
+    window.location.hash = "#tasbih";
+  } else {
+    window.location.replace("#tasbih");
+  }
+  _("#wrapmenu").style.display = "none";
+  _("#home").style.display = "none";
+  _("#surah").style.display = "block";
+  _("#surah").innerHTML = `<div class="loader"></div>`;
+
+  let reas = await get("zikir.json");
+  let re = JSON.parse(reas);
+  tasbih["sum"] = 0;
+  tasbih["counter"] = 0;
+  tasbih["target"] = 0;
+  tasbih["ayah"] = "";
+  tasbih["zikirnum"] = "n";
+  tasbih["history"]["n"] = { sum: 0, counter: 0, target: 0, ayah: "" };
+
+  let zikirlist = `<span class="widgettittle">Zikir</span><hr/>`;
+  for (i in re) {
+    tasbih["history"][i] = { sum: 0, counter: 0, target: re[i]["amount"], ayah: "" };
+    zikirlist += `<div id="zikirayah${i}" class="listayah" style="border:none;text-align:left;margin-bottom:10px;" onclick="zikirsetayah(${i});">
+        <div class="arabic" style="width:100%;text-align:right;font-size:20px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">${re[i]["arab"]}</div>
+        <span class="artr" style="display:block;font-size:14px;"><i>${re[i]["transliteration"]}</i></span>
+        <span class="arid" style="display:block;font-size:14px;">${re[i]["indonesia"]}</span>
+        <textarea id="zikirdata${i}" style="display:none;">${JSON.stringify(re[i])}</textarea>
+      </div><hr/>`;
+  }
+  zikirlist += `<div id="zikirayah${i}" class="listayah" style="border:none;text-align:left;margin-top:10px;margin-bottom:10px;" onclick="zikirsetayah('n');">
+      <span class="arid" style="text-align:center;display:block;font-size:14px;">Zikir Sendiri</span>
+    </div><hr/>`;
+  let targetpage = `<span class="widgettittle">Target Zikir</span>
+    Atur target bacaan zikir
+    <div style="margin-bottom:10px;">
+      <button type="button" class="btn btn-theme" style="width:65px;margin-right:10px;" onclick="setnomtargetsikir(33)">33x</button>
+      <button type="button" class="btn btn-theme" style="width:65px;margin-right:10px;" onclick="setnomtargetsikir(100)">100x</button>
+      <button type="button" class="btn btn-theme" style="width:65px;" onclick="setnomtargetsikir(1000)">1000x</button>
+    </div>
+    <input type="text" id="nomtargetzikir" class="form-control" pattern="[0-9]*" inputmode="numeric" placeholder="Target jumlah zikir"/>
+    <button type="button" class="btn btn-theme" style="margin-top:15px;" onclick="setzikirtarget()">Terapkan</button>`;
+
+  _("#widgetcontent").innerHTML = '<div id="wrapzikirtarget">' + targetpage + '</div><div id="wrapzikirlist">' + zikirlist + '</div>';
+
+  if (localStorage.getItem("tasbih") != "") {
+    let gettas = JSON.parse(localStorage.getItem("tasbih"));
+    tasbih["history"] = gettas["history"];
+  }
+
+  let tasbih_counter = tasbih["counter"] == 0 ? "Tap" : tasbih["counter"];
+  let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
+  let cont = `<!-- Tasbih -->
+    <div style="padding: 0px 15px;background:var(--color-content);border-radius:10px;height:100%;">
+      <div class="titleq">Tasbih</div>
+      <div id="menutasbih" style="margin-bottom:10px;height:40px;">
+        <span id="totalzikir" style="color:var(--color-text);"></span>
+        <button type="button" id="resetzikir" onclick="zikirreset()" style="border: none;float:right;cursor:pointer;user-select:none;background:var(--color-title-text);color:#ffffff;padding:5px 12px;border-radius:5px;">Ulangi</button>
+        <button type="button" id="targetzikir" onclick="zikirtarget()" style="border: none;float:right;margin-right:10px;cursor:pointer;user-select:none;background:var(--color-title-text);color:#ffffff;padding:5px 12px;border-radius:5px;">Target</button>
+      </div>
+      <div style="min-height:290px">
+      <div id="pilihzikir" onclick="zikirlist()" style="user-select:none;text-align:center;cursor:pointer;padding:10px;border:1px solid var(--color-text);color:var(--color-text);border-radius:5px;">Pilih Zikir</div>
+      </div>
+      <div id="counterwrap" style="cursor:pointer;left:0px;bottom:30px;width:100%;" onclick="countertasbih()">
+          <div id="countercircle"
+              style="cursor:pointer;user-select:none;position:relative;margin:20px auto;width:300px;height:300px;color:var(--color-content);background:var(--color-title-text);border-radius:50%;text-align:center;font-size:30px;line-height:10;">
+              ${tasbih_counter + tasbih_target}
+          </div>
+      </div>
+    </div>`;
+
+  _("#surah").innerHTML = cont;
+  _(".page")[0].style.marginBottom = "0px";
+  zikirsetayah(tasbih["zikirnum"]);
+}
+
+function zikirtarget() {
+  _("#modalwidget").modal("show");
+  _("#wrapzikirlist").style.display = "none";
+  _("#wrapzikirtarget").style.display = "block";
+}
+
+function setnomtargetsikir(nom = "") {
+  _("#nomtargetzikir").value = nom;
+}
+
+function setzikirtarget() {
+  let target = _("#nomtargetzikir").value;
+  tasbih["target"] = target;
+  tasbih["history"][tasbih["zikirnum"]]["target"] = target;
+
+  let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
+  if (tasbih_target != "") {
+    _("#totalzikir").innerHTML = "Total " + tasbih["sum"];
+  } else {
+    _("#totalzikir").innerHTML = "";
+  }
+  _("#countercircle").innerHTML = tasbih["counter"] + tasbih_target;
+
+  _("#nomtargetzikir").value = "";
+  _("#modalwidget").modal("hide");
+  localStorage.setItem("tasbih", JSON.stringify(tasbih));
+}
+
+function zikirreset() {
+  tasbih["sum"] = 0;
+  tasbih["counter"] = 0;
+
+  tasbih["history"][tasbih["zikirnum"]]["counter"] = 0;
+  tasbih["history"][tasbih["zikirnum"]]["sum"] = 0;
+
+  let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
+  if (tasbih_target != "") {
+    _("#totalzikir").innerHTML = "Total " + tasbih["sum"];
+  } else {
+    _("#totalzikir").innerHTML = "";
+  }
+  _("#countercircle").innerHTML = tasbih["counter"] + tasbih_target;
+  localStorage.setItem("tasbih", JSON.stringify(tasbih));
+}
+
+function zikirlist() {
+  _("#modalwidget").modal("show");
+  _("#wrapzikirlist").style.display = "block";
+  _("#wrapzikirtarget").style.display = "none";
+}
+
+function zikirsetayah(no = "") {
+  tasbih["sum"] = tasbih["history"][no]["sum"];
+  tasbih["counter"] = tasbih["history"][no]["counter"];
+  tasbih["target"] = tasbih["history"][no]["target"];
+  tasbih["zikirnum"] = no;
+
+  if (no != "n") {
+    let zikirdata = JSON.parse(_("#zikirdata" + no).value);
+    tasbih["ayah"] = `<div>
+      <div class="arabic" style="width:100%;font-size:20px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">${zikirdata["arab"]}</div>
+      <span class="artr" style="display:block;font-size:14px;"><i>${zikirdata["transliteration"]}</i></span>
+      <span class="arid" style="display:block;font-size:14px;">${zikirdata["indonesia"]}</span>
+    </div>`;
+    _("#pilihzikir").innerHTML = tasbih["ayah"];
+  }
+
+  let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
+  if (tasbih_target != "") {
+    _("#totalzikir").innerHTML = "Total " + tasbih["sum"];
+  } else {
+    _("#totalzikir").innerHTML = "";
+  }
+  _("#countercircle").innerHTML = tasbih["counter"] + tasbih_target;
+
+  _("#modalwidget").modal("hide");
+}
+
+function countertasbih() {
+  tasbih["counter"] = tasbih["counter"] + 1;
+  let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
+  if (tasbih["counter"] > tasbih["target"] && tasbih["target"] != 0 && tasbih["target"] != 1) {
+    tasbih["counter"] = 1;
+    tasbih["sum"] = tasbih["sum"] + 1;
+  }
+
+  tasbih["history"][tasbih["zikirnum"]]["target"] = tasbih["target"];
+  tasbih["history"][tasbih["zikirnum"]]["counter"] = tasbih["counter"];
+  tasbih["history"][tasbih["zikirnum"]]["sum"] = tasbih["sum"];
+
+
+  if (tasbih_target != "") {
+    _("#totalzikir").innerHTML = "Total " + tasbih["sum"];
+  } else {
+    _("#totalzikir").innerHTML = "";
+  }
+  _("#countercircle").innerHTML = tasbih["counter"] + tasbih_target;
+
+  localStorage.setItem("tasbih", JSON.stringify(tasbih));
 }
 
 async function doaharian() {
@@ -1325,6 +1504,7 @@ window.onhashchange = function () {
     _("#tsurah").innerHTML = "";
     _("#wrapmenu").style.display = "none";
     _("#gotoayah").innerHTML = "";
+    _(".page")[0].removeAttribute("style");
     bataladdBookmark();
 
     document.getElementsByTagName("body")[0].style.overflow = null;
@@ -1347,7 +1527,7 @@ window.onclick = function (event) {
   }
   if (!isAwake) {
     isAwake = true;
-    awakeEnable();
+    //awakeEnable();
   }
 };
 
@@ -1374,6 +1554,9 @@ if (localStorage.getItem("zoomlevel") == null) {
 }
 if (localStorage.getItem("viewmode") == null) {
   localStorage.setItem("viewmode", "line");
+}
+if (localStorage.getItem("tasbih") == null) {
+  localStorage.setItem("tasbih", "");
 }
 
 
@@ -1424,6 +1607,8 @@ if (pg.substring(0, 3) == "#qs") {
   getasmaulhusna();
 } else if (pg == "#doaharian") {
   doaharian();
+} else if (pg == "#tasbih") {
+  gettasbih();
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
