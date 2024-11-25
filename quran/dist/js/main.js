@@ -629,8 +629,10 @@ function zikirsetayah(no = "") {
       <span class="artr" style="display:block;font-size:14px;"><i>${zikirdata["transliteration"]}</i></span>
       <span class="arid" style="display:block;font-size:14px;">${zikirdata["indonesia"]}</span>
     </div>`;
-    _("#pilihzikir").innerHTML = tasbih["ayah"];
+  } else {
+    tasbih["ayah"] = 'Pilih Zikir';
   }
+  _("#pilihzikir").innerHTML = tasbih["ayah"];
 
   let tasbih_target = tasbih["target"] == 0 || tasbih["target"] == 1 ? "" : " / " + tasbih["target"];
   if (tasbih_target != "") {
