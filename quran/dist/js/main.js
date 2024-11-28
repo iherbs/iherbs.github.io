@@ -668,6 +668,67 @@ function countertasbih() {
   localStorage.setItem("tasbih", JSON.stringify(tasbih));
 }
 
+async function getzikir() {
+  closeNav();
+  if (window.location.hash == '') {
+    window.location.hash = "#zikir";
+  } else {
+    window.location.replace("#zikir");
+  }
+  _("#wrapmenu").style.display = "none";
+  _("#home").style.display = "none";
+  _("#surah").style.display = "block";
+  _("#surah").innerHTML = `<div class="loader"></div>`;
+
+  let list = `<div class="titleq">Zikir</div>
+          <div style="padding:15px;">
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('salat')">Zikir Setelah Salat</div>
+          </div>
+          <div style="padding:15px;">
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('pagi')">Zikir Pagi</div>
+          </div>
+          <div style="padding:15px;margin-bottom:20px;">
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('petang')">Zikir Petang</div>
+          </div>`;
+  _("#surah").innerHTML = list;
+}
+
+async function loadzikir(jns = "") {
+  closeNav();
+  window.location.hash = "#zikir" + jns;
+
+  _("#wrapmenu").style.display = "none";
+  _("#home").style.display = "none";
+  _("#surah").style.display = "block";
+  _("#surah").innerHTML = `<div class="loader"></div>`;
+
+  let rezikir = await get(url + "zikir" + jns + ".json");
+  let zikr = JSON.parse(rezikir);
+
+  let list = `<div class="titleq">Zikir ${jns}</div>
+          <table style="padding:20px;">`;
+
+  for (i in zikr) {
+    list += `<tr>
+              <td class="widgettittle" style="display:table-cell;vertical-align:top;color:var(--color-text);width:10px;">${parseInt(i) + 1}.&nbsp;&nbsp;</td>
+              <td class="widgettittle" style="display:table-cell;vertical-align:top;color:var(--color-text);">${zikr[i]['title_id']}</td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+                  ${zikr[i]['arab']}
+                </div>
+                <span class="artr" style="display:block;font-size:14px;"><i>${zikr[i]["transliteration"]}</i></span>
+                <span class="arid" style="display:block;font-size:14px;">${zikr[i]["indonesia"]}</span>
+                <br><br>
+              </td>
+            </tr>`;
+  }
+  list += `</table>`;
+
+  _("#surah").innerHTML = list;
+}
+
 async function doaharian() {
   closeNav();
   if (window.location.hash == '') {
@@ -1515,6 +1576,8 @@ window.onhashchange = function () {
         _(".modal")[m].style.display = "none";
       }
     }
+  } else if (pg == "#zikir") {
+    getzikir();
   }
 };
 
@@ -1611,6 +1674,14 @@ if (pg.substring(0, 3) == "#qs") {
   doaharian();
 } else if (pg == "#tasbih") {
   gettasbih();
+} else if (pg == "#zikir") {
+  getzikir();
+} else if (pg == "#zikirsalat") {
+  loadzikir("salat");
+} else if (pg == "#zikirpagi") {
+  loadzikir("pagi");
+} else if (pg == "#zikirpetang") {
+  loadzikir("petang");
 } else {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
