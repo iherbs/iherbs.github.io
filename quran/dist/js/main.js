@@ -682,7 +682,7 @@ async function getzikir() {
 
   let list = `<div class="titleq">Zikir</div>
           <div style="padding:15px;">
-            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('salat')">Zikir Setelah Salat</div>
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('salat')">Zikir Salat</div>
           </div>
           <div style="padding:15px;">
             <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('pagi')">Zikir Pagi</div>
@@ -705,7 +705,7 @@ async function loadzikir(jns = "") {
   let rezikir = await get(url + "zikir" + jns + ".json");
   let zikr = JSON.parse(rezikir);
 
-  let list = `<div class="titleq">Zikir ${jns}</div>
+  let list = `<div class="titleq">Zikir ${jns.charAt(0).toUpperCase() + jns.slice(1)}</div>
           <table style="padding:20px;">`;
 
   for (i in zikr) {
