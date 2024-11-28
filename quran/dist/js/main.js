@@ -682,13 +682,13 @@ async function getzikir() {
 
   let list = `<div class="titleq">Zikir</div>
           <div style="padding:15px;">
-            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('salat')">Zikir Setelah Salat</div>
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('salat')">Zikir Setelah Salat</div>
           </div>
           <div style="padding:15px;">
-            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('pagi')">Zikir Pagi</div>
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('pagi')">Zikir Pagi</div>
           </div>
           <div style="padding:15px;margin-bottom:20px;">
-            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);" onclick="loadzikir('petang')">Zikir Petang</div>
+            <div style="cursor:pointer;user-select:none;border:1px solid var(--color-text);border-radius:7px;padding:25px;color:var(--color-title-text);text-align:center;" onclick="loadzikir('petang')">Zikir Petang</div>
           </div>`;
   _("#surah").innerHTML = list;
 }
