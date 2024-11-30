@@ -1327,7 +1327,7 @@ function addmdlBookmark(mark = "") {
     let listbook = "";
     for (b in book) {
       listbook += `<div class="listbook" onclick="addBookmark('${book[b]}','${markno}')" style="padding:10px 10px 5px 10px;">
-                    <div class="bookmark" style="display:inline-block;position:relative;width:16px;"></div>
+                    <div class="bookmark" style="display:inline-block;position:relative;width:16px;right:auto;margin-top:auto;"></div>
                     <span class="nmayah" style="position:relative;display:inline-block;top:-6px;">${book[b]}</span>
                 </div>`;
     }
