@@ -958,7 +958,26 @@ function showpegon() {
   _("#modalwidget").modal("show");
   _("#widgetcontent").innerHTML = `<span class="widgettittle">Pegon</span>
     <textarea placeholder="Teks latin" id="txtla" class="form-control" style="height:70px;font-size:16px;" onkeyup="pegon(this,'l')"></textarea>
-    <textarea placeholder="Teks Arab" id="txtar" class="form-control" style="height:70px;font-size:16px;text-align:right;font-family:'Arabic';" onkeyup="pegon(this,'a')"></textarea>`;
+    <textarea placeholder="Teks Arab" id="txtar" class="form-control" style="height:70px;font-size:16px;text-align:right;font-family:'Arabic';" onkeyup="pegon(this,'a')"></textarea>
+    <button type="button" class="btn btn-theme" onclick="copystr('txtar')">Copy</button>`;
+}
+
+function copystr(elid = "") {
+  let txt = "";
+  if (document.getElementById(elid) != null) {
+    if (document.getElementById('txtar').innerHTML == "") {
+      txt = _("#" + elid).value;
+    } else {
+      txt = _("#" + elid).innerHTML;
+    }
+  } else {
+    txt = elid;
+  }
+  if (txt != "") {
+    navigator.clipboard.writeText(txt);
+    toast("Copied");
+    closeOptions();
+  }
 }
 
 function zoompage(num = 0) {
