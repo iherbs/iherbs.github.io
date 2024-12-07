@@ -356,7 +356,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="subttl">Highlight</td>
+                        <td class="subttl">
+                            Highlight
+                            <input type="range" id="halpha" onchange="setHAlpha();" min="0" max="1" step="0.1"
+                                value="1">
+                        </td>
                         <td align="right">
                             <button type="button" id="rehl" onclick="removeHL()">&times;</button>
                             <input type="color" id="hcolor" class="colorpick" onchange="setHColor()" />

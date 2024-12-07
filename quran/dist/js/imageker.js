@@ -373,6 +373,19 @@ function setColor() {
 function setHColor() {
     let color = document.getElementById("hcolor").value;
     cap.style.background = color;
+    setHAlpha();
+}
+
+function setHAlpha() {
+    let alphanum = document.getElementById("halpha").value;
+    let arcolor = cap.style.background.replace('rgb(', '').replace('rgba(', '').replace(')', '').split(',');
+    console.log(arcolor[3]);
+    let red = arcolor[0];
+    let green = arcolor[1];
+    let blue = arcolor[2];
+    let alpha = alphanum;
+    console.log('rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')');
+    cap.style.background = 'rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')';
 }
 
 function removeHL() {

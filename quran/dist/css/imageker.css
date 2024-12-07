@@ -160,9 +160,40 @@ input[type=number] {
     margin-top: 0px;
     font-size: 20px;
     text-align: center;
-    padding: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 25px;
     border-radius: 7px;
     overflow: visible;
+}
+
+#halpha {
+    -webkit-appearance: none;
+    position: relative;
+    top: 0px;
+    background: #dddddd;
+    border-radius: 5px;
+    width: 111px;
+    height: 10px;
+}
+
+#halpha::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: var(--color-title-text);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#halpha::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: var(--color-title-text);
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .ic-align {
