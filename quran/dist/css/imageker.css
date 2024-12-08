@@ -174,7 +174,7 @@ input[type=number] {
     top: 0px;
     background: #dddddd;
     border-radius: 5px;
-    width: 111px;
+    width: 70px;
     height: 10px;
 }
 
@@ -279,7 +279,8 @@ input[type=number] {
     width: 8px;
 }
 
-#rehl {
+#rehl,
+#rebg {
     position: relative;
     top: -3px;
     border: none;

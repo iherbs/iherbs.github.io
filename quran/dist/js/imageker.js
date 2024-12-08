@@ -398,6 +398,10 @@ function setBgColor() {
     wrapimage.style.background = color;
 }
 
+function removeBg() {
+    document.getElementById("wrapimage").style.background = "none";
+}
+
 function setStyle(par = 'n') {
     if (par == 'b') {
         cap.style.fontWeight = "bold";
@@ -451,6 +455,8 @@ function generate() {
         width: element.offsetWidth,
         height: element.offsetHeight,
         scale: 3,
+        background: null,
+        backgroundColor: null,
     }).then(function (canvas) {
 
         boxWrapper.style.top = boxt + "px";
