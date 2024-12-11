@@ -1071,7 +1071,7 @@ function copytext() {
     txt = qs["name"] + "\n\n" + qs["ayah_text"] + "\n\n" +
       qs["text"];
   } else {
-    txt = qs["ayah_text"] + "\n\n" +
+    txt = qs["ayah_text"].replace("\u06DE", "").replaceAll("\u08d6", "") + "\n\n" +
       qs["text"] + "\n" + qs["name"];
   }
   navigator.clipboard.writeText(txt);
