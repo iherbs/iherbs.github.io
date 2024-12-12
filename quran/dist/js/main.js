@@ -813,7 +813,7 @@ function imagemaker_show() {
     txt = '<div style="width:100%;line-height:2.3;padding:10px 18px;font-size:22px;">' + qs["name"] + '</div><div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + qs["ayah_text"] +
       '</div>' + qs["text"];
   } else {
-    txt = '<div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + qs["ayah_text"] +
+    txt = '<div id="txtarabic" style="width:100%;line-height:2.3;padding:10px 18px;font-family:arabic;">' + qs["ayah_text"].replace("\u06DE", "") +
       '</div>' + qs["text"] +
       '<br>' + qs["name"];
   }
