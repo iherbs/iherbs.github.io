@@ -312,7 +312,7 @@ async function getsurah(surat = 1, nayah = "") {
   let tajweed = localStorage.getItem("tajweed");
   let viewmode = localStorage.getItem("viewmode");
 
-  viewbuku = '<span id="rn0" style="scroll-margin:40px;"></span>';
+  viewbuku = '<span class="vwbkayah" id="rnayah0" style="display:none;"><span id="rn0"></span></span>';
   ayah += '<div id="track0" style="display:none;">https://github.com/iherbs/quran-json/raw/main/Audio/001/001.mp3</div>';
   for (i in re) {
     let mark = surah + "_" + re[i]["no_ayah"];
