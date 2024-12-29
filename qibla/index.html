@@ -85,7 +85,7 @@
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
 
-    function init() {
+    function initCompass() {
         compassCircle.addEventListener("click", startCompass);
         navigator.geolocation.getCurrentPosition(locationHandler);
 
@@ -157,7 +157,7 @@
         return Math.round(psi);
     }
 
-    init();
+    initCompass();
 </script>
 
 </html>
