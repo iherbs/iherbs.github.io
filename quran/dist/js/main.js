@@ -729,6 +729,11 @@ async function loadzikir(jns = "") {
   _("#surah").innerHTML = list;
 }
 
+function getqibla() {
+  closeNav();
+  window.location.href = "qibla";
+}
+
 async function doaharian() {
   closeNav();
   if (window.location.hash == '') {
