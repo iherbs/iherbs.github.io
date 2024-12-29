@@ -130,8 +130,6 @@
         const { latitude, longitude } = position.coords;
         pointDegree = calcDegreeToPoint(latitude, longitude);
 
-        // calculate(latitude, longitude);
-
         if (pointDegree < 0) {
             pointDegree = pointDegree + 360;
         }
