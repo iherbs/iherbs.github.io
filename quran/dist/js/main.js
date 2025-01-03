@@ -318,8 +318,8 @@ async function getsurah(surat = 1, nayah = "") {
     let mark = surah + "_" + re[i]["no_ayah"];
     let dirs = (surat.toString().length == 1 ? '00' + surat : (surat.toString().length == 2 ? '0' + surat : surat));
     let dira = (re[i]["no_ayah"].toString().length == 1 ? '00' + re[i]["no_ayah"] : (re[i]["no_ayah"].toString().length == 2 ? '0' + re[i]["no_ayah"] : re[i]["no_ayah"]));
-    ayah += `<tr id="n${re[i]["no_ayah"]}" style="scroll-margin:40px;">
-            <td style="vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
+    ayah += `<tr id="n${re[i]["no_ayah"]}" style="display:block;scroll-margin:40px;">
+            <td style="display:block;width:100%;vertical-align:top;padding-top:15px;padding-bottom:15px;padding-left:15px;padding-right:15px;">
                 <div id="track${re[i]["no_ayah"]}" class="tracks">https://github.com/iherbs/quran-json/raw/main/Audio/${dirs}/${dira}.mp3</div>
                 <div id="actmore${re[i]["no_ayah"]}">
                   <div class="bookmark" id="bm${mark}" onclick="addmdlBookmark('${mark}')"></div>
@@ -339,13 +339,13 @@ async function getsurah(surat = 1, nayah = "") {
 
     gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
-    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:11px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ';
+    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:11px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ' + (surah == 1 && re[i]["no_ayah"] == 1 ? '<br>' : '');
   }
   _("#gotoayah").innerHTML = gotono;
 
   let bismillah = "";
   if (surah != 1) {
-    bismillah = '<tr><td colspan="3"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
+    bismillah = '<tr style="display:block;"><td colspan="3" style="display:block;width:100%;"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
   }
 
   _(
@@ -367,7 +367,7 @@ async function getsurah(surat = 1, nayah = "") {
     </table>
 
     <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;text-align:${surat == 1 ? "center" : "justify"};text-align-last:center;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
-    <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};">${bismillah + ayah}</table>`;
+    <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};"><tbody style="display:block;">${bismillah + ayah}</tbody></table>`;
   window.scrollTo({ top: 0 });
   if (nayah != "" && nayah != "-") {
     gotoayah(nayah);
