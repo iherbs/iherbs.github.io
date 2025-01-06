@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quran</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="Description" content="Al-Quran. Digital Al-Qur'an. Al Quran online, Quran online.">
+    <meta name="theme-color" content="#007070" />
+    <link rel="shortcut icon" type="image/png" href="https://iherbs.github.io/quran/icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="https://iherbs.github.io/quran/icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="https://iherbs.github.io/quran/icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="https://iherbs.github.io/quran/icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="https://iherbs.github.io/quran/icon.png" />
+    <link rel="shortcut icon" type="image/png" href="https://iherbs.github.io/quran/icon.png" />
+
+    <meta property="og:url" content="https://iherbs.github.io/quran/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Quran">
+    <meta property="og:description" content="Al-Quran. Digital Al-Qur'an. Al Quran online, Quran online.">
+    <meta property="og:image"
+        content="https://raw.githubusercontent.com/iherbs/iherbs.github.io/main/quran/quran-book.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quran">
+    <meta name="twitter:description" content="Al-Quran. Digital Al-Qur'an. Al Quran online, Quran online.">
+    <meta name="twitter:image"
+        content="https://raw.githubusercontent.com/iherbs/iherbs.github.io/main/quran/quran-book.png">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            height: 100vh;
+            overflow-x: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #007070;
+            color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .container {
+            margin-top: 50px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .book,
+        .page {
+            user-select: none;
+        }
+
+        .pside {
+            position: absolute;
+            display: inline;
+            width: 100%;
+        }
+
+        .psidel {
+            left: -100%;
+        }
+
+        .psider {
+            top: 0px;
+            right: -100%;
+        }
+
+        /* LOADER / LOADING ================== */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007070;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            position: relative;
+            margin: 150px auto;
+            animation: spin 2s linear infinite;
+            -webkit-animation: spin 2s linear infinite;
+            -moz-animation: spin 2s linear infinite;
+            -o-animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+            }
+
+            to {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg);
+            }
+
+            to {
+                -moz-transform: rotate(360deg);
+            }
+        }
+
+        @-o-keyframes spin {
+            from {
+                -o-transform: rotate(0deg);
+            }
+
+            to {
+                -o-transform: rotate(360deg);
+            }
+        }
+
+        /* END LOADER / LOADING ================== */
+
+        /* Modal ==================*/
+        .modal,
+        .modaloverlay {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .modal {
+            display: none;
+            overflow: auto;
+            padding-bottom: 150px;
+            z-index: 10000;
+        }
+
+        .modaloverlay {
+            background: rgba(0, 50, 50, 0.6);
+        }
+
+        .modalclose {
+            cursor: pointer;
+            position: relative;
+            float: right;
+            color: gray;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            top: -16px;
+            right: -11px;
+        }
+
+        .modalwrap {
+            position: relative;
+            margin: 0px auto;
+            top: 10%;
+            width: 80%;
+            background: #ffffff;
+            color: #333333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 8px #444;
+            z-index: 1;
+        }
+
+        /* End Modal ==================*/
+
+        .icon-turn-down {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path style="fill:white;" d="M178.3 506.3L40.3 368.3C35 363 32 355.8 32 348.3C32 332.7 44.7 320 60.3 320H144V112c0-8.8-7.2-16-16-16H32C14.3 96 0 81.7 0 64V32C0 14.3 14.3 0 32 0h96c61.9 0 112 50.1 112 112V320h83.7c15.6 0 28.3 12.7 28.3 28.3c0 7.5-3 14.7-8.3 20L205.7 506.3C202 510 197.1 512 192 512s-10-2-13.7-5.7z"/></svg>');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            display: inline-block;
+            height: 20px;
+            width: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar">
+        <span style="float:left;">Quran</span>
+        <span id="toayah" onclick="modalgotoayah()" class="icon-turn-down"
+            style="position:relative;margin-left:5px;margin-right:25px;cursor:pointer;float:right;"></span>
+    </div>
+
+    <div class="container">
+        <div id="book" class="book">
+            <div class="pside psidel" id="pagel"></div>
+            <div class="page">
+                <div id="page">
+                    <div class="loader"></div>
+                </div>
+            </div>
+            <div class="pside psider" id="pager"></div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="modalwidget">
+        <div class="modaloverlay"></div>
+        <div class="modalwrap">
+            <span class="modalclose">&times;</span>
+            <div id="widgetcontent" style="padding:10px 10px;">
+                <div style="text-align:center;">
+                    <select id="surah" style="padding: 10px 20px; border: 1px solid #007070; border-radius: 5px;"
+                        onchange="getjml()"></select>
+                    <select id="ayah"
+                        style="padding: 10px 20px; border: 1px solid #007070; border-radius: 5px;"></select>
+                    <br><br>
+                    <button onclick="goToPage()"
+                        style="padding: 10px 20px; background-color: #007070; color: #ffffff; border: none; border-radius: 5px; cursor: pointer;">Go</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const book = document.getElementById('book');
+        const imgl = document.getElementById('pagel');
+        const img = document.getElementById('page');
+        const imgr = document.getElementById('pager');
+        const url = 'https://raw.githubusercontent.com/iherbs/quran-json/refs/heads/main/Images/tajwid/';
+        const ext = '.png';
+
+        async function get(file = "") {
+            return new Promise((resolve, _reject) => {
+                xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("GET", file);
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        // console.log(xmlhttp.responseText);
+                        resolve(xmlhttp.responseText);
+                    }
+                };
+                xmlhttp.send();
+            });
+        }
+
+        let pages = 1;
+        let iml = pages + 1;
+        let im = pages;
+        let imr = pages - 1;
+        let surah_list = {}, tofc = {};
+
+        function _(id) {
+            let el = {}, ismodal = false;
+            if (id.substr(0, 1) == "#") {
+                el = document.getElementById(id.substr(1, id.length));
+                if (el != null) {
+                    if (el.classList.contains("modal")) {
+                        ismodal = true;
+                    }
+                }
+            } else if (id.substr(0, 1) == ".") {
+                el = document.querySelectorAll(id);
+            } else if (id.substr(0, 1) == "@") {
+                el = document.getElementsByName(id.substr(1, id.length));
+            }
+
+            if (ismodal) {
+                el.modal = function (opt = "") {
+                    if (opt == "show") {
+                        el.style.display = "block";
+                        document
+                            .getElementsByTagName("body")[0]
+                            .style.overflow = "hidden";
+                    } else if (opt == "hide") {
+                        el.style.display = "none";
+                        document.getElementsByTagName("body")[0].style.overflow = null;
+                    }
+                };
+            }
+
+            return el;
+        }
+
+        _(".modaloverlay").forEach((el) =>
+            el.addEventListener("click", (event) => {
+                event.target.parentNode.style.display = "none";
+                let mop = true;
+                for (m in _(".modaloverlay")) {
+                    if (!isNaN(m)) {
+                        if (_(".modaloverlay")[m].parentNode.style.display == "block") {
+                            mop = false;
+                        }
+                    }
+                }
+                if (mop) {
+                    document.getElementsByTagName("body")[0].style.overflow = null;
+                }
+            })
+        );
+
+        _(".modalclose").forEach((el) =>
+            el.addEventListener("click", (event) => {
+                event.target.parentNode.parentNode.style.display = "none";
+                let mop = true;
+                for (m in _(".modaloverlay")) {
+                    if (!isNaN(m)) {
+                        if (_(".modaloverlay")[m].parentNode.style.display == "block") {
+                            mop = false;
+                        }
+                    }
+                }
+                if (mop) {
+                    document.getElementsByTagName("body")[0].style.overflow = null;
+                }
+            })
+        );
+
+
+        async function init() {
+            let re = await get('https://raw.githubusercontent.com/iherbs/quran-json/main/surah_list.json');
+            surah_list = JSON.parse(re);
+
+            let rep = await get('https://raw.githubusercontent.com/iherbs/quran-json/refs/heads/main/Images/page.json');
+            tofc = JSON.parse(rep);
+        }
+        init();
+
+        function modalgotoayah() {
+            _("#modalwidget").modal("show");
+            let list = "";
+            for (i in surah_list) {
+                list += `<option value="${surah_list[i].id}">${surah_list[i].name}</option>`;
+            }
+            if (_("#surah").innerHTML == "") {
+                _("#surah").innerHTML = list;
+            }
+            if (_("#ayah").innerHTML == "") {
+                getjml();
+            }
+        }
+
+        function getjml() {
+            let surah = _("#surah").value, list = "";
+            for (i = 1; i <= surah_list[surah]["count"]; i++) {
+                list += `<option value="${i}">${i}</option>`;
+            }
+            _("#ayah").innerHTML = list;
+        }
+
+        function goToPage() {
+            let surah = _("#surah").value;
+            let ayah = _("#ayah").value;
+            _("#modalwidget").modal("hide");
+            pages = tofc[surah][ayah]["no"];
+            img.innerHTML = `<div class="loader"></div>`;
+            getPage();
+        }
+
+        function getPage() {
+            if (pages < 1) {
+                pages = 604;
+            } else if (pages > 604) {
+                pages = 1;
+            }
+
+            iml = parseInt(pages) + 1;
+            im = parseInt(pages);
+            imr = parseInt(pages) - 1;
+
+            if (parseInt(iml) > 604) {
+                iml = 1;
+            }
+
+            if (parseInt(imr) < 1) {
+                imr = 604;
+            }
+
+            if (parseInt(iml) < 10) {
+                iml = '00' + iml;
+            } else if (parseInt(iml) < 100) {
+                iml = '0' + iml;
+            }
+
+            if (parseInt(im) < 10) {
+                im = '00' + pages;
+            } else if (parseInt(im) < 100) {
+                im = '0' + pages;
+            }
+
+            if (parseInt(imr) < 10) {
+                imr = '00' + imr;
+            } else if (parseInt(imr) < 100) {
+                imr = '0' + imr;
+            }
+
+
+            setTimeout(() => {
+                initialX = 0;
+                currentX = 0;
+                book.style.transition = 'none';
+                book.style.transform = 'translateX(0)';
+                img.innerHTML = `<img src="${url}${im}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
+                imgl.innerHTML = `<img src="${url}${iml}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
+                imgr.innerHTML = `<img src="${url}${imr}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
+            }, 500);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        getPage();
+
+        let startX = 0;
+        let endX = 0;
+
+        img.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+        });
+
+        img.addEventListener('mouseup', (e) => {
+            endX = e.clientX;
+            handleSwipe();
+        });
+
+        img.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        img.addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (startX - 100 > endX) {
+                // previous page
+                // console.log('Swiped left');
+                pages--;
+                book.style.transition = 'transform 0.5s ease';
+                book.style.transform = 'translateX(-100%)';
+                getPage();
+            } else if (startX + 100 < endX) {
+                // next page
+                // console.log('Swiped right');
+                pages++;
+                book.style.transition = 'transform 0.5s ease';
+                book.style.transform = 'translateX(100%)';
+                getPage();
+            } else {
+                initialX = 0;
+                currentX = 0;
+                book.style.transition = 'transform 0.5s ease';
+                book.style.transform = 'translateX(0)';
+                setTimeout(() => {
+                    book.style.transition = 'none';
+                }, 500);
+            }
+        }
+
+        // ==================== Dragging ====================
+        let isDragging = false;
+        let initialX = 0;
+        let initialY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        let initialDistance = 0;
+        let currentDistance = 0;
+        let scale = 1;
+
+        book.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            initialX = e.clientX - currentX;
+        });
+
+        book.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                book.style.transform = `translateX(${currentX}px)`;
+            }
+        });
+
+        book.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        book.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        book.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                initialDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                initialX = e.touches[0].clientX - currentX;
+                initialY = e.touches[0].clientY - currentY;
+            }
+        });
+
+        book.addEventListener('touchmove', (e) => {
+
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = currentDistance / initialDistance;
+                let curX = e.touches[0].clientX - initialX;
+                let curY = e.touches[0].clientY - initialY;
+                book.style.transform = `translateX(${curX}px) translateY(${curY}px) scale(${scale})`;
+            } else if (e.touches.length === 1 && isDragging) {
+                // e.preventDefault();
+                currentX = e.touches[0].clientX - initialX;
+                book.style.transform = `translateX(${currentX}px)`;
+            }
+        });
+
+        book.addEventListener('touchend', () => {
+            isDragging = false;
+
+            initialDistance = 0;
+            currentDistance = 0;
+        });
+
+        book.addEventListener('touchcancel', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+
+</html>
