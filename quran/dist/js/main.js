@@ -179,6 +179,14 @@ async function getqlist() {
   surah_list = re;
   // console.log(re);
   makeqlist();
+
+  let listsurah = "";
+  _("#listsurah").innerHTML = "";
+  for (i in re) {
+    listsurah += '<option value="' + re[i]["id"] + '">' + re[i]["id"] + ". " + re[i]["name"] + '</option>';
+  }
+  _("#listsurah").innerHTML = listsurah;
+  getlistayah();
 }
 
 function makeqlist(key = "") {
@@ -186,10 +194,8 @@ function makeqlist(key = "") {
     table = "";
 
   let keyjuz = key.split(" ");
-  keyjuz = keyjuz[1],
-    listsurah = "";
+  keyjuz = keyjuz[1];
 
-  _("#listsurah").innerHTML = "";
   for (i in re) {
     if (
       (key == "" ||
@@ -210,13 +216,10 @@ function makeqlist(key = "") {
             </div>
             <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
         </div>`;
-      listsurah += '<option value="' + re[i]["id"] + '">' + re[i]["id"] + ". " + re[i]["name"] + '</option>';
     }
   }
 
   _("#list").innerHTML = table;
-  _("#listsurah").innerHTML = listsurah;
-  getlistayah();
 }
 
 function surahayahlist() {
