@@ -41,7 +41,7 @@
                     <span id="tohome" onclick="history.back()" class="icon-home"
                         style="position:relative;top:2px;margin-right:5px;cursor:pointer;"></span>
                     <span id="tsurah" onclick="openNav()" style="cursor:pointer;"></span>
-                    <span id="toayah" onclick="_('#modalgotoayah').modal('show')" class="icon-turn-down"
+                    <span id="toayah" onclick="surahayahlist()" class="icon-turn-down"
                         style="position:relative;top:2px;margin-left:5px;cursor:pointer;"></span>
                 </div>
             </div>
@@ -141,10 +141,17 @@
                     <div class="bookmark-active" style="margin-left:8px;width:17px;"></div>
                 </div>
                 <div class="titleq">Al-Qur'an</div>
-                <div style="padding:5px;">
-                    <div class="findfield">
-                        <input type="text" id="cari" class="form-control txtfind" placeholder="Cari" />
-                        <div class="fndclear" id="clearsrc">×</div>
+                <div style="padding:5px;display:flex;">
+                    <div style="display:inline-block;width:100%;">
+                        <div class="findfield">
+                            <input type="text" id="cari" class="form-control txtfind" placeholder="Cari" />
+                            <div class="fndclear" id="clearsrc">×</div>
+                        </div>
+                    </div>
+                    <div style="display:inline;border-top:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc;border-top-right-radius:5px;border-bottom-right-radius:5px;margin-left:-3px;background:#ffffff;z-index:1;"
+                        onclick="surahayahlist()">
+                        <span id="toayah" class="icon-turn-down-grey"
+                            style="position:relative;top:6px;margin-left:5px;cursor:pointer;"></span>
                     </div>
                 </div>
                 <div id="list" style="overflow:hidden;"></div>
@@ -189,9 +196,19 @@
 
     <div class="modal" id="modalgotoayah">
         <div class="modaloverlay"></div>
-        <div class="modalwrap" style="width:170px;">
+        <div class="modalwrap">
             <span class="modalclose">&times;</span>
-            <div id="gotoayah" style="padding:10px 10px;"></div>
+            <div id="gotoayah" style="padding:10px 10px;">
+                <div style="text-align:center;">
+                    <div style="font-weight:bold;font-size:18px;margin-bottom:10px;">Go <span id="toayah"
+                            class="icon-turn-down-grey"
+                            style="position:relative;top:5px;margin-left:5px;cursor:pointer;"></span></div>
+                    <select id="listsurah" class="form-control" style="margin-bottom:5px;display:inline;width:69%;"
+                        onchange="getlistayah()"></select>
+                    <select id="listsurahayah" class="form-control" style="margin-bottom:5px;display:inline;width:27%;"
+                        onchange="gotosurahayah()"></select>
+                </div>
+            </div>
         </div>
     </div>
 

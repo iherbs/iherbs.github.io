@@ -186,8 +186,10 @@ function makeqlist(key = "") {
     table = "";
 
   let keyjuz = key.split(" ");
-  keyjuz = keyjuz[1];
+  keyjuz = keyjuz[1],
+    listsurah = "";
 
+  _("#listsurah").innerHTML = "";
   for (i in re) {
     if (
       (key == "" ||
@@ -208,9 +210,40 @@ function makeqlist(key = "") {
             </div>
             <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
         </div>`;
+      listsurah += '<option value="' + re[i]["id"] + '">' + re[i]["id"] + ". " + re[i]["name"] + '</option>';
     }
   }
+
   _("#list").innerHTML = table;
+  _("#listsurah").innerHTML = listsurah;
+  getlistayah();
+}
+
+function surahayahlist() {
+  _('#modalgotoayah').modal('show');
+  if (_("#listsurah").value != surah && surah != 0) {
+    _("#listsurah").value = surah;
+    getlistayah();
+  }
+}
+
+function getlistayah() {
+  let nosr = parseInt(surah_list[_("#listsurah").value]["count"]);
+  _("#listsurahayah").innerHTML = "";
+  for (i = 1; i <= nosr; i++) {
+    _("#listsurahayah").innerHTML += '<option value="' + i + '">' + i + '</option>';
+  }
+}
+
+function gotosurahayah() {
+  let nosr = parseInt(_("#listsurah").value);
+  let noay = parseInt(_("#listsurahayah").value);
+  if (nosr != surah) {
+    getsurah(nosr, noay);
+  } else {
+    gotoayah(noay);
+  }
+  _('#modalgotoayah').modal('hide');
 }
 
 function cari(qry = "") {
@@ -306,7 +339,7 @@ async function getsurah(surat = 1, nayah = "") {
   surah_data = re;
   // console.log(re);
 
-  let ayah = "", gotono = "";
+  let ayah = "";
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
@@ -337,11 +370,9 @@ async function getsurah(surat = 1, nayah = "") {
             </td>
         </tr>`;
 
-    gotono += `<div class="listayah" onclick="gotoayah(${re[i]["no_ayah"]})">${re[i]["no_ayah"]}</div>`;
 
     viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:11px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ' + (surah == 1 && re[i]["no_ayah"] == 1 ? '<br>' : '');
   }
-  _("#gotoayah").innerHTML = gotono;
 
   let bismillah = "";
   if (surah != 1) {
@@ -1590,7 +1621,6 @@ window.onhashchange = function () {
     _("#surah").innerHTML = "";
     _("#tsurah").innerHTML = "";
     _("#wrapmenu").style.display = "none";
-    _("#gotoayah").innerHTML = "";
     _(".page")[0].removeAttribute("style");
     bataladdBookmark();
 
