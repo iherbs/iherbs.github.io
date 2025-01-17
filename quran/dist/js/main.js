@@ -232,7 +232,7 @@ function surahayahlist() {
 
 function getlistayah() {
   let nosr = parseInt(surah_list[_("#listsurah").value]["count"]);
-  _("#listsurahayah").innerHTML = "";
+  _("#listsurahayah").innerHTML = '<option value="1">#</option>';
   for (i = 1; i <= nosr; i++) {
     _("#listsurahayah").innerHTML += '<option value="' + i + '">' + i + '</option>';
   }
@@ -897,10 +897,11 @@ async function getjuz() {
   _("#widgetcontent").innerHTML = '<div class="loader"></div>';
   let reas = await get(url + "juz_list.json");
   let juz = JSON.parse(reas);
+  console.log(juz);
 
   _("#widgetcontent").innerHTML = `<span class="widgettittle">JUZ</span>`;
   for (let i = 1; i <= 30; i++) {
-    _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="gotoBookmark('${juz[i]["start"]["no_surah"] + "_" + juz[i]["start"]["ayah"]}');_('#modalwidget').modal('hide');"><b>Juz ${i}</b><br>(${juz[i]["start"]["nm_surah"] + ", " + juz[i]["start"]["ayah"]} ~ ${juz[i]["end"]["nm_surah"] + ", " + juz[i]["end"]["ayah"]})</div>`;
+    _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="gotoBookmark('${juz[i]["start"]["no_surah"] + "_" + juz[i]["start"]["ayah"]}');_('#modalwidget').modal('hide');"><b>Juz ${i}</b><br>[${"(" + juz[i]["start"]["no_surah"] + ")" + juz[i]["start"]["nm_surah"] + ", " + juz[i]["start"]["ayah"]} ~ ${"(" + juz[i]["end"]["no_surah"] + ")" + juz[i]["end"]["nm_surah"] + ", " + juz[i]["end"]["ayah"]}]</div>`;
   }
 }
 
