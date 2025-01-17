@@ -232,7 +232,7 @@ function surahayahlist() {
 
 function getlistayah() {
   let nosr = parseInt(surah_list[_("#listsurah").value]["count"]);
-  _("#listsurahayah").innerHTML = '<option value="1">#</option>';
+  _("#listsurahayah").innerHTML = '';
   for (i = 1; i <= nosr; i++) {
     _("#listsurahayah").innerHTML += '<option value="' + i + '">' + i + '</option>';
   }
