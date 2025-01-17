@@ -199,14 +199,14 @@
         <div class="modalwrap">
             <span class="modalclose">&times;</span>
             <div id="gotoayah" style="padding:10px 10px;">
-                <div style="text-align:center;">
-                    <div style="font-weight:bold;font-size:18px;margin-bottom:10px;">Go <span id="toayah"
-                            class="icon-turn-down-grey"
-                            style="position:relative;top:5px;margin-left:5px;cursor:pointer;"></span></div>
+                <div style="text-align:center;margin-top:20px;">
                     <select id="listsurah" class="form-control" style="margin-bottom:5px;display:inline;width:69%;"
                         onchange="getlistayah()"></select>
                     <select id="listsurahayah" class="form-control" style="margin-bottom:5px;display:inline;width:27%;"
                         onchange="gotosurahayah()"></select>
+                    <button type="button" class="btn btn-theme" onclick="gotosurahayah()"
+                        style="font-weight:bold;font-size:18px;margin-top:10px;cursor:pointer;">Go <span id="toayah"
+                            class="icon-turn-down" style="position:relative;top:3px;margin-left:5px;"></span></button>
                 </div>
             </div>
         </div>
