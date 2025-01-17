@@ -897,7 +897,6 @@ async function getjuz() {
   _("#widgetcontent").innerHTML = '<div class="loader"></div>';
   let reas = await get(url + "juz_list.json");
   let juz = JSON.parse(reas);
-  console.log(juz);
 
   _("#widgetcontent").innerHTML = `<span class="widgettittle">JUZ</span>`;
   for (let i = 1; i <= 30; i++) {
