@@ -19,8 +19,8 @@
     position: absolute;
     width: 100%;
     top: 38%;
-    border-style: dashed;
-    border-color: #f1a;
+    border-style: solid;
+    border-color: #1af;
     border-width: 1px;
 }
 
@@ -30,8 +30,8 @@
     position: absolute;
     height: 100%;
     left: 50%;
-    border-style: dashed;
-    border-color: #f1a;
+    border-style: solid;
+    border-color: #1af;
     border-width: 1px;
 }
 
