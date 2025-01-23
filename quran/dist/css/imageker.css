@@ -1,10 +1,38 @@
+:root {
+    --snaplinehorizontal: none;
+    --snaplinevertical: none;
+}
+
 #wrapimage,
 #bgimage {
+    position: relative;
     overflow: hidden;
     width: 100%;
     height: 500px;
     background: #f0f8ff;
     touch-action: none;
+}
+
+#wrapimage::before {
+    display: var(--snaplinehorizontal);
+    content: "";
+    position: absolute;
+    width: 100%;
+    top: 38%;
+    border-style: dashed;
+    border-color: #f1a;
+    border-width: 1px;
+}
+
+#wrapimage::after {
+    display: var(--snaplinevertical);
+    content: "";
+    position: absolute;
+    height: 100%;
+    left: 50%;
+    border-style: dashed;
+    border-color: #f1a;
+    border-width: 1px;
 }
 
 #controlimage {
@@ -30,6 +58,7 @@
     transform-origin: top left;
     user-select: none;
     overflow: visible;
+    z-index: 1;
 }
 
 /* .box:hover>.dot {
@@ -76,7 +105,7 @@
 
 .dot.top-mid {
     top: -5px;
-    left: calc(50% - 5px);
+    left: calc(50% - 3.8px);
     /* cursor: n-resize; */
 }
 
@@ -100,7 +129,7 @@
 
 .dot.rotate {
     top: -30px;
-    left: calc(50% - 5px);
+    left: calc(50% - 3.8px);
 }
 
 .rotate-link {

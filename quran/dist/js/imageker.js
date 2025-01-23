@@ -1,6 +1,8 @@
 
 var box = document.getElementById("box");
 var boxWrapper = document.getElementById("box-wrapper");
+let cap = document.getElementById("caption");
+let isdrag = false;
 const minWidth = 0;
 const minHeight = 0;
 
@@ -40,8 +42,10 @@ function hideboxder() {
 }
 
 function repositionElement(x, y, f = 'px') {
+    cap.setAttribute("contenteditable", "false");
     boxWrapper.style.left = x + f;
     boxWrapper.style.top = y + f;
+    snapcenter();
 }
 
 function resize(w, h) {
@@ -70,6 +74,38 @@ function rotateBox(deg) {
     boxWrapper.style.transform = `rotate(${deg}deg)`;
 }
 
+function snapcenter() {
+    var parent = document.getElementById('wrapimage');
+    var parentRect = parent.getBoundingClientRect();
+    var boxRect = cap.getBoundingClientRect();
+
+    const centerX = parentRect.width / 2;
+    const centerY = (parentRect.height / 2) - (boxRect.height / 3);
+
+    const threshold = 8; // Snap threshold in pixels
+
+    const currentX = boxWrapper.offsetLeft;
+    const currentY = boxWrapper.offsetTop;
+
+    if (Math.abs(currentX - centerX) < threshold) {
+        boxWrapper.style.left = centerX + 'px';
+        if (isdrag) {
+            document.documentElement.style.setProperty("--snaplinevertical", "block");
+        }
+    } else {
+        document.documentElement.style.setProperty("--snaplinevertical", "none");
+    }
+
+    if (Math.abs(currentY - centerY) < threshold) {
+        boxWrapper.style.top = centerY + 'px';
+        if (isdrag) {
+            document.documentElement.style.setProperty("--snaplinehorizontal", "block");
+        }
+    } else {
+        document.documentElement.style.setProperty("--snaplinehorizontal", "none");
+    }
+}
+
 // ======================================================================================
 // drag support
 boxWrapper.addEventListener('touchstart', function (event) {
@@ -85,6 +121,7 @@ boxWrapper.addEventListener('touchstart', function (event) {
 
 
     function eventMoveHandlerTouch(event) {
+        isdrag = true;
         var touch = event.touches[0];
         repositionElement(initX + (touch.pageX - mousePressX),
             initY + (touch.pageY - mousePressY));
@@ -92,6 +129,11 @@ boxWrapper.addEventListener('touchstart', function (event) {
 
     boxWrapper.addEventListener('touchmove', eventMoveHandlerTouch, false);
     window.addEventListener('touchend', function eventEndHandlerTouch() {
+        isdrag = false;
+        cap.setAttribute("contenteditable", "true");
+        document.documentElement.style.setProperty("--snaplinehorizontal", "none");
+        document.documentElement.style.setProperty("--snaplinevertical", "none");
+
         boxWrapper.removeEventListener('touchmove', eventMoveHandlerTouch, false);
         window.removeEventListener('touchend', eventEndHandlerTouch);
     }, false);
@@ -170,7 +212,6 @@ function resizeHandlerTouch(event, left = false, top = false, xResize = false, y
     }, false);
 }
 
-
 rightMid.addEventListener('touchstart', e => resizeHandlerTouch(e, false, false, true, false));
 leftMid.addEventListener('touchstart', e => resizeHandlerTouch(e, true, false, true, false));
 topMid.addEventListener('touchstart', e => resizeHandlerTouch(e, false, true, false, true));
@@ -228,12 +269,18 @@ boxWrapper.addEventListener('mousedown', function (event) {
 
 
     function eventMoveHandler(event) {
+        isdrag = true;
         repositionElement(initX + (event.clientX - mousePressX),
             initY + (event.clientY - mousePressY));
     }
 
     boxWrapper.addEventListener('mousemove', eventMoveHandler, false);
     window.addEventListener('mouseup', function eventEndHandler() {
+        isdrag = false;
+        cap.setAttribute("contenteditable", "true");
+        document.documentElement.style.setProperty("--snaplinehorizontal", "none");
+        document.documentElement.style.setProperty("--snaplinevertical", "none");
+
         boxWrapper.removeEventListener('mousemove', eventMoveHandler, false);
         window.removeEventListener('mouseup', eventEndHandler);
     }, false);
@@ -355,7 +402,6 @@ resize(250, 110);
 repositionElement(50, 20, "%");
 
 // =======================================================================================================
-let cap = document.getElementById("caption");
 function setSize(siz = "") {
     let size = document.getElementById("tsize").value;
     if (siz != "") {
