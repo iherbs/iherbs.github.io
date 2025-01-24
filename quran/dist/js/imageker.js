@@ -489,7 +489,7 @@ function generate() {
     boxWrapper.style.top = (boxt - (boxh / 2)) + "px";
 
     box.style.width = "0px";
-    boxWrapper.style.left = (boxl - (boxw / 2)) + "px";
+    boxWrapper.style.left = ((boxl - (boxw / 2)) - 0.5) + "px";
 
     document.getElementById("previewImage").innerHTML = "";
     var element = document.getElementById("wrapimage");
@@ -507,7 +507,7 @@ function generate() {
 
         boxWrapper.style.top = boxt + "px";
         box.style.height = boxh + "px";
-        boxWrapper.style.left = boxl + "px";
+        boxWrapper.style.left = (boxl - 0.5) + "px";
         box.style.width = boxw + "px";
 
         cap.style.width = "100%";
