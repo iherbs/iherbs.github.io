@@ -496,6 +496,7 @@ function generate() {
 
     html2canvas(element, {
         dpi: 144,
+        quality: 100,
         allowTaint: true,
         useCORS: true,
         width: element.offsetWidth,
