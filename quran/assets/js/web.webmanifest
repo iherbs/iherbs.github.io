@@ -1,0 +1,16 @@
+{
+    "name": "Quran",
+    "short_name": "Quran",
+    "description": "Quranbuku, digital quran",
+    "icons": [
+        {
+            "src": "../img/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/",
+    "display": "fullscreen",
+    "theme_color": "#007070",
+    "background_color": "#addddd"
+}
