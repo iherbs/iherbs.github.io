@@ -283,7 +283,7 @@ a {
   display: inline-block;
 }
 
-.dropbtn {
+#dropbtn {
   color: var(--color-text);
   background: transparent;
   border: none;
@@ -293,11 +293,11 @@ a {
   display: none;
   position: absolute;
   background-color: var(--color-even-ayah);
-  min-width: 160px;
+  min-width: 350px;
   bottom: 25px;
-  left: 6px;
+  left: -75px;
   overflow: auto;
-  border-radius: 5px;
+  border-radius: 8px;
   box-shadow: 0px 8px 16px 0px rgb(var(--color-shadow-rgb));
 }
 
@@ -312,6 +312,34 @@ a {
   color: var(--color-text);
   background: var(--color-even-ayah);
 }
+
+
+/* btnrepeat ========= */
+.btnrepeat {
+  display: inline-block;
+  cursor: pointer;
+  padding: 6px 5px;
+  width: 30%;
+  border: 1px solid var(--color-theme);
+  border-radius: 10px;
+  margin: 5px;
+  background: #ffffff;
+}
+
+.lblmop input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 100%;
+}
+
+.lblmop input:checked~.btnrepeat {
+  background: var(--color-title-text);
+  color: #ffffff;
+}
+
+/* btnrepeat ========= */
 
 .horizontal-dots {
   display: block;

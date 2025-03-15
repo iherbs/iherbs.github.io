@@ -2,7 +2,7 @@ var xmlhttp,
   surah = 0, markno = "", viewbuku = "", zoomlevel = 0, trackrate = 1, trackmode = 'A', isAwake = false,
   url = "https://raw.githubusercontent.com/iherbs/quran-json/main/",
   tasbih = { sum: 0, counter: 0, target: 0, ayah: "", zikirnum: "n", history: {} };
-let surah_list = {}, surah_data = [], doa_data = [], asma = [];
+let surah_list = {}, surah_data = [], doa_data = [], asma = [], jmlayah = 0, fromayah = 0, untilayah = 0, repeat = 1, repeatnum = 1, tracknow = 0;
 function _(id) {
   let el = {}, ismodal = false;
   if (id.substr(0, 1) == "#") {
@@ -69,16 +69,15 @@ _(".modalclose").forEach((el) =>
   })
 );
 
-_(".dropbtn").forEach((el) =>
-  el.addEventListener("click", (event) => {
-    // console.log(window.getComputedStyle(el.nextElementSibling).display == "none");
-    if (window.getComputedStyle(el.nextElementSibling).display === "none") {
-      el.nextElementSibling.style.display = "block";
-    } else {
-      el.nextElementSibling.style.display = "none";
-    }
-  })
-);
+_("#dropbtn").addEventListener("click", (event) => {
+  // console.log(window.getComputedStyle(el.nextElementSibling).display == "none");
+  if (window.getComputedStyle(_("#dropbtn").nextElementSibling).display === "none") {
+    getlistayahplayer();
+    _("#dropbtn").nextElementSibling.style.display = "block";
+  } else {
+    _("#dropbtn").nextElementSibling.style.display = "none";
+  }
+})
 
 function toast(txt = "") {
   var x = document.getElementById("toast");
@@ -231,10 +230,29 @@ function surahayahlist() {
 }
 
 function getlistayah() {
+  let opts = '';
   let nosr = parseInt(surah_list[_("#listsurah").value]["count"]);
   _("#listsurahayah").innerHTML = '';
   for (i = 1; i <= nosr; i++) {
-    _("#listsurahayah").innerHTML += '<option value="' + i + '">' + i + '</option>';
+    opts += '<option value="' + i + '">' + i + '</option>';
+  }
+  _("#listsurahayah").innerHTML = opts;
+}
+
+function getlistayahplayer() {
+  let nosr = parseInt(surah_data.length);
+  if (jmlayah != nosr) {
+    jmlayah = nosr;
+    let opts = '';
+    let optss = '';
+    _("#pdari").innerHTML = '';
+    _("#psampai").innerHTML = '';
+    for (i = 1; i <= nosr; i++) {
+      opts += '<option value="' + i + '">' + i + '</option>';
+      optss += '<option value="' + i + '" ' + (i == nosr ? 'selected' : '') + '>' + i + '</option>';
+    }
+    _("#pdari").innerHTML = opts;
+    _("#psampai").innerHTML = optss;
   }
 }
 
@@ -379,7 +397,7 @@ async function getsurah(surat = 1, nayah = "") {
 
   let bismillah = "";
   if (surah != 1) {
-    bismillah = '<tr style="display:block;"><td colspan="3" style="display:block;width:100%;"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
+    bismillah = '<tr id="n0" style="display:block;"><td colspan="3" style="display:block;width:100%;"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
   }
 
   _(
@@ -1160,6 +1178,7 @@ let timrsc = setTimeout(() => { }, 100);
 let timrpl = setTimeout(() => { }, 100);
 function audioPlay(id = "", recog = false) {
   closeOptions();
+  tracknow = parseInt(id);
   let sound = _("#track" + id).innerHTML;
   // track.setAttribute("controls", "true");
   _("#player").style.display = "block";
@@ -1252,21 +1271,31 @@ function audioPlay(id = "", recog = false) {
         _("#bplps" + id).classList.add("play-button");
       }
       if (trackmode == 'A' || trackmode == 'O') {
-        id = parseInt(id) + 1;
-        if (id <= surah_data.length) {
+        tracknow = parseInt(id) + 1;
+        untilayah = untilayah == 0 ? surah_data.length : untilayah;
+        if (tracknow <= untilayah) {
           timrsc = setTimeout(() => {
-            gotoayah(id, true);
+            gotoayah(tracknow, true);
           }, 1000);
           timrpl = setTimeout(() => {
-            audioPlay(id);
+            audioPlay(tracknow);
           }, 2000);
         } else {
-          id = surah_data.length;
+          tracknow = untilayah == 0 ? surah_data.length : untilayah;
           if (trackmode == 'O') {
             nextsurah();
-            id = surah == 1 ? 1 : 0;
+            tracknow = surah == 1 ? 1 : 0;
             timrpl = setTimeout(() => {
-              audioPlay(id);
+              audioPlay(tracknow);
+            }, 2000);
+          } else if ((repeat > 1 && repeatnum < repeat) || repeat == 0) {
+            repeatnum = repeatnum + 1;
+            tracknow = fromayah == 1 ? 0 : fromayah;
+            timrsc = setTimeout(() => {
+              gotoayah(tracknow, true);
+            }, 1000);
+            timrpl = setTimeout(() => {
+              audioPlay(tracknow);
             }, 2000);
           }
         }
@@ -1308,6 +1337,27 @@ function audiorate(rate = 1) {
 
 function onceauto(param = 'A') {
   trackmode = param;
+  if (param == 'O') {
+    document.getElementsByName("btnrepeat")[0].checked = true;
+    document.getElementById("pdari").value = 1;
+    document.getElementById("psampai").value = parseInt(surah_data.length);
+  }
+}
+
+function audiofromto() {
+  fromayah = document.getElementById("pdari").value;
+  untilayah = document.getElementById("psampai").value;
+  if (fromayah != 1 || untilayah != parseInt(surah_data.length)) {
+    trackmode = 'A';
+    document.getElementsByName("onceauto")[0].checked = true;
+  }
+}
+
+function audiorepeat(ulang = 1) {
+  repeat = ulang;
+  if (ulang != 1) {
+    document.getElementsByName("onceauto")[0].checked = true;
+  }
 }
 
 function closeTrack() {
@@ -1641,7 +1691,7 @@ window.onhashchange = function () {
 window.onclick = function (event) {
   // Close the dropdown if the user clicks outside of it
   // console.log(event.target);
-  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem') && !event.target.matches('.onceauto') && !event.target.matches('.checklbl') && !event.target.matches('.markoa')) {
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.horizontal-dots') && !event.target.matches('.contentmark') && !event.target.matches('.radiospeed') && !event.target.matches('.checkmark') && !event.target.matches('.dropitem') && !event.target.matches('.onceauto') && !event.target.matches('.checklbl') && !event.target.matches('.markoa') && !event.target.matches('.moptitem')) {
     var dropdowns = document.getElementsByClassName("dropdown-content");
     for (var i = 0; i < dropdowns.length; i++) {
       dropdowns[i].style.display = "none";
@@ -1814,12 +1864,13 @@ function StartSpeech() {
 function StopSpeech() {
   recognition.stop();
   recognizing = false;
+  trackmode = 'A';
 }
 
 const GetSpeech = (ayat = 0) => {
   closeOptions();
   trackmode = '1';
-  _("@onceauto")[2].checked = true;
+  // _("@onceauto")[2].checked = true;
 
   audioPlay(ayat, true);
 

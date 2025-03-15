@@ -225,53 +225,108 @@
         <input type="range" id="seekbar" value="0" min="0" max="100" step="1" />
         <div id="audiocontrol">
             <div class="dropdown playermenu" style="margin-top:-4px;margin-left:-100px;">
-                <button type="button" class="dropbtn">
+                <button type="button" id="dropbtn">
                     <span class="horizontal-dots"></span>
                 </button>
                 <div id="myDropdown" class="dropdown-content">
-                    <label class="dropitem" style="cursor:default;"><b>Speed</b></label>
-                    <label class="dropitem" onclick="audiorate(0.25)">
-                        <label class="contentmark">0.25
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(0.5)">
-                        <label class="contentmark">0.5
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(0.75)">
-                        <label class="contentmark">0.75
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(1)">
-                        <label class="contentmark">Normal
-                            <input type="radio" name="speed" class="radiospeed" checked="checked">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(1.25)">
-                        <label class="contentmark">1.25
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(1.5)">
-                        <label class="contentmark">1.5
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
-                    <label class="dropitem" onclick="audiorate(1.75)">
-                        <label class="contentmark">1.75
-                            <input type="radio" name="speed" class="radiospeed">
-                            <span class="checkmark"></span>
-                        </label>
-                    </label>
+                    <table width="100%">
+                        <tr>
+                            <td valign="top" width="50%">
+                                <label class="dropitem moptitem" style="cursor:default;">
+                                    <b class="moptitem">Speed</b>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(0.25)">
+                                    <label class="contentmark">0.25
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(0.5)">
+                                    <label class="contentmark">0.5
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(0.75)">
+                                    <label class="contentmark">0.75
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(1)">
+                                    <label class="contentmark">Normal
+                                        <input type="radio" name="speed" class="radiospeed" checked="checked">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(1.25)">
+                                    <label class="contentmark">1.25
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(1.5)">
+                                    <label class="contentmark">1.5
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                                <label class="dropitem" onclick="audiorate(1.75)">
+                                    <label class="contentmark">1.75
+                                        <input type="radio" name="speed" class="radiospeed">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </label>
+                            </td>
+                            <td valign="top" width="50%">
+                                <label class="dropitem moptitem" style="cursor:default;">
+                                    <b class="moptitem">Ayat</b>
+                                </label>
+                                <label class="dropitem" style="padding-top:5px;padding-bottom:0px;">
+                                    Dari
+                                    <select id="pdari" class="form-control moptitem" onchange="audiofromto()"
+                                        style="margin-bottom:5px;display:inline;"></select>
+                                </label>
+                                <label class="dropitem" style="padding-top:3px;padding-bottom:5px;">
+                                    Sampai
+                                    <select id="psampai" class="form-control moptitem" onchange="audiofromto()"
+                                        style="margin-bottom:5px;display:inline;"></select>
+                                </label>
+                                <label class="dropitem moptitem" style="cursor:default;padding-top:0px;">
+                                    <b class="moptitem">Ulang</b>
+                                </label>
+                                <div style="position:relative;margin-bottom:7px;">
+                                    <label class="lblmop moptitem" onclick="audiorepeat(1)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" checked="checked" />
+                                        <div class="btnrepeat moptitem">1x</div>
+                                    </label>
+                                    <label class="lblmop moptitem" onclick="audiorepeat(2)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" />
+                                        <div class="btnrepeat moptitem">2x</div>
+                                    </label>
+                                    <label class="lblmop moptitem" onclick="audiorepeat(3)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" />
+                                        <div class="btnrepeat moptitem">3x</div>
+                                    </label>
+                                    <label class="lblmop moptitem" onclick="audiorepeat(4)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" />
+                                        <div class="btnrepeat moptitem">4x</div>
+                                    </label>
+                                    <label class="lblmop moptitem" onclick="audiorepeat(5)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" />
+                                        <div class="btnrepeat moptitem">5x</div>
+                                    </label>
+                                    <label class="lblmop moptitem" onclick="audiorepeat(0)">
+                                        <input type="radio" name="btnrepeat" class="moptitem" />
+                                        <div class="btnrepeat moptitem">
+                                            &nbsp;<span class="moptitem"
+                                                style="position:absolute;font-size:25px;margin-left:-10px;margin-top:-5px;">∞</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                     <div style="display:flex;width:100%;border-top:1px solid var(--color-theme);background:#ffffff;">
                         <label class="markoa" onclick="onceauto('A')">
                             <input type="radio" name="onceauto" class="onceauto" checked="checked">
@@ -280,10 +335,6 @@
                         <label class="markoa" onclick="onceauto('O')">
                             <input type="radio" name="onceauto" class="onceauto">
                             <span class="checklbl">∞</span>
-                        </label>
-                        <label class="markoa" onclick="onceauto('1')">
-                            <input type="radio" name="onceauto" class="onceauto">
-                            <span class="checklbl">1</span>
                         </label>
                     </div>
                 </div>
