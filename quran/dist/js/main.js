@@ -107,12 +107,12 @@ async function get(file = "") {
 
 function openNav() {
   _("#sidenavoverlay").style.display = "block";
-  document.getElementById("mySidenav").style.width = "250px";
+  document.getElementById("mySidenav").style.left = "0px";
 }
 
 function closeNav() {
   _("#sidenavoverlay").style.display = "none";
-  document.getElementById("mySidenav").style.width = "0";
+  document.getElementById("mySidenav").style.left = "-252px";
 }
 
 function setTheme() {
@@ -397,7 +397,7 @@ async function getsurah(surat = 1, nayah = "") {
 
   let bismillah = "";
   if (surah != 1) {
-    bismillah = '<tr id="n0" style="display:block;"><td colspan="3" style="display:block;width:100%;"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
+    bismillah = '<tr id="n0" style="display:block;scroll-margin:40px;""><td colspan="3" style="display:block;width:100%;"><div class="arabic bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</div></td></tr>';
   }
 
   _(
@@ -1284,8 +1284,10 @@ function audioPlay(id = "", recog = false) {
           tracknow = untilayah == 0 ? surah_data.length : untilayah;
           if (trackmode == 'O') {
             nextsurah();
+            untilayah = 0;
             tracknow = surah == 1 ? 1 : 0;
             timrpl = setTimeout(() => {
+              getlistayahplayer();
               audioPlay(tracknow);
             }, 2000);
           } else if ((repeat > 1 && repeatnum < repeat) || repeat == 0) {
@@ -1297,6 +1299,8 @@ function audioPlay(id = "", recog = false) {
             timrpl = setTimeout(() => {
               audioPlay(tracknow);
             }, 2000);
+          } else if (repeatnum >= repeat) {
+            repeatnum = 1;
           }
         }
       }
@@ -1347,7 +1351,7 @@ function onceauto(param = 'A') {
 function audiofromto() {
   fromayah = document.getElementById("pdari").value;
   untilayah = document.getElementById("psampai").value;
-  if (fromayah != 1 || untilayah != parseInt(surah_data.length)) {
+  if (trackmode == 'O') {
     trackmode = 'A';
     document.getElementsByName("onceauto")[0].checked = true;
   }
@@ -1356,6 +1360,7 @@ function audiofromto() {
 function audiorepeat(ulang = 1) {
   repeat = ulang;
   if (ulang != 1) {
+    trackmode = 'A';
     document.getElementsByName("onceauto")[0].checked = true;
   }
 }
@@ -1862,9 +1867,11 @@ function StartSpeech() {
 }
 
 function StopSpeech() {
+  if (recognizing) {
+    trackmode = 'A';
+  }
   recognition.stop();
   recognizing = false;
-  trackmode = 'A';
 }
 
 const GetSpeech = (ayat = 0) => {

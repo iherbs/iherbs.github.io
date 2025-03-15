@@ -230,102 +230,109 @@
                 </button>
                 <div id="myDropdown" class="dropdown-content">
                     <table width="100%">
-                        <tr>
-                            <td valign="top" width="50%">
-                                <label class="dropitem moptitem" style="cursor:default;">
-                                    <b class="moptitem">Speed</b>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(0.25)">
-                                    <label class="contentmark">0.25
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                        <tbody>
+                            <tr>
+                                <td valign="top" width="50%">
+                                    <label class="dropitem moptitem" style="cursor:default;">
+                                        <b class="moptitem">Speed</b>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(0.5)">
-                                    <label class="contentmark">0.5
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(0.25)">
+                                        <label class="contentmark">0.25
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(0.75)">
-                                    <label class="contentmark">0.75
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(0.5)">
+                                        <label class="contentmark">0.5
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(1)">
-                                    <label class="contentmark">Normal
-                                        <input type="radio" name="speed" class="radiospeed" checked="checked">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(0.75)">
+                                        <label class="contentmark">0.75
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(1.25)">
-                                    <label class="contentmark">1.25
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(1)">
+                                        <label class="contentmark">Normal
+                                            <input type="radio" name="speed" class="radiospeed" checked="checked">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(1.5)">
-                                    <label class="contentmark">1.5
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(1.25)">
+                                        <label class="contentmark">1.25
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                                <label class="dropitem" onclick="audiorate(1.75)">
-                                    <label class="contentmark">1.75
-                                        <input type="radio" name="speed" class="radiospeed">
-                                        <span class="checkmark"></span>
+                                    <label class="dropitem" onclick="audiorate(1.5)">
+                                        <label class="contentmark">1.5
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                </label>
-                            </td>
-                            <td valign="top" width="50%">
-                                <label class="dropitem moptitem" style="cursor:default;">
-                                    <b class="moptitem">Ayat</b>
-                                </label>
-                                <label class="dropitem" style="padding-top:5px;padding-bottom:0px;">
-                                    Dari
-                                    <select id="pdari" class="form-control moptitem" onchange="audiofromto()"
-                                        style="margin-bottom:5px;display:inline;"></select>
-                                </label>
-                                <label class="dropitem" style="padding-top:3px;padding-bottom:5px;">
-                                    Sampai
-                                    <select id="psampai" class="form-control moptitem" onchange="audiofromto()"
-                                        style="margin-bottom:5px;display:inline;"></select>
-                                </label>
-                                <label class="dropitem moptitem" style="cursor:default;padding-top:0px;">
-                                    <b class="moptitem">Ulang</b>
-                                </label>
-                                <div style="position:relative;margin-bottom:7px;">
-                                    <label class="lblmop moptitem" onclick="audiorepeat(1)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" checked="checked" />
-                                        <div class="btnrepeat moptitem">1x</div>
+                                    <label class="dropitem" onclick="audiorate(1.75)">
+                                        <label class="contentmark">1.75
+                                            <input type="radio" name="speed" class="radiospeed">
+                                            <span class="checkmark"></span>
+                                        </label>
                                     </label>
-                                    <label class="lblmop moptitem" onclick="audiorepeat(2)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" />
-                                        <div class="btnrepeat moptitem">2x</div>
+                                </td>
+                                <td valign="top">
+                                    <div
+                                        style="position: absolute;display: block;top: 6%;height: 80%;width: 1px;border-left: 1px solid #ccc;">
+                                    </div>
+                                </td>
+                                <td valign="top" width="50%">
+                                    <label class="dropitem moptitem" style="cursor:default;">
+                                        <b class="moptitem">Ayat</b>
                                     </label>
-                                    <label class="lblmop moptitem" onclick="audiorepeat(3)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" />
-                                        <div class="btnrepeat moptitem">3x</div>
+                                    <label class="dropitem" style="padding-top:5px;padding-bottom:0px;">
+                                        Dari
+                                        <select id="pdari" class="form-control moptitem" onchange="audiofromto()"
+                                            style="margin-bottom:5px;display:inline;"></select>
                                     </label>
-                                    <label class="lblmop moptitem" onclick="audiorepeat(4)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" />
-                                        <div class="btnrepeat moptitem">4x</div>
+                                    <label class="dropitem" style="padding-top:3px;padding-bottom:5px;">
+                                        Sampai
+                                        <select id="psampai" class="form-control moptitem" onchange="audiofromto()"
+                                            style="margin-bottom:5px;display:inline;"></select>
                                     </label>
-                                    <label class="lblmop moptitem" onclick="audiorepeat(5)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" />
-                                        <div class="btnrepeat moptitem">5x</div>
+                                    <label class="dropitem moptitem" style="cursor:default;padding-top:0px;">
+                                        <b class="moptitem">Ulang</b>
                                     </label>
-                                    <label class="lblmop moptitem" onclick="audiorepeat(0)">
-                                        <input type="radio" name="btnrepeat" class="moptitem" />
-                                        <div class="btnrepeat moptitem">
-                                            &nbsp;<span class="moptitem"
-                                                style="position:absolute;font-size:25px;margin-left:-10px;margin-top:-5px;">∞</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
+                                    <div style="position:relative;margin-bottom:7px;">
+                                        <label class="lblmop moptitem" onclick="audiorepeat(1)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" checked="checked" />
+                                            <div class="btnrepeat moptitem">1x</div>
+                                        </label>
+                                        <label class="lblmop moptitem" onclick="audiorepeat(2)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" />
+                                            <div class="btnrepeat moptitem">2x</div>
+                                        </label>
+                                        <label class="lblmop moptitem" onclick="audiorepeat(3)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" />
+                                            <div class="btnrepeat moptitem">3x</div>
+                                        </label>
+                                        <label class="lblmop moptitem" onclick="audiorepeat(4)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" />
+                                            <div class="btnrepeat moptitem">4x</div>
+                                        </label>
+                                        <label class="lblmop moptitem" onclick="audiorepeat(5)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" />
+                                            <div class="btnrepeat moptitem">5x</div>
+                                        </label>
+                                        <label class="lblmop moptitem" onclick="audiorepeat(0)">
+                                            <input type="radio" name="btnrepeat" class="moptitem" />
+                                            <div class="btnrepeat moptitem">
+                                                &nbsp;<span class="moptitem"
+                                                    style="position:absolute;font-size:25px;margin-left:-10px;margin-top:-5px;">∞</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                     <div style="display:flex;width:100%;border-top:1px solid var(--color-theme);background:#ffffff;">
                         <label class="markoa" onclick="onceauto('A')">
@@ -334,7 +341,10 @@
                         </label>
                         <label class="markoa" onclick="onceauto('O')">
                             <input type="radio" name="onceauto" class="onceauto">
-                            <span class="checklbl">∞</span>
+                            <span class="checklbl">
+                                <span
+                                    style="position:absolute;font-size: 22px;margin-left:-10px;margin-top: -4px;">∞</span>
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -356,16 +366,18 @@
         <div id="state" style="display:none;"></div>
         <div id="previewsurah"></div>
         <table width="100%" cellspacing="5">
-            <tr id="btncopylink">
-                <td><button type="button" class="btnop" onclick="copylink()">Copy Link</button></td>
-            </tr>
-            <tr id="btncopytext">
-                <td><button type="button" class="btnop" onclick="copytext()">Copy Text</button></td>
-            </tr>
-            <tr id="btncreateimage">
-                <td><button type="button" class="btnop" onclick="imagemaker_show()">Create Image</button></td>
-            </tr>
-            <tr id="btnmore"></tr>
+            <tbody>
+                <tr id="btncopylink">
+                    <td><button type="button" class="btnop" onclick="copylink()">Copy Link</button></td>
+                </tr>
+                <tr id="btncopytext">
+                    <td><button type="button" class="btnop" onclick="copytext()">Copy Text</button></td>
+                </tr>
+                <tr id="btncreateimage">
+                    <td><button type="button" class="btnop" onclick="imagemaker_show()">Create Image</button></td>
+                </tr>
+                <tr id="btnmore"></tr>
+            </tbody>
         </table>
     </div>
 
@@ -414,74 +426,77 @@
         <div id="controlimage" onclick="hideboxder()">
             <div style="padding-top:1px;padding-left:15px;padding-right:15px;">
                 <table width="100%" cellspacing="5">
-                    <tr>
-                        <td colspan="2"><label class="titlestyle"><b>Text</b></label></td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">Size</td>
-                        <td align="right"><input type="number" id="tsize" value="18" onkeyup="setSize()"
-                                onchange="setSize()" /></td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">Color</td>
-                        <td align="right"><input type="color" id="tcolor" class="colorpick" onchange="setColor()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">
-                            Highlight
-                            <input type="range" id="halpha" onchange="setHAlpha();" min="0" max="1" step="0.1"
-                                value="1">
-                        </td>
-                        <td align="right">
-                            <button type="button" id="rehl" onclick="removeHL()">&times;</button>
-                            <input type="color" id="hcolor" class="colorpick" onchange="setHColor()" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">Style</td>
-                        <td align="right">
-                            <button type="button" class="btnst" onclick="setStyle('n')">N</button>
-                            <button type="button" class="btnst" onclick="setStyle('b')">B</button>
-                            <button type="button" class="btnst" onclick="setStyle('i')"><i>I</i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">Aligment</td>
-                        <td align="right">
-                            <button type="button" class="btnst" onclick="setAlign('L')" style="height:26px;">
-                                <span class="ic-align align-left"></span>
-                            </button>
-                            <button type="button" class="btnst" onclick="setAlign('C')" style="height:26px;">
-                                <span class="ic-align align-center"></span>
-                            </button>
-                            <button type="button" class="btnst" onclick="setAlign('R')" style="height:26px;">
-                                <span class="ic-align align-right"></span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="subttl">Background</td>
-                        <td align="right">
-                            <button type="button" id="rebg" onclick="removeBg()">&times;</button>
-                            <input type="color" id="bcolor" value="#f0f8ff" class="colorpick" onchange="setBgColor()" />
-                            <label id="slcimg">
-                                <input type="file" id="bgimage" accept="image/png,image/jpeg"
-                                    onchange="checkfile('bgimage')" style="visibility:hidden;width:0px;">
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <label class="titlestyle">
-                                <button type="button" class="btnst" style="padding:6px 15px;margin-right:20px;"
-                                    onclick="imagemaker_hide()">Close</button>
-                                <button type="button" id="downloadimg" class="btnst" style="padding:6px 15px;"
-                                    onclick="generate()">Save</button>
-                                <a href="#" id="generatedownload" style="display:none;"></a>
-                            </label>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td colspan="2"><label class="titlestyle"><b>Text</b></label></td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">Size</td>
+                            <td align="right"><input type="number" id="tsize" value="18" onkeyup="setSize()"
+                                    onchange="setSize()" /></td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">Color</td>
+                            <td align="right"><input type="color" id="tcolor" class="colorpick" onchange="setColor()" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">
+                                Highlight
+                                <input type="range" id="halpha" onchange="setHAlpha();" min="0" max="1" step="0.1"
+                                    value="1">
+                            </td>
+                            <td align="right">
+                                <button type="button" id="rehl" onclick="removeHL()">&times;</button>
+                                <input type="color" id="hcolor" class="colorpick" onchange="setHColor()" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">Style</td>
+                            <td align="right">
+                                <button type="button" class="btnst" onclick="setStyle('n')">N</button>
+                                <button type="button" class="btnst" onclick="setStyle('b')">B</button>
+                                <button type="button" class="btnst" onclick="setStyle('i')"><i>I</i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">Aligment</td>
+                            <td align="right">
+                                <button type="button" class="btnst" onclick="setAlign('L')" style="height:26px;">
+                                    <span class="ic-align align-left"></span>
+                                </button>
+                                <button type="button" class="btnst" onclick="setAlign('C')" style="height:26px;">
+                                    <span class="ic-align align-center"></span>
+                                </button>
+                                <button type="button" class="btnst" onclick="setAlign('R')" style="height:26px;">
+                                    <span class="ic-align align-right"></span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subttl">Background</td>
+                            <td align="right">
+                                <button type="button" id="rebg" onclick="removeBg()">&times;</button>
+                                <input type="color" id="bcolor" value="#f0f8ff" class="colorpick"
+                                    onchange="setBgColor()" />
+                                <label id="slcimg">
+                                    <input type="file" id="bgimage" accept="image/png,image/jpeg"
+                                        onchange="checkfile('bgimage')" style="visibility:hidden;width:0px;">
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label class="titlestyle">
+                                    <button type="button" class="btnst" style="padding:6px 15px;margin-right:20px;"
+                                        onclick="imagemaker_hide()">Close</button>
+                                    <button type="button" id="downloadimg" class="btnst" style="padding:6px 15px;"
+                                        onclick="generate()">Save</button>
+                                    <a href="#" id="generatedownload" style="display:none;"></a>
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
