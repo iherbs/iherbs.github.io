@@ -727,7 +727,7 @@
                 let surah = _("#surah").value;
                 let ayah = _("#ayah").value;
                 _("#modalwidget").modal("hide");
-                currentIndex = tofc[surah][ayah]["no"];
+                currentIndex = parseInt(tofc[surah][ayah]["no"]) - 1;
                 showLoading(true);
                 goToImage(currentIndex, true);
             });
