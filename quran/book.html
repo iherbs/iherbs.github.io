@@ -27,116 +27,168 @@
     <meta name="twitter:description" content="Al-Quran. Digital Al-Qur'an. Al Quran online, Quran online.">
     <meta name="twitter:image"
         content="https://raw.githubusercontent.com/iherbs/iherbs.github.io/main/quran/quran-book.png">
-
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        a {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            overflow: hidden;
             background-color: #ffffff;
             height: 100vh;
-            overflow-x: hidden;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
-        img {
+        .viewer-container {
             width: 100%;
-            height: auto;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff;
         }
 
-        #navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .image-container {
+            display: flex;
+            height: 100%;
+            transition: transform 0.3s ease-out;
+        }
+
+        .image-wrapper {
+            padding-top: 30px;
+            flex: 0 0 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+        }
+
+        .image-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transform-origin: center center;
+            transition: transform 0.1s ease;
+        }
+
+        .btn {
+            padding: 6px 12px;
             background-color: #007070;
-            color: #ffffff;
-            padding: 10px;
-            text-align: center;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #007070;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            color: #333;
+            align-self: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #navigation {
+            position: fixed;
+            bottom: -55px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 9px;
+            background-color: #007070;
+            border-radius: 10px;
+            margin: 5px;
+            z-index: 100;
+            transform: translateY(0px);
+            transition: transform 0.3s ease-out;
+        }
+
+        #zoom-controls {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 15px;
+            z-index: 10;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #zoom-controls .btn {
+            width: 35px;
+            height: 35px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
             z-index: 1000;
+            display: none;
         }
 
-        .container {
-            margin-top: 50px;
-            position: relative;
-            overflow-x: hidden;
+        .arrow {
+            border: solid #ffffff;
+            border-width: 0 3px 3px 0;
+            display: inline-block;
+            padding: 3px;
         }
 
-        .book,
-        .page {
-            user-select: none;
+        .arrow-left {
+            transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
         }
 
-        .pside {
-            position: absolute;
-            display: inline;
-            width: 100%;
+        .arrow-right {
+            transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
         }
 
-        .psidel {
-            left: -100%;
+        .icon-turn-down {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path style="fill:white;" d="M178.3 506.3L40.3 368.3C35 363 32 355.8 32 348.3C32 332.7 44.7 320 60.3 320H144V112c0-8.8-7.2-16-16-16H32C14.3 96 0 81.7 0 64V32C0 14.3 14.3 0 32 0h96c61.9 0 112 50.1 112 112V320h83.7c15.6 0 28.3 12.7 28.3 28.3c0 7.5-3 14.7-8.3 20L205.7 506.3C202 510 197.1 512 192 512s-10-2-13.7-5.7z"/></svg>');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            display: inline-block;
+            height: 20px;
+            width: 20px;
         }
-
-        .psider {
-            top: 0px;
-            right: -100%;
-        }
-
-        /* LOADER / LOADING ================== */
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #007070;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            position: relative;
-            margin: 150px auto;
-            animation: spin 2s linear infinite;
-            -webkit-animation: spin 2s linear infinite;
-            -moz-animation: spin 2s linear infinite;
-            -o-animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @-webkit-keyframes spin {
-            from {
-                -webkit-transform: rotate(0deg);
-            }
-
-            to {
-                -webkit-transform: rotate(360deg);
-            }
-        }
-
-        @-moz-keyframes spin {
-            from {
-                -moz-transform: rotate(0deg);
-            }
-
-            to {
-                -moz-transform: rotate(360deg);
-            }
-        }
-
-        @-o-keyframes spin {
-            from {
-                -o-transform: rotate(0deg);
-            }
-
-            to {
-                -o-transform: rotate(360deg);
-            }
-        }
-
-        /* END LOADER / LOADING ================== */
 
         /* Modal ==================*/
         .modal,
@@ -186,38 +238,91 @@
         }
 
         /* End Modal ==================*/
-
-        .icon-turn-down {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path style="fill:white;" d="M178.3 506.3L40.3 368.3C35 363 32 355.8 32 348.3C32 332.7 44.7 320 60.3 320H144V112c0-8.8-7.2-16-16-16H32C14.3 96 0 81.7 0 64V32C0 14.3 14.3 0 32 0h96c61.9 0 112 50.1 112 112V320h83.7c15.6 0 28.3 12.7 28.3 28.3c0 7.5-3 14.7-8.3 20L205.7 506.3C202 510 197.1 512 192 512s-10-2-13.7-5.7z"/></svg>');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 20px 20px;
-            display: inline-block;
-            height: 20px;
-            width: 20px;
+        /* LOADER / LOADING ================== */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007070;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            position: relative;
+            margin: 10px auto;
+            animation: spin 2s linear infinite;
+            -webkit-animation: spin 2s linear infinite;
+            -moz-animation: spin 2s linear infinite;
+            -o-animation: spin 2s linear infinite;
         }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+            }
+
+            to {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg);
+            }
+
+            to {
+                -moz-transform: rotate(360deg);
+            }
+        }
+
+        @-o-keyframes spin {
+            from {
+                -o-transform: rotate(0deg);
+            }
+
+            to {
+                -o-transform: rotate(360deg);
+            }
+        }
+
+        /* END LOADER / LOADING ================== */
     </style>
 </head>
 
 <body>
-    <div id="navbar">
-        <span style="float:left;">Quran</span>
-        <span id="toayah" onclick="modalgotoayah()" class="icon-turn-down"
-            style="position:relative;margin-left:5px;margin-right:25px;cursor:pointer;float:right;"></span>
+    <div class="loading" id="loadingIndicator">
+        <div class="loader"></div>
     </div>
 
-    <div class="container">
-        <div id="book" class="book">
-            <div class="pside psidel" id="pagel"></div>
-            <div class="page">
-                <div id="page">
-                    <div class="loader"></div>
-                </div>
-            </div>
-            <div class="pside psider" id="pager"></div>
+    <div class="viewer-container" id="viewer">
+        <div class="image-container" id="imageContainer">
         </div>
     </div>
 
+    <div id="navigation">
+        <button id="nextBtn" class="btn">
+            <span class="arrow arrow-left"></span>
+        </button>
+        <span id="toayah" class="icon-turn-down" style="position:relative;margin-top:5px;cursor:pointer;"></span>
+        <div class="page-indicator" id="pageIndicator" style="display:none;">1 / 604</div>
+        <button id="prevBtn" class="btn" disabled>
+            <span class="arrow arrow-right"></span>
+        </button>
+    </div>
+
+    <div id="zoom-controls">
+        <button id="zoomInBtn" class="btn">+</button>
+        <button id="zoomOutBtn" class="btn">-</button>
+        <button id="resetZoomBtn" class="btn">⟲</button>
+    </div>
 
     <div class="modal" id="modalwidget">
         <div class="modaloverlay"></div>
@@ -230,7 +335,7 @@
                     <select id="ayah"
                         style="padding: 10px 20px; border: 1px solid #007070; border-radius: 5px;"></select>
                     <br><br>
-                    <button onclick="goToPage()"
+                    <button id="goToPage"
                         style="padding: 10px 20px; background-color: #007070; color: #ffffff; border: none; border-radius: 5px; cursor: pointer;">Go</button>
                 </div>
             </div>
@@ -238,12 +343,9 @@
     </div>
 
     <script>
-        const book = document.getElementById('book');
-        const imgl = document.getElementById('pagel');
-        const img = document.getElementById('page');
-        const imgr = document.getElementById('pager');
-        const url = 'https://raw.githubusercontent.com/iherbs/quran-json/refs/heads/main/Images/tajwid/';
-        const ext = '.png';
+        let isnavopen = false;
+        let touchtime = 0;
+        let surah_list = {}, tofc = {};
 
         async function get(file = "") {
             return new Promise((resolve, _reject) => {
@@ -258,12 +360,6 @@
                 xmlhttp.send();
             });
         }
-
-        let pages = 1;
-        let iml = pages + 1;
-        let im = pages;
-        let imr = pages - 1;
-        let surah_list = {}, tofc = {};
 
         function _(id) {
             let el = {}, ismodal = false;
@@ -331,7 +427,6 @@
             })
         );
 
-
         async function init() {
             let re = await get('https://raw.githubusercontent.com/iherbs/quran-json/main/surah_list.json');
             surah_list = JSON.parse(re);
@@ -341,20 +436,6 @@
         }
         init();
 
-        function modalgotoayah() {
-            _("#modalwidget").modal("show");
-            let list = "";
-            for (i in surah_list) {
-                list += `<option value="${surah_list[i].id}">${surah_list[i].name}</option>`;
-            }
-            if (_("#surah").innerHTML == "") {
-                _("#surah").innerHTML = list;
-            }
-            if (_("#ayah").innerHTML == "") {
-                getjml();
-            }
-        }
-
         function getjml() {
             let surah = _("#surah").value, list = "";
             for (i = 1; i <= surah_list[surah]["count"]; i++) {
@@ -363,188 +444,485 @@
             _("#ayah").innerHTML = list;
         }
 
-        function goToPage() {
-            let surah = _("#surah").value;
-            let ayah = _("#ayah").value;
-            _("#modalwidget").modal("hide");
-            pages = tofc[surah][ayah]["no"];
-            img.innerHTML = `<div class="loader"></div>`;
-            getPage();
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Konfigurasi
+            const totalImages = 604;
+            const imageBaseUrl = 'https://raw.githubusercontent.com/iherbs/quran-json/main/Images/tajwid/';
+            const imageExtension = '.png';
+            const bufferSize = 3; // Jumlah gambar yang di-cache di kedua sisi
 
-        function getPage() {
-            if (pages < 1) {
-                pages = 604;
-            } else if (pages > 604) {
-                pages = 1;
-            }
+            // Elemen DOM
+            const imageContainer = document.getElementById('imageContainer');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
+            const viewer = document.getElementById('viewer');
+            const loadingIndicator = document.getElementById('loadingIndicator');
 
-            iml = parseInt(pages) + 1;
-            im = parseInt(pages);
-            imr = parseInt(pages) - 1;
-
-            if (parseInt(iml) > 604) {
-                iml = 1;
-            }
-
-            if (parseInt(imr) < 1) {
-                imr = 604;
-            }
-
-            if (parseInt(iml) < 10) {
-                iml = '00' + iml;
-            } else if (parseInt(iml) < 100) {
-                iml = '0' + iml;
-            }
-
-            if (parseInt(im) < 10) {
-                im = '00' + pages;
-            } else if (parseInt(im) < 100) {
-                im = '0' + pages;
-            }
-
-            if (parseInt(imr) < 10) {
-                imr = '00' + imr;
-            } else if (parseInt(imr) < 100) {
-                imr = '0' + imr;
-            }
-
-
-            setTimeout(() => {
-                initialX = 0;
-                currentX = 0;
-                book.style.transition = 'none';
-                book.style.transform = 'translateX(0)';
-                img.innerHTML = `<img src="${url}${im}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
-                imgl.innerHTML = `<img src="${url}${iml}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
-                imgr.innerHTML = `<img src="${url}${imr}${ext}" class="qbook" alt="Quran" draggable="false"/>`;
-            }, 500);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        getPage();
-
-        let startX = 0;
-        let endX = 0;
-
-        img.addEventListener('mousedown', (e) => {
-            startX = e.clientX;
-        });
-
-        img.addEventListener('mouseup', (e) => {
-            endX = e.clientX;
-            handleSwipe();
-        });
-
-        img.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-        });
-
-        img.addEventListener('touchend', (e) => {
-            endX = e.changedTouches[0].clientX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            if (startX - 100 > endX) {
-                // previous page
-                // console.log('Swiped left');
-                pages--;
-                book.style.transition = 'transform 0.5s ease';
-                book.style.transform = 'translateX(-100%)';
-                getPage();
-            } else if (startX + 100 < endX) {
-                // next page
-                // console.log('Swiped right');
-                pages++;
-                book.style.transition = 'transform 0.5s ease';
-                book.style.transform = 'translateX(100%)';
-                getPage();
+            if (mobiledevice()) {
+                // mobile
+                isnavopen = false;
+                document.getElementById('zoom-controls').style.display = 'none';
+                // document.getElementById('navigation').style.transform = 'translateY(0px)';
             } else {
-                initialX = 0;
-                currentX = 0;
-                book.style.transition = 'transform 0.5s ease';
-                book.style.transform = 'translateX(0)';
+                // desktop
+                isnavopen = true;
+                document.getElementById('zoom-controls').style.display = 'flex';
+                document.getElementById('navigation').style.transform = 'translateY(-60px)';
+            }
+
+            // State aplikasi
+            let currentIndex = 0;
+            let zoomLevel = 1;
+            let startX = 0;
+            let startY = 0;
+            let isDragging = false;
+            let isPinching = false;
+            let initialDistance = 0;
+            let imgTransformX = 0;
+            let imgTransformY = 0;
+            let currentImage = null;
+            let loadedImages = {}; // Cache untuk gambar yang sudah dimuat
+            let currentImageElements = []; // Elemen gambar yang saat ini ada di DOM
+
+            // Fungsi untuk menampilkan loading indicator
+            function showLoading(show) {
+                loadingIndicator.style.display = show ? 'block' : 'none';
+            }
+
+            // Format nomor halaman dengan leading zero
+            function formatPageNumber(num) {
+                return num.toString().padStart(3, '0');
+            }
+
+            // Inisialisasi gambar
+            async function initImages() {
+                // showLoading(true);
+
+                // Load gambar pertama dan buffer di sekitarnya
+                await loadImageRange(0, bufferSize);
+
+                updateView();
+                showLoading(false);
+            }
+
+            // Memuat range gambar tertentu
+            async function loadImageRange(start, end) {
+                const promises = [];
+
+                for (let i = start; i <= end; i++) {
+                    if (i >= 0 && i < totalImages && !loadedImages[i]) {
+                        promises.push(loadSingleImage(i));
+                    }
+                }
+
+                await Promise.all(promises);
+            }
+
+            // Memuat satu gambar
+            function loadSingleImage(index) {
+                return new Promise((resolve) => {
+                    if (loadedImages[index]) {
+                        resolve();
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.onload = function () {
+                        loadedImages[index] = img.src;
+                        resolve();
+                    };
+                    img.onerror = function () {
+                        console.error('Gagal memuat gambar:', img.src);
+                        resolve();
+                    };
+
+                    const pageNum = ("000" + formatPageNumber(index + 1)).slice(-3);
+                    img.src = `${imageBaseUrl}${pageNum}${imageExtension}`;
+                });
+            }
+
+            // Memperbarui tampilan dengan gambar yang sesuai
+            function updateView() {
+                // showLoading(true);
+
+                // Hapus semua elemen gambar yang ada
+                imageContainer.innerHTML = '';
+                currentImageElements = [];
+
+                // Hitung range gambar yang perlu ditampilkan
+                const start = Math.max(0, parseInt(currentIndex) - bufferSize);
+                const end = Math.min(totalImages - 1, parseInt(currentIndex) + parseInt(bufferSize));
+
+                // Buat wrapper untuk gambar dalam range
+                for (let i = start; i <= end; i++) {
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.className = 'image-wrapper';
+                    imageWrapper.dataset.index = i;
+
+                    const img = document.createElement('img');
+                    img.alt = `Halaman ${i + 1}`;
+                    img.dataset.index = i;
+                    img.draggable = false;
+
+                    // Gunakan gambar yang sudah di-cache jika ada
+                    if (loadedImages[i]) {
+                        img.src = loadedImages[i];
+                    } else {
+                        const pageNum = formatPageNumber(i + 1);
+                        img.src = `${imageBaseUrl}${pageNum}${imageExtension}`;
+                        loadedImages[i] = img.src;
+                    }
+                    img.onload = function () {
+                        showLoading(false);
+                    };
+
+                    imageWrapper.prepend(img);
+                    imageContainer.prepend(imageWrapper);
+                    currentImageElements.push(img);
+
+                    // Jika ini gambar saat ini, simpan referensinya
+                    if (i === parseInt(currentIndex)) {
+                        currentImage = img;
+                    }
+                }
+
+                // Geser container ke gambar yang aktif (arah Al-Quran)
+
+                imageContainer.style.transition = 'none';
+                const currentWrapper = imageContainer.querySelector(`[data-index="${currentIndex}"]`);
+                const wrapperOffset = currentWrapper ? currentWrapper.offsetLeft : 0;
+                imageContainer.style.transform = `translateX(calc(${wrapperOffset * -1}px))`;
+                // imageContainer.style.transform = `translateX(${(currentWrapper) * 100}%)`;
+
+                // Update tombol navigasi
+                prevBtn.disabled = parseInt(currentIndex) === 0;
+                nextBtn.disabled = parseInt(currentIndex) === totalImages - 1;
+
+                // Update indikator halaman
+                pageIndicator.textContent = `${parseInt(currentIndex) + 1} / ${totalImages}`;
+
+                // Reset zoom dan posisi gambar
+                resetZoom();
+
+                // Preload gambar berikutnya di background
                 setTimeout(() => {
-                    book.style.transition = 'none';
-                }, 500);
+                    const nextStart = Math.min(parseInt(currentIndex) + 1, totalImages - 1);
+                    const nextEnd = Math.min(parseInt(currentIndex) + bufferSize + 1, totalImages - 1);
+                    loadImageRange(nextStart, nextEnd);
+
+                    const prevStart = Math.max(parseInt(currentIndex) - bufferSize - 1, 0);
+                    const prevEnd = Math.max(parseInt(currentIndex) - 1, 0);
+                    loadImageRange(prevStart, prevEnd);
+
+                }, 300);
             }
-        }
 
-        // ==================== Dragging ====================
-        let isDragging = false;
-        let initialX = 0;
-        let initialY = 0;
-        let currentX = 0;
-        let currentY = 0;
-
-        let initialDistance = 0;
-        let currentDistance = 0;
-        let scale = 1;
-
-        book.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            initialX = e.clientX - currentX;
-        });
-
-        book.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                currentX = e.clientX - initialX;
-                book.style.transform = `translateX(${currentX}px)`;
+            // Navigasi gambar
+            async function goToImage(index, jump = false) {
+                if (index >= 0 && index < totalImages) {
+                    currentIndex = parseInt(index);
+                    if (!jump) {
+                        const currentWrapper = imageContainer.querySelector(`[data-index="${currentIndex}"]`);
+                        const wrapperOffset = currentWrapper ? currentWrapper.offsetLeft : 0;
+                        imageContainer.style.transition = 'transform 0.3s ease-out';
+                        imageContainer.style.transform = `translateX(calc(${wrapperOffset * -1}px))`;
+                    }
+                    setTimeout(async () => {
+                        await updateView();
+                    }, 500);
+                }
             }
-        });
 
-        book.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+            // Zoom gambar
+            function applyZoom() {
+                if (!currentImage) return;
 
-        book.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
-
-        book.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                initialDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-            } else if (e.touches.length === 1) {
-                isDragging = true;
-                initialX = e.touches[0].clientX - currentX;
-                initialY = e.touches[0].clientY - currentY;
+                currentImage.style.transform = `translate(${imgTransformX}px, ${imgTransformY}px) scale(${zoomLevel})`;
             }
-        });
 
-        book.addEventListener('touchmove', (e) => {
-
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                currentDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-                scale = currentDistance / initialDistance;
-                let curX = e.touches[0].clientX - initialX;
-                let curY = e.touches[0].clientY - initialY;
-                book.style.transform = `translateX(${curX}px) translateY(${curY}px) scale(${scale})`;
-            } else if (e.touches.length === 1 && isDragging) {
-                // e.preventDefault();
-                currentX = e.touches[0].clientX - initialX;
-                book.style.transform = `translateX(${currentX}px)`;
+            function zoomIn() {
+                zoomLevel = Math.min(zoomLevel + 0.2, 3);
+                applyZoom();
             }
-        });
 
-        book.addEventListener('touchend', () => {
-            isDragging = false;
+            function zoomOut() {
+                zoomLevel = Math.max(zoomLevel - 0.2, 1);
+                if (zoomLevel === 1) {
+                    resetImagePosition();
+                }
+                applyZoom();
+            }
 
-            initialDistance = 0;
-            currentDistance = 0;
-        });
+            function resetZoom() {
+                zoomLevel = 1;
+                resetImagePosition();
+                applyZoom();
+            }
 
-        book.addEventListener('touchcancel', () => {
-            isDragging = false;
+            function resetImagePosition() {
+                imgTransformX = 0;
+                imgTransformY = 0;
+            }
+
+            // Hitung jarak antara dua titik sentuh
+            function getDistance(touches) {
+                const a = touches[0].clientX - touches[1].clientX;
+                const b = touches[0].clientY - touches[1].clientY;
+                return Math.sqrt(a * a + b * b);
+            }
+
+            function toggleNav() {
+                if (isnavopen) {
+                    document.getElementById('zoom-controls').style.display = 'none';
+                    document.getElementById('navigation').style.transform = 'translateY(0px)';
+                } else {
+                    document.getElementById('zoom-controls').style.display = 'flex';
+                    document.getElementById('navigation').style.transform = 'translateY(-60px)';
+                }
+                isnavopen = !isnavopen;
+            }
+
+            // Event listeners untuk navigasi
+            prevBtn.addEventListener('click', () => goToImage(parseInt(currentIndex) - 1));
+            nextBtn.addEventListener('click', () => goToImage(parseInt(currentIndex) + 1));
+
+            // Event listeners untuk zoom
+            zoomInBtn.addEventListener('click', zoomIn);
+            zoomOutBtn.addEventListener('click', zoomOut);
+            resetZoomBtn.addEventListener('click', resetZoom);
+
+            // Event listeners untuk touch (mobile)
+            viewer.addEventListener('touchstart', handleTouchStart, { passive: false });
+            viewer.addEventListener('touchmove', handleTouchMove, { passive: false });
+            viewer.addEventListener('touchend', handleTouchEnd);
+
+            // Event listeners untuk mouse (desktop)
+            viewer.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+
+            // Event listener untuk keyboard
+            document.addEventListener('keydown', handleKeyDown);
+
+            // gotopage
+            document.getElementById('toayah').addEventListener('click', () => {
+                _("#modalwidget").modal("show");
+                let list = "";
+                for (i in surah_list) {
+                    list += `<option value="${surah_list[i].id}">${surah_list[i].name}</option>`;
+                }
+                if (_("#surah").innerHTML == "") {
+                    _("#surah").innerHTML = list;
+                }
+                if (_("#ayah").innerHTML == "") {
+                    getjml();
+                }
+            });
+
+            document.getElementById('goToPage').addEventListener('click', () => {
+                let surah = _("#surah").value;
+                let ayah = _("#ayah").value;
+                _("#modalwidget").modal("hide");
+                currentIndex = tofc[surah][ayah]["no"];
+                showLoading(true);
+                goToImage(currentIndex, true);
+            });
+
+            function handleTouchStart(e) {
+                touchtime = new Date().getTime();
+                if (e.touches.length === 1 && zoomLevel === 1) {
+                    // Persiapan untuk swipe (hanya saat tidak zoom)
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    isPinching = false;
+                    e.preventDefault();
+                } else if (e.touches.length === 2) {
+                    // Persiapan untuk pinch zoom
+                    initialDistance = getDistance(e.touches);
+                    isPinching = true;
+                    isDragging = false;
+                    e.preventDefault();
+                } else if (e.touches.length === 1 && zoomLevel > 1) {
+                    // Persiapan untuk drag gambar yang di-zoom
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    isDragging = true;
+                    isPinching = false;
+                    e.preventDefault();
+                }
+            }
+
+            function handleTouchMove(e) {
+                if (isPinching && e.touches.length === 2) {
+                    // Handle pinch zoom
+                    const currentDistance = getDistance(e.touches);
+                    const scale = currentDistance / initialDistance;
+
+                    // Update zoom level dengan batasan
+                    const newZoom = zoomLevel * scale;
+                    if (newZoom >= 1 && newZoom <= 3) {
+                        zoomLevel = newZoom;
+                        applyZoom();
+                    } else {
+                        resetZoom();
+                    }
+
+                    initialDistance = currentDistance;
+                    e.preventDefault();
+                } else if (isDragging && zoomLevel === 1 && e.touches.length === 1) {
+                    // Handle swipe (hanya saat tidak zoom)
+                    const currentX = e.touches[0].clientX;
+                    const diff = startX - currentX;
+
+                    // Geser container sementara selama drag (arah Al-Quran)
+                    imageContainer.style.transition = 'none';
+                    const currentWrapper = imageContainer.querySelector(`[data-index="${currentIndex}"]`);
+                    const wrapperOffset = currentWrapper ? currentWrapper.offsetLeft : 0;
+                    imageContainer.style.transform = `translateX(calc(${wrapperOffset * -1}px - ${diff}px))`;
+                    e.preventDefault();
+                } else if (isDragging && zoomLevel > 1 && e.touches.length === 1) {
+                    // Handle drag gambar yang di-zoom
+                    const currentX = e.touches[0].clientX;
+                    const currentY = e.touches[0].clientY;
+
+                    imgTransformX -= (startX - currentX) / zoomLevel;
+                    imgTransformY -= (startY - currentY) / zoomLevel;
+
+                    startX = currentX;
+                    startY = currentY;
+
+                    applyZoom();
+                    e.preventDefault();
+                }
+            }
+
+            function handleTouchEnd(e) {
+                if (isDragging && zoomLevel === 1) {
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+
+                    // Kembalikan transisi
+                    imageContainer.style.transition = 'transform 0.3s ease-out';
+
+                    // Tentukan apakah perlu pindah gambar (arah Al-Quran)
+                    if (diff > 50 && parseInt(currentIndex) > 0) {
+                        // Swipe ke kanan - previous page
+                        goToImage(parseInt(currentIndex) - 1);
+                    } else if (diff < -50 && parseInt(currentIndex) < totalImages - 1) {
+                        // Swipe ke kiri - next page
+                        goToImage(parseInt(currentIndex) + 1);
+                    } else {
+                        // Kembali ke posisi semula
+                        updateView();
+                    }
+                }
+
+                if (((new Date().getTime()) - touchtime) < 120) {
+                    touchtime = 0;
+                    toggleNav();
+                }
+
+                isDragging = false;
+                isPinching = false;
+            }
+
+            function handleMouseDown(e) {
+                touchtime = new Date().getTime();
+                if (zoomLevel === 1) {
+                    startX = e.clientX;
+                    isDragging = true;
+                    viewer.style.cursor = 'grabbing';
+                } else {
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    isDragging = true;
+                    viewer.style.cursor = 'move';
+                }
+            }
+
+            function handleMouseMove(e) {
+                if (isDragging && zoomLevel === 1) {
+                    const currentX = e.clientX;
+                    const diff = startX - currentX;
+
+                    // Geser container sementara selama drag (arah Al-Quran)
+                    // imageContainer.style.transition = 'none';
+                    const currentWrapper = imageContainer.querySelector(`[data-index="${currentIndex}"]`);
+                    const wrapperOffset = currentWrapper ? currentWrapper.offsetLeft : 0;
+                    imageContainer.style.transform = `translateX(calc(${wrapperOffset * -1}px - ${diff}px))`;
+                } else if (isDragging && zoomLevel > 1) {
+                    const currentX = e.clientX;
+                    const currentY = e.clientY;
+
+                    imgTransformX -= (startX - currentX) / zoomLevel;
+                    imgTransformY -= (startY - currentY) / zoomLevel;
+
+                    startX = currentX;
+                    startY = currentY;
+
+                    applyZoom();
+                }
+            }
+
+            function handleMouseUp(e) {
+                if (isDragging && zoomLevel === 1) {
+                    const endX = e.clientX;
+                    const diff = startX - endX;
+
+                    // Kembalikan transisi dan cursor
+                    imageContainer.style.transition = 'transform 0.3s ease-out';
+                    viewer.style.cursor = 'grab';
+
+                    // Tentukan apakah perlu pindah gambar (arah Al-Quran)
+                    if (diff > 100 && parseInt(currentIndex) > 0) {
+                        // Swipe ke kanan - previous page
+                        goToImage(parseInt(currentIndex) - 1);
+                    } else if (diff < -100 && parseInt(currentIndex) < totalImages - 1) {
+                        // Swipe ke kiri - next page
+                        goToImage(parseInt(currentIndex) + 1);
+                    } else {
+                        // Kembali ke posisi semula
+                        updateView();
+                    }
+                } else if (isDragging && zoomLevel > 1) {
+                    viewer.style.cursor = 'grab';
+                }
+
+                if (((new Date().getTime()) - touchtime) < 120) {
+                    touchtime = 0;
+                    toggleNav();
+                }
+
+                isDragging = false;
+            }
+
+            function handleKeyDown(e) {
+                // Navigasi dengan keyboard
+                if (e.key === 'ArrowRight' && parseInt(currentIndex) < totalImages - 1) {
+                    goToImage(parseInt(currentIndex) + 1);
+                } else if (e.key === 'ArrowLeft' && parseInt(currentIndex) > 0) {
+                    goToImage(parseInt(currentIndex) - 1);
+                } else if (e.key === '+') {
+                    zoomIn();
+                } else if (e.key === '-') {
+                    zoomOut();
+                } else if (e.key === '0') {
+                    resetZoom();
+                }
+            }
+
+            // Inisialisasi
+            initImages();
         });
+        const mobiledevice = function () {
+            let check = false;
+            (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
+            return check;
+        };
     </script>
 </body>
 
