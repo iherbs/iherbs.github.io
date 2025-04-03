@@ -475,7 +475,7 @@
             }
 
             // State aplikasi
-            let currentIndex = 0;
+            let currentIndex = localStorage.getItem("lastview") == null ? 0 : parseInt(localStorage.getItem("lastview"));
             let zoomLevel = 1;
             let startX = 0;
             let startY = 0;
@@ -625,6 +625,7 @@
             async function goToImage(index, jump = false) {
                 if (index >= 0 && index < totalImages) {
                     currentIndex = parseInt(index);
+                    localStorage.setItem("lastview", currentIndex);
                     if (!jump) {
                         const currentWrapper = imageContainer.querySelector(`[data-index="${currentIndex}"]`);
                         const wrapperOffset = currentWrapper ? currentWrapper.offsetLeft : 0;
