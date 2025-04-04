@@ -360,7 +360,7 @@ async function getsurah(surat = 1, nayah = "") {
   surah_data = re;
   // console.log(re);
 
-  let ayah = "";
+  let ayah = "", page = 0;
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
@@ -392,7 +392,13 @@ async function getsurah(surat = 1, nayah = "") {
         </tr>`;
 
 
-    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '" style="padding-left:11px;">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ' + (surah == 1 && re[i]["no_ayah"] == 1 ? '<br>' : '');
+    viewbuku += '<span class="vwbkayah" id="rnayah' + re[i]["no_ayah"] + '">' + parseArabic(re[i]["text_ayah"], tajweed) + ' <span id="rn' + re[i]["no_ayah"] + '" style="scroll-margin:40px;cursor:pointer;" onclick="moreOption(' + surah + ',' + re[i]["no_ayah"] + ')">' + arabicNumbers(re[i]["no_ayah"]) + '</span></span> ' + (surah == 1 && re[i]["no_ayah"] == 1 ? '<br>' : '');
+    if (i == 0) {
+      page = re[i]["page"];
+    } else if (page != re[i]["page"]) {
+      page = re[i]["page"];
+      viewbuku += '<hr style="margin-top:20px;margin-bottom:20px;border:1px solid #9a9a9a">';
+    }
   }
 
   let bismillah = "";
@@ -418,7 +424,7 @@ async function getsurah(surat = 1, nayah = "") {
     </tr>
     </table>
 
-    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;font-size:27px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;text-align:${surat == 1 ? "center" : "justify"};text-align-last:center;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
+    <div class="arabic" id="rawsurah" style="display:${viewmode == "line" ? "none" : "block"};width:100%;font-size:28px;line-height:2.3;margin-top:20px;margin-bottom:30px;direction:rtl;text-align:${surat == 1 ? "center" : "justify"};text-align-last:center;padding-left:20px;padding-right:20px;">${bismillah + viewbuku}</div>
     <table class="surah" id="datasurah" style="display:${viewmode == "book" ? "none" : "block"};"><tbody style="display:block;">${bismillah + ayah}</tbody></table>`;
   window.scrollTo({ top: 0 });
   if (nayah != "" && nayah != "-") {
@@ -1292,7 +1298,7 @@ function audioPlay(id = "", recog = false) {
             }, 2000);
           } else if ((repeat > 1 && repeatnum < repeat) || repeat == 0) {
             repeatnum = repeatnum + 1;
-            tracknow = fromayah == 1 ? 0 : fromayah;
+            tracknow = fromayah == 1 ? (surah == 1 ? 1 : 0) : fromayah;
             timrsc = setTimeout(() => {
               gotoayah(tracknow, true);
             }, 1000);
@@ -1341,6 +1347,7 @@ function audiorate(rate = 1) {
 
 function onceauto(param = 'A') {
   trackmode = param;
+  untilayah = parseInt(surah_data.length);
   if (param == 'O') {
     document.getElementsByName("btnrepeat")[0].checked = true;
     document.getElementById("pdari").value = 1;
