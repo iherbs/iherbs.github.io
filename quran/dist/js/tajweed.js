@@ -8,7 +8,7 @@ var idhghammatcherwihtoutghunnah = /([نًٌٍ][ْۡاى]?[ۛۚۗۖۙۘ]? [رل]
 var idhghammimimatcher = /([م][ْۛۚۗۖۙۘۡ]? م)/g; //
 var ikhfamatcher = /([نًٌٍ][ْۡاى]?[ۛۚۗۖۙۘ]? ?[صذثكجشقسدطزفتضظک])/g; //
 var ikhfasyamatcher = /([م][ْۡ]? ?ب)/g; //
-var madda = /(وْ|يْ)/g;
+var madda = /(\u064F\u0648|\u0650\u064A)/g;// /(\u064E\u0627|\u064F\u0648|\u0650\u064A)/g; // /(وْ|يْ)/g;
 var hamzawaslmatcher = /([ن|م]ّ)/g; //
 
 function parseArabic(text, show = "true") {
