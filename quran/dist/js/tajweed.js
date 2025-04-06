@@ -22,6 +22,7 @@ function parseArabic(text, show = "true") {
         // &zwj == \u200D;
         // console.log(text);
         // text = text.replace(ghunnahmatcher, (text.substr((text.indexOf('$&') + 1), 2) == "ال" ? '&zwj;' : '') + '<tajweed class="ghunnah">$&</tajweed>');
+        text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
         text = text.replace(ghunnahmatcher, '<tajweed class="ghunnah">$&</tajweed>');
         text = text.replace(qalqalamatcher, '<tajweed class="qalqala">$&</tajweed>');
         text = text.replace(iqlabmmatcher, '<tajweed class="iqlab">$&</tajweed>');
@@ -64,7 +65,6 @@ function parseArabic(text, show = "true") {
             }
         });
         text = text.replace(ikhfasyamatcher, '<tajweed class="ikhfasya">$&</tajweed>');
-        text = text.replace(idhghammimimatcher, '<tajweed class="idhghammimi">$&</tajweed>');
         text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
         // text = text.replace(hamzawaslmatcher, '<tajweed class="ham_wasl">$&</tajweed>');
     }

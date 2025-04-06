@@ -969,7 +969,13 @@ async function showtafsir(id = 0) {
   }
 }
 
+function goback() {
+  _("#surah").innerHTML = ``;
+  window.history.back();
+}
+
 function nextsurah() {
+  _("#surah").innerHTML = ``;
   closeTrack();
   closeOptions();
   closeRecog();
@@ -981,6 +987,7 @@ function nextsurah() {
 }
 
 function prevsurah() {
+  _("#surah").innerHTML = ``;
   closeTrack();
   closeOptions();
   closeRecog();
@@ -996,16 +1003,189 @@ function showtajweedinfo() {
   _("#modalwidget").modal("show");
   _("#widgetcontent").innerHTML = `<div style="line-height:1.7;">
       <div style="font-weight:bold;font-size:20px;margin-bottom:5px;">Tajweed<hr></div>
-      <label class="ghunnah">Ghunnah</label><br>
-      <label class="madda">Maddah</label><br>
-      <label class="qalqala">Qalqala</label><br>
-      <label class="iqlab">Iqlab</label><br>
-      <label class="ikhfa">Ikhfa</label><br>
-      <label class="ikhfasya">Ikhfa Syafawi</label><br>
-      <label class="idhgham">Idhgham</label><br>
-      <label class="idhghammimi">Idhgham Mimi</label><br>
-      <label class="idhghamnoghunnah">Idhgham Without Ghunnah</label>
+
+      <label class="ghunnah" style="font-weight:bold;">Ghunnah</label><br>
+      <div>
+Ketika huruf Nun ber-Tasyidid نّ atau Mim ber-Tasyidid مّ, tanda tasyidid itu yang seperti huruf w.
+Cara baca hukum Ghunnah yaitu didengungkan serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf Nun/Mim-nya.<br>
+<i>*Namun jika huruf sebelumnya adalah nun mati atau tanwin maka hukumnya berubah menjadi Idgham Bighunnah</i>.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+ثُ<tajweed class="ghunnah">مّ</tajweed>َ لَتَرَوُ<tajweed class="ghunnah">نّ</tajweed>َهَا عَ<tajweed class="">يْ</tajweed>نَ الْيَقِ<tajweed class="">يْ</tajweed>نِۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/102/007.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+
+      <label class="madda" style="font-weight:bold;">Maddah</label><br>
+      <div>
+Memanjangkan suara saat bertemu dengan huruf mad yaitu wau (و), ya (ي), dan alif (ا), sebelum wau berbaris dhammah, sebelum ya berbaris kasrah dan sebelum alif berbaris fathah.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+قُلْ يٰٓاَيُّهَا الْكٰفِرُ<tajweed class="madda">وْ</tajweed>نَۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/109/001.mp3')"></label>
+</td></tr>
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+فَذٰلِكَ الَّذِ<tajweed class="madda">يْ</tajweed> يَدُعُّ الْيَتِ<tajweed class="madda">يْ</tajweed>مَۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/107/002.mp3')"></label>
+</td></tr>
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+مَآ اَغْنٰى عَنْهُ مَالُهٗ وَمَا كَسَبَۗ 
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/111/002.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+
+      <label class="qalqala" style="font-weight:bold;">Qalqala</label><br>
+      <div>
+Ketika salah satu dari 5 huruf ini (ق ط د ج ب) mati (sukun) di tengah-tengah kalimat, maka ini disebut Qalqalah Sughra (Qalqalah Kecil). Dan ketika salah satu huruf tersebut dihentikan karena waqaf atau di akhir ayat disebut Qalqalah Kubra (Qalqalah Besar), pada Qalqalah Kubra apabila waqaf tidak dihentikan bacaannya maka tidak di-Qalqalah-kan. Cara baca hukum Qalqalah yaitu seperti dipantulkan huruf Qalqalah-nya.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+اِ<tajweed class="qalqala">قْ</tajweed>رَأْ بِاسْمِ رَبِّكَ الَّذِ<tajweed class="madda">يْ</tajweed> خَلَقَۚ 
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/096/001.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+
+      <label class="iqlab" style="font-weight:bold;">Iqlab</label><br>
+      <div>
+Ketika huruf Nun mati نْ atau Tanwin ــًـــٍــٌـ bertemu dengan huruf Ba (ب).
+Cara baca hukum Iqlab yaitu menggantikan huruf nun mati atau tanwin dengan huruf mim mati serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf Ba-nya. Pada beberapa mushaf ditulis huruf mim kecil berdiri di antaranya, tetapi ada juga mushaf yang tidak menulis mim kecil di antaranya.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+كَلَّا لَيُنْ<tajweed class="iqlab">ۢب</tajweed>َذَ<tajweed class="ghunnah">نّ</tajweed>َ فِى الْحُطَمَةِۖ 
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/104/004.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+
+      <label class="ikhfa" style="font-weight:bold;">Ikhfa</label><br>
+      <div>
+Ketika huruf Nun mati نْ atau Tanwin ــًـــٍــٌـ bertemu dengan salah satu dari 15 huruf ini (ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك).
+Cara baca hukum Ikhfa yaitu menyamarkan huruf nun mati atau tanwin seperti huruf NG serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf di depannya.
+Dan Ikhfa terbagi menjadi 3 bagian, yaitu:
+<ol style="margin-left:12px;">
+<li>Ikhfa Aqrob adalah Dekat, sehingga NG-nya terdengar agak kurang jelas, ada 3 huruf, yaitu: (ت د ط).</li>
+<li>Ikhfa Ausath adalah Pertengahan, sehingga NG-nya terdengar sedang, ada 10 huruf, yaitu: (ث ج ذ ز س ش ص ض ظ ف).</li>
+<li>Ikhfa Ab'ad adalah Jauh, sehingga NG-nya terdengar jelas, ada 2 huruf, yaitu: (ق ك).</li>
+</ol>
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+مِ<tajweed class="ikhfa">نْ</tajweed> <tajweed class="ikhfa">ش</tajweed>َرِّ مَا خَلَ<tajweed class="qalqala">قَۙ</tajweed>
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/113/002.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+      
+      <label class="ikhfasya" style="font-weight:bold;">Ikhfa Syafawi</label><br>
+      <div>
+Ketika huruf Mim mati مْ bertemu dengan huruf Ba (ب).
+Cara baca hukum Ikhfa Syafawi yaitu menyamarkan huruf mim mati seperti huruf MNG serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf Ba-nya.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+لَّسْتَ عَلَ<tajweed class="madda">يْ</tajweed>هِ<tajweed class="ikhfasya">مْ ب</tajweed>ِمُصَ<tajweed class="madda">يْ</tajweed>طِرٍۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/088/022.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+      
+      <label class="idhgham" style="font-weight:bold;">Idhgham</label><br>
+      <div>
+Ketika huruf Nun mati نْ atau Tanwin ــًـــٍــٌـ bertemu dengan salah satu dari 4 huruf ini (و م ن ي).
+Cara baca hukum Idham Bighunnah yaitu meleburkan nun mati atau tanwin dengan huruf di depannya dan seolah-olah huruf N di nun mati atau tanwin tidak dibaca dan sambil didengungkan serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf di depannya.<br>
+<i>* Namun jika huruf Nun mati نْ bertemu dengan huruf Wau (و) atau Ya (ي) itu tersambung (tanpa dipisah oleh spasi), maka hukumnya menjadi Idzhar Wajib (dibaca dengan jelas tanpa dengung) contohnya ada di QS. Al-Baqarah ayat 86 pada kata "dun-yaa". Di aplikasi ini hukum Idzhar tidak kami beri warna dikarenakan hukum Idzhar dibaca jelas sesuai huruf tanpa ada dengung.</i>
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+فَمَ<tajweed class="idhgham">نْ</tajweed> <tajweed class="idhgham">يّ</tajweed>َعْمَلْ مِثْقَالَ ذَرَّةٍ خَ<tajweed class="madda">يْ</tajweed>ر<tajweed class="idhgham">ًا</tajweed> <tajweed class="idhgham">يّ</tajweed>َرَهٗۚ 
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/099/007.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+      
+      <label class="idhghammimi" style="font-weight:bold;">Idhgham Mimi</label><br>
+      <div>
+Ketika huruf Mim mati مْ bertemu dengan huruf Mim (م) ber-harakat (Mim hidup).
+Cara baca hukum Idgham Mitslain yaitu meleburkan huruf mim mati dengan huruf mim ber-harakat (Mim hidup) di depannya dan seolah-olah huruf M di mim mati dibaca sambil didengungkan serta ditahan sekitar 2 harakat sebelum menyebut jelas huruf Mim ber-harakat (Mim hidup) di depannya.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+اِ<tajweed class="ghunnah">نّ</tajweed>َهَا عَلَ<tajweed class="madda">يْ</tajweed>هِ<tajweed class="idhghammimi">مْ م</tajweed>ُّؤْصَدَةٌۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/104/008.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+      
+      <label class="idhghamnoghunnah" style="font-weight:bold;">Idhgham Bilaghunnah</label>
+      <div>
+Ketika huruf Nun mati نْ atau Tanwin ــًـــٍــٌـ bertemu dengan salah satu dari 2 huruf ini Lam (ل) atau Ra (ر).
+Cara baca hukum Idham Bilaghunnah yaitu meleburkan nun mati atau tanwin dengan huruf di depannya dan seolah-olah huruf N di nun mati atau tanwin tidak dibaca tanpa didengungkan serta ditahan sekitar 1 atau 2 harakat sebelum menyebut jelas huruf di depannya.
+<table style="width:100%;">
+<tr><td>
+<div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
+وَ<tajweed class="madda">يْ</tajweed>ل<tajweed class="idhghamnoghunnah">ٌ ل</tajweed>ِّكُلِّ هُمَزَة<tajweed class="idhghamnoghunnah">ٍ ل</tajweed>ُّمَزَةٍۙ
+</div>
+</td>
+<td style="padding-left:10px;">&nbsp;
+<label class="btnaudio play-button" style="display:block;position:static;margin-top:-21px;margin-right:-10px;margin-left:10px;" onclick="playasound('https://github.com/iherbs/quran-json/raw/main/Audio/104/001.mp3')"></label>
+</td></tr>
+</table>
+      </div>
+      <br>
+      
     </div>`;
+}
+
+function playasound(audio = "") {
+  let track = _("#track");
+  track.src = audio;
+  track.play();
 }
 
 function pegon(me, t = "") {
@@ -1666,6 +1846,12 @@ window.addEventListener("scroll", function () {
     _("#scrolltop").style.display = "none";
   }
 });
+
+window.onpopstate = function () {
+  if (window.location.hash == "") {
+    _("#surah").innerHTML = "";
+  }
+}
 
 window.onhashchange = function () {
   // console.log(window.location.hash);
