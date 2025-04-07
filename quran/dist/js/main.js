@@ -213,7 +213,9 @@ function makeqlist(key = "") {
                 <small class="arti">(${re[i]["text_id"]})</small>
                 <span class="type">${re[i]["type_id"] + ", " + re[i]["count"] + " Ayat"}</span>
             </div>
-            <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
+            <div class="col" style="text-align:right;float:right;margin-top:8px;font-size:35px;white-space:nowrap;font-family:surahnames;">
+              ${('000' + i).slice(-3)}
+            </div>
         </div>`;
     }
   }
@@ -908,7 +910,9 @@ function getjuzamma() {
     if (parseInt(re[i]["id"]) == 1 || parseInt(re[i]["id"]) >= 78) {
       _("#widgetcontent").innerHTML += `<div class="listayah" style="text-align:left;padding:10px;" onclick="getsurah(${re[i]["id"]});_('#modalwidget').modal('hide');">
       <b>${re[i]["id"] + '. ' + re[i]["name"]}</b>
-      <div class="col arabic" style="text-align:right;float:right;font-size:20px;white-space:nowrap;">${re[i]["text"]}</div>
+      <div class="col" style="text-align:right;float:right;font-size:35px;white-space:nowrap;font-family:surahnames;">
+        ${('000' + i).slice(-3)}
+      </div>
       <br>${re[i]["text_id"]}
       </div>`;
     }
@@ -1724,8 +1728,7 @@ function dataBookmark() {
         }" style="margin-left:25px;padding-bottom:2px;">
         <div class="delbook" style="float:right;" onclick="confdelBookmark('${book[g]
         }','${mark[b]}')">&times;</div>
-        <div class="arabic" style="float:right;font-size:20px;">${surah_list[bm[0]]["text"]
-        }</div>
+        <div style="font-family:surahnames;float:right;margin-top:4px;font-size:30px;">${('000' + bm[0]).slice(-3)}</div>
         <div onclick="gotoBookmark('${mark[b]
         }')" style="width:100%;height:100%;">
             <span class="nmayah" style="display:block;">
@@ -1830,6 +1833,14 @@ _("#cari").addEventListener("keyup", () => {
   }
 });
 
+function handleBackButton() {
+  // close all
+  _("#modalwidget").modal("hide");
+  _("#bookmarkpage").modal("hide");
+  _("#modalgotoayah").modal("hide");
+  closeNav();
+}
+
 _("#clearsrc").addEventListener("click", () => {
   _("#cari").value = "";
   _("#wload").innerHTML = "";
@@ -1850,6 +1861,7 @@ window.addEventListener("scroll", function () {
 window.onpopstate = function () {
   if (window.location.hash == "") {
     _("#surah").innerHTML = "";
+    closeNav();
   }
 }
 

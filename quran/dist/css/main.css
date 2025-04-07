@@ -52,6 +52,12 @@
   src: url("../../dist/font/Poppins-Regular.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "surahnames";
+  font-style: "normal";
+  src: url("../../dist/font/sura_names.woff2") format("woff2");
+}
+
 
 * {
   padding: 0px;
