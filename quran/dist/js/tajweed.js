@@ -65,7 +65,18 @@ function parseArabic(text, show = "true") {
             }
         });
         text = text.replace(ikhfasyamatcher, '<tajweed class="ikhfasya">$&</tajweed>');
-        text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
+        // text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
+        text = text.replace(madda, function (match, capture) {
+            if (match.includes('\u064F')) {
+                match = match.replace('\u064F', '');
+                return '\u064F <tajweed class="madda">' + match + '</tajweed>';
+            } else if (match.includes('\u0650')) {
+                match = match.replace('\u0650', '');
+                return '\u0650 <tajweed class="madda">' + match + '</tajweed>';
+            } else {
+                return '<tajweed class="madda">' + match + '</tajweed>';
+            }
+        });
         // text = text.replace(hamzawaslmatcher, '<tajweed class="ham_wasl">$&</tajweed>');
     }
     text = text.replaceAll('\u06dE', '<span class="smark">\u06dE</span>');

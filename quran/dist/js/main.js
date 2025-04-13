@@ -432,6 +432,7 @@ async function getsurah(surat = 1, nayah = "") {
   if (nayah != "" && nayah != "-") {
     gotoayah(nayah);
   }
+
 }
 
 function viewmode(vwmd = "") {
@@ -1833,14 +1834,6 @@ _("#cari").addEventListener("keyup", () => {
   }
 });
 
-function handleBackButton() {
-  // close all
-  _("#modalwidget").modal("hide");
-  _("#bookmarkpage").modal("hide");
-  _("#modalgotoayah").modal("hide");
-  closeNav();
-}
-
 _("#clearsrc").addEventListener("click", () => {
   _("#cari").value = "";
   _("#wload").innerHTML = "";
@@ -1848,6 +1841,62 @@ _("#clearsrc").addEventListener("click", () => {
   xmlhttp.abort();
   makeqlist();
 });
+
+let tcstartX = 0;
+let tcstartY = 0;
+let pgsrh = _("#surah");
+pgsrh.addEventListener('touchstart', handleTouchStart, { passive: false });
+pgsrh.addEventListener('touchmove', handleTouchMove, { passive: false });
+pgsrh.addEventListener('touchend', handleTouchEnd);
+
+function handleTouchStart(e) {
+  if (e.touches.length === 1 && window.location.hash == '#surah') {
+    // Persiapan untuk swipe (hanya saat tidak zoom)
+    tcstartX = e.touches[0].clientX;
+    tcstartY = e.touches[0].clientY;
+  }
+}
+
+function handleTouchMove(e) {
+  if (e.touches.length === 1 && window.location.hash == '#surah') {
+    // Handle swipe
+    const currentX = e.touches[0].clientX;
+    const diff = tcstartX - currentX;
+    if (Math.abs(diff) > 50) {
+      let moveto = (Math.abs(diff) - 150) > -33 ? -33 : (Math.abs(diff) - 150);
+      if (diff < -50) {
+        _("#navnext").style.left = moveto + 'px';
+      } else if (diff > 50) {
+        _("#navprev").style.right = moveto + 'px';
+      }
+    }
+  }
+}
+
+function handleTouchEnd(e) {
+  if (window.location.hash == '#surah') {
+    const endX = e.changedTouches[0].clientX;
+    const diff = tcstartX - endX;
+    _("#navnext").style.left = '-75px';
+    _("#navprev").style.right = '-75px';
+    // Tentukan apakah perlu pindah gambar (arah Al-Quran)
+    if (diff > 115) {
+      // Swipe ke kanan - previous page
+      prevsurah();
+    } else if (diff < -115) {
+      // Swipe ke kiri - next page
+      nextsurah();
+    }
+  }
+}
+
+function handleBackButton() {
+  // close all
+  _("#modalwidget").modal("hide");
+  _("#bookmarkpage").modal("hide");
+  _("#modalgotoayah").modal("hide");
+  closeNav();
+}
 
 window.addEventListener("scroll", function () {
   // console.log(window.document.documentElement.scrollTop);
