@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Emoji Farm</title>
+    <style>
+        :root {
+            --soil-color: #8B4513;
+            --soil-hover: #A0522D;
+            --progress-bg: #ddd;
+            --progress-fill: #4CAF50;
+            --button-bg: #6B8E23;
+            --button-hover: #7BA05B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2E8B57;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #e6f7e6;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .farm-grid {
+            display: grid;
+            grid-template-rows: repeat(2, auto);
+            grid-auto-flow: column;
+            gap: 15px;
+            padding-top: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            /* Scroll horizontal */
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #ddd;
+            width: 100%;
+        }
+
+        .farm-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .farm-grid::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        .farm-grid::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .farm-grid {
+                gap: 10px;
+            }
+        }
+
+        .plot {
+            background-color: var(--soil-color);
+            border-radius: 10px;
+            height: 100px;
+            width: 75px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            justify-self: center;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .plot:hover {
+            background-color: var(--soil-hover);
+            transform: translateY(-3px);
+        }
+
+        .plant {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            transition: all 0.5s ease;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-container {
+            width: 80%;
+            height: 8px;
+            background-color: var(--progress-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--progress-fill);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .controls {
+            display: none;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .inventory {
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .inventory-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2E8B57;
+        }
+
+        .inventory-items {
+            display: grid;
+            grid-template-rows: repeat(2, auto);
+            /* Maksimal 2 baris */
+            grid-auto-flow: column;
+            /* Item mengalir ke samping */
+            grid-gap: 10px;
+            overflow-x: auto;
+            /* Scroll horizontal */
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #ddd;
+        }
+
+        .inventory-items::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .inventory-items::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        .inventory-items::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 5px;
+        }
+
+        .inventory-item {
+            font-size: 1.5rem;
+            background-color: #f9f9f9;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-width: 80px;
+            /* Lebar minimum untuk setiap item */
+            text-align: center;
+        }
+
+        .inventory-count {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .money-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2E8B57;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .notification {
+            position: fixed;
+            text-align: center;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(46, 139, 87, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .show-notification {
+            opacity: 1;
+        }
+
+        @keyframes plantGrow {
+            0% {
+                transform: scale(0.8);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .grow-animation {
+            animation: plantGrow 0.5s ease;
+        }
+
+        .day-counter {
+            display: none;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .time-display {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #555;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .time-progress {
+            flex-grow: 1;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .time-progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.5s linear;
+        }
+
+        .last-played {
+            display: none;
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .market {
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .market-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2E8B57;
+        }
+
+        .market-items {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-top: 5px;
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #ddd;
+        }
+
+        .market-items::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .market-items::-webkit-scrollbar-track {
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        .market-items::-webkit-scrollbar-thumb {
+            background: #4CAF50;
+            border-radius: 5px;
+        }
+
+        .market-item {
+            flex: 0 0 auto;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .market-item:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .market-item.selected {
+            border: 2px solid #4CAF50;
+            background-color: #e6f7e6;
+        }
+
+        .market-item-emoji {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .market-item-name {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .market-item-cost {
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .popup {
+            background-color: #e6f7e6;
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .popup-overlay.show .popup {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            color: #2E8B57;
+            margin-bottom: 10px;
+        }
+
+        .popup-message {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .popup-button {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .popup-button:hover {
+            background-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .popup-cancel {
+            background-color: #ffffff;
+        }
+
+        .popup-cancel:hover {
+            background-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .quest {
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .quest-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2E8B57;
+        }
+
+        .quest-content {
+            align-items: center;
+        }
+
+        .quest-item {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .quest-npc {
+            font-size: 1.5rem;
+        }
+
+        .quest-details {
+            font-size: 1rem;
+            color: #333;
+            padding-top: 5px;
+        }
+
+        .quest-button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            position: absolute;
+            right: 60px;
+        }
+
+        .quest-button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .quest-button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .points-progress-container {
+            position: relative;
+            top: 1px;
+            width: 70px;
+            /* Lebar progress bar */
+            height: 20px;
+            /* Tinggi progress bar */
+            background-color: var(--progress-bg);
+            /* Abu-abu */
+            border-radius: 7px;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .points-progress-bar {
+            height: 100%;
+            background-color: var(--progress-fill);
+            /* Hijau */
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .points-text {
+            position: absolute;
+            left: 10px;
+            font-size: 0.8rem;
+            color: #333;
+            text-align: center;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🌱 Cozy Emoji Farm 🌻</h1>
+
+    <div class="game-container">
+        <div class="day-counter">Day: <span id="day">1</span></div>
+        <div class="time-display">
+            <span>🕒</span>
+            <div class="time-progress">
+                <div class="time-progress-bar" id="time-progress"></div>
+            </div>
+        </div>
+
+        <div class="money-display">
+            <div style="display: block;">
+                ⭐ <span id="level">1</span>
+                <div class="points-progress-container">
+                    <div class="points-progress-bar" id="points-progress"></div>
+                    <span class="points-text" id="points-text">0/5</span>
+                </div>
+                <span style="float:right;">💰 <span id="money" style="padding-top: 5px;">50</span></span>
+            </div>
+
+        </div>
+
+        <div class="controls">
+            <button id="clear-plants">Clear All</button>
+        </div>
+
+        <div class="farm-grid" id="farm-grid">
+            <!-- Farm plots will be added here by JavaScript -->
+        </div>
+
+        <div class="market">
+            <div class="market-title">
+                🛒 Market
+                <span id="cancelmarket" style="display:none;float:right;">❌</span>
+            </div>
+            <div class="market-items" id="market-items">
+                <!-- Market items will be added here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="quest">
+            <div class="quest-title">📜 Quest</div>
+            <div class="quest-content" id="quest-content">
+                <!-- Quest details will be added here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="inventory">
+            <div class="inventory-title">📦 Inventory</div>
+            <div class="inventory-items" id="inventory">
+                <!-- Inventory items will be added here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="last-played" id="last-played"></div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup">
+            <div class="popup-title">Confirm</div>
+            <div class="popup-message" id="popup-message"></div>
+            <div class="popup-buttons">
+                <button class="popup-button" id="popup-confirm">✔️</button>
+                <button class="popup-button popup-cancel" id="popup-cancel">❌</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            money: 100,
+            day: 1,
+            time: 0,
+            dayDuration: 60, // seconds per in-game day
+            realTimeScale: 60, // 1 real second = 60 game seconds (1:60 ratio)
+            lastPlayed: null,
+            level: 1,
+            points: 0,
+            quests: [],
+            plotCount: 4,
+            plots: [],
+            inventory: {},
+            selectedSeed: null,
+            plantTypes: [
+                { emoji: '🌾', name: 'Wheat', growthTime: 6, value: 10, cost: 5 },
+                { emoji: '🌽', name: 'Corn', growthTime: 8, value: 15, cost: 8 },
+                { emoji: '🥕', name: 'Carrot', growthTime: 11, value: 15, cost: 10 },
+                { emoji: '🥜', name: 'Peanuts', growthTime: 11, value: 20, cost: 11 },
+                { emoji: '🫘', name: 'Beans', growthTime: 13, value: 16, cost: 12 },
+                { emoji: '🥒', name: 'Cucumber', growthTime: 13, value: 16, cost: 14 },
+                { emoji: '🌶️', name: 'Pepper', growthTime: 17, value: 20, cost: 15 },
+                { emoji: '🫑', name: 'Bell Pepper', growthTime: 18, value: 25, cost: 16 },
+                { emoji: '🥔', name: 'Potato', growthTime: 25, value: 30, cost: 20 },
+                { emoji: '🍆', name: 'Eggplant', growthTime: 20, value: 20, cost: 15 },
+                { emoji: '🍎', name: 'Apple', growthTime: 25, value: 25, cost: 17 },
+                { emoji: '🍓', name: 'Strawberry', growthTime: 27, value: 25, cost: 18 },
+                { emoji: '🍐', name: 'Pear', growthTime: 28, value: 25, cost: 17 },
+                { emoji: '🍊', name: 'Orange', growthTime: 30, value: 25, cost: 16 },
+                { emoji: '🍋', name: 'Lemon', growthTime: 30, value: 25, cost: 16 },
+                { emoji: '🍋‍🟩', name: 'Lime', growthTime: 30, value: 25, cost: 17 },
+                { emoji: '🍌', name: 'Banana', growthTime: 25, value: 25, cost: 18 },
+                { emoji: '🍉', name: 'Watermelon', growthTime: 27, value: 30, cost: 20 },
+                { emoji: '🍇', name: 'Grapes', growthTime: 35, value: 35, cost: 30 },
+                { emoji: '🫐', name: 'Blueberries', growthTime: 33, value: 30, cost: 25 },
+                { emoji: '🍈', name: 'Melon', growthTime: 45, value: 45, cost: 40 },
+                { emoji: '🍒', name: 'Cherry', growthTime: 30, value: 30, cost: 25 },
+                { emoji: '🍑', name: 'Peach', growthTime: 40, value: 40, cost: 35 },
+                { emoji: '🥭', name: 'Mango', growthTime: 35, value: 25, cost: 20 },
+                { emoji: '🍍', name: 'Pineapple', growthTime: 35, value: 25, cost: 20 },
+                { emoji: '🥥', name: 'Coconut', growthTime: 38, value: 20, cost: 15 },
+                { emoji: '🥝', name: 'Kiwi', growthTime: 40, value: 28, cost: 22 },
+                { emoji: '🍅', name: 'Tomato', growthTime: 30, value: 25, cost: 20 },
+                { emoji: '🥑', name: 'Avocado', growthTime: 30, value: 35, cost: 25 },
+                { emoji: '🫛', name: 'Peas', growthTime: 20, value: 20, cost: 15 },
+                { emoji: '🥦', name: 'Broccoli', growthTime: 30, value: 25, cost: 15 },
+                { emoji: '🥬', name: 'Lettuce', growthTime: 20, value: 20, cost: 13 },
+                { emoji: '🍄', name: 'Mushroom', growthTime: 20, value: 15, cost: 10 },
+                { emoji: '🌹', name: 'Rose', growthTime: 20, value: 30, cost: 20 },
+                { emoji: '🌷', name: 'Tulip', growthTime: 20, value: 15, cost: 10 },
+                { emoji: '🪻', name: 'Hyacinth', growthTime: 25, value: 25, cost: 20 },
+                { emoji: '🪷', name: 'Lotus', growthTime: 30, value: 45, cost: 35 },
+                { emoji: '🌺', name: 'Hibiscus', growthTime: 30, value: 35, cost: 30 },
+                { emoji: '🌼', name: 'Daisy', growthTime: 30, value: 40, cost: 30 },
+                { emoji: '🌻', name: 'Sunflower', growthTime: 35, value: 50, cost: 35 },
+                { emoji: '🌸', name: 'Sakura', growthTime: 35, value: 50, cost: 35 },
+                { emoji: '🟫', name: 'Land', growthTime: 0, value: 0, cost: 300 }
+            ],
+            gameInterval: null,
+            npcs: [
+                '🧔🏻‍♂️', '🧔🏻', '🤡', '👻', '🤖', '👽', '🧜🏻‍♂️', '🧚🏻‍♂️',
+                '🧞‍♂️', '🧝🏻‍♂️', '🧙🏻‍♂️', '🧛🏻‍♂️', '🧟‍♂️', '🥷🏻', '🎅🏻',
+                '💂🏻‍♂️', '🤴🏻', '👷🏻‍♂️', '👮🏻‍♂️', '🕵🏻‍♂️', '👨🏻‍✈️', '👨🏻‍🔬',
+                '👨🏻‍⚕️', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍🚒', '👨🏻‍🌾', '👨🏻‍💼',
+                '👨🏻‍⚖️', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍🍳', '🧕🏻', '👳🏻‍♂️',
+                '👲🏻', '👨🏻‍🦳', '👨🏻‍🦱', '👨🏻‍🦲', '🕴🏻', '💃🏻', '🕺🏻'
+            ]
+        };
+
+        // DOM elements
+        const farmGrid = document.getElementById('farm-grid');
+        const marketItems = document.getElementById('market-items');
+        const clearPlantsBtn = document.getElementById('clear-plants');
+        const moneyDisplay = document.getElementById('money');
+        const dayDisplay = document.getElementById('day');
+        const inventoryDisplay = document.getElementById('inventory');
+        const notification = document.getElementById('notification');
+        const timeProgressBar = document.getElementById('time-progress');
+        const lastPlayedDisplay = document.getElementById('last-played');
+        const cancelmarket = document.getElementById('cancelmarket');
+        const levelDisplay = document.getElementById('level');
+        const pointsProgress = document.getElementById('points-progress');
+        const pointsText = document.getElementById('points-text');
+        const questContent = document.getElementById('quest-content');
+
+        const popupOverlay = document.getElementById('popup-overlay');
+        const popupMessage = document.getElementById('popup-message');
+        const popupConfirm = document.getElementById('popup-confirm');
+        const popupCancel = document.getElementById('popup-cancel');
+
+        // Initialize the game
+        function initGame() {
+            loadGame();
+            calculateOfflineProgress();
+            createFarmPlots();
+            populateMarket();
+            updateUI();
+            startGameLoop();
+            updateLastPlayedDisplay();
+            generateQuests();
+        }
+
+        // Dapatkan tanaman yang tersedia di market berdasarkan level
+        function getAvailablePlants(level) {
+            // Pada Level 1, hanya Wheat dan Corn
+            const basePlants = gameState.plantTypes.slice(0, 2); // 🌾, 🌽
+            // Tambah 1 tanaman per level setelah Level 1
+            const additionalPlants = level > 1 ? gameState.plantTypes.slice(2, 2 + (level - 1)) : [];
+            // Selalu sertakan Land
+            const landPlant = gameState.plantTypes.find(p => p.emoji === '🟫');
+            return [...basePlants, ...additionalPlants, landPlant];
+        }
+
+        // Populate market items
+        function populateMarket() {
+            marketItems.innerHTML = '';
+
+            const availablePlants = getAvailablePlants(gameState.level);
+
+            availablePlants.forEach(plant => {
+                const item = document.createElement('div');
+                item.className = 'market-item';
+                item.dataset.emoji = plant.emoji;
+                item.innerHTML = `
+                    <div class="market-item-emoji">${plant.emoji}</div>
+                    <div class="market-item-name">${plant.name}</div>
+                    <div class="market-item-cost">$${plant.cost}</div>
+                `;
+                item.addEventListener('click', async () => {
+                    // Remove selected class from all items
+                    document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                    cancelmarket.style.display = "block";
+                    if (plant.emoji == "🟫") {
+                        cancelmarket.style.display = "none";
+                        let confirmed = await showPopup('<span style="font-size:20px;">Buy Land 🟫?</span>');
+                        if (confirmed) {
+                            const seedCost = getPlantCost(plant.emoji);
+                            if (gameState.money >= seedCost) {
+                                gameState.money -= seedCost;
+                                gameState.plotCount++;
+                                updateUI();
+                                createFarmPlots();
+                                showNotification(`New Land 🟫 Added!`);
+                            } else {
+                                showNotification(`Not enough money to buy Land!`);
+                            }
+                        }
+                    } else {
+                        // Add selected class to clicked item
+                        item.classList.add('selected');
+                        gameState.selectedSeed = plant.emoji;
+                        // showNotification(`Selected ${plant.name} for planting!`);
+                    }
+                });
+                marketItems.appendChild(item);
+            });
+        }
+
+        // Calculate growth while game was closed
+        function calculateOfflineProgress() {
+            if (!gameState.lastPlayed) return;
+            const now = new Date();
+            const lastPlayed = new Date(gameState.lastPlayed);
+            const secondsPassed = (now - lastPlayed) / 1000;
+            const gameSecondsPassed = secondsPassed * gameState.realTimeScale;
+            if (gameSecondsPassed > 0) {
+                const maxDays = 30; // Batas maksimum 30 hari offline
+                const daysPassed = Math.min(Math.floor(gameSecondsPassed / gameState.dayDuration), maxDays);
+                const remainingSeconds = gameSecondsPassed % gameState.dayDuration;
+                if (daysPassed > 0) {
+                    for (let i = 0; i < daysPassed; i++) {
+                        advanceDay();
+                    }
+                    showNotification(`Welcome back! ${daysPassed} day${daysPassed > 1 ? 's' : ''} passed.`);
+                }
+                gameState.time = remainingSeconds;
+            }
+        }
+
+        // Create farm plots
+        function createFarmPlots() {
+            farmGrid.innerHTML = '';
+
+            // Adjust plot count based on screen size
+            const screenWidth = window.innerWidth;
+
+            // Initialize plots array if needed
+            while (gameState.plots.length < gameState.plotCount) {
+                gameState.plots.push({ plant: null, growth: 0, plantedAt: null });
+            }
+
+            // Trim if we have more plots than needed
+            gameState.plots = gameState.plots.slice(0, gameState.plotCount);
+
+            for (let i = 0; i < gameState.plotCount; i++) {
+                const plot = document.createElement('div');
+                plot.className = 'plot';
+                plot.dataset.index = i;
+
+                const plant = document.createElement('div');
+                plant.className = 'plant';
+                plant.textContent = gameState.plots[i].plant || '';
+
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+
+                // Calculate growth progress
+                if (gameState.plots[i].plant) {
+                    const growthTime = getGrowthTime(gameState.plots[i].plant);
+                    const growthProgress = Math.min(gameState.plots[i].growth, growthTime);
+                    progressBar.style.width = `${(growthProgress / growthTime) * 100}%`;
+                } else {
+                    progressBar.style.width = '0%';
+                }
+
+                progressContainer.appendChild(progressBar);
+                plot.appendChild(plant);
+                plot.appendChild(progressContainer);
+
+                plot.addEventListener('click', () => handlePlotClick(i));
+                farmGrid.appendChild(plot);
+            }
+        }
+
+        // Handle plot click
+        function handlePlotClick(index) {
+            const plot = gameState.plots[index];
+
+            if (!plot.plant) {
+                // Plant a seed if empty and seed is selected
+                if (gameState.selectedSeed) {
+                    const seedCost = getPlantCost(gameState.selectedSeed);
+
+                    if (gameState.money >= seedCost) {
+                        plot.plant = gameState.selectedSeed;
+                        plot.growth = 0;
+                        plot.plantedAt = new Date().toISOString();
+                        gameState.money -= seedCost;
+                        updatePlotUI(index);
+                        updateUI();
+                        showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for $${seedCost}!`);
+                        gameState.selectedSeed = null;
+                        // Reset selected item in market
+                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        cancelmarket.style.display = "none";
+                        saveGame();
+                    } else {
+                        showNotification(`Not enough money to buy ${getPlantName(gameState.selectedSeed)}!`);
+                    }
+                }
+            } else if (isReadyToHarvest(index)) {
+                // Harvest if ready
+                harvestPlant(index);
+            }
+        }
+
+        // Check if plant is ready to harvest
+        function isReadyToHarvest(index) {
+            const plot = gameState.plots[index];
+            return plot.growth >= getGrowthTime(plot.plant);
+        }
+
+        // Harvest a plant
+        function harvestPlant(index) {
+            const plot = gameState.plots[index];
+            const plantEmoji = plot.plant;
+            const plantValue = getPlantValue(plantEmoji);
+
+            // Add to inventory
+            if (!gameState.inventory[plantEmoji]) {
+                gameState.inventory[plantEmoji] = 0;
+            }
+            gameState.inventory[plantEmoji]++;
+
+            // Add money
+            // gameState.money += plantValue;
+
+            // Clear the plot
+            plot.plant = null;
+            plot.growth = 0;
+            plot.plantedAt = null;
+
+            // Update UI
+            updatePlotUI(index);
+            updateUI();
+
+            // Show notification
+            // showNotification(`Harvested ${getPlantName(plantEmoji)} for $${plantValue}!`);
+            saveGame();
+        }
+
+        // Start the game loop for automatic day progression
+        function startGameLoop() {
+            if (gameState.gameInterval) { clearInterval(gameState.gameInterval); }
+            gameState.gameInterval = setInterval(() => {
+                gameState.time += 0.1;
+                updateTimeDisplay();
+                const hasGrowingPlants = gameState.plots.some(plot => plot.plant);
+                if (hasGrowingPlants) { updatePlantGrowth(0.1); }
+                if (gameState.time >= gameState.dayDuration) { nextDay(); }
+            }, 100);
+        }
+
+        // Update plant growth based on elapsed time
+        function updatePlantGrowth(seconds) {
+            gameState.plots.forEach((plot, index) => {
+                if (plot.plant) {
+                    plot.growth += seconds;
+                    if (plot.growth > getGrowthTime(plot.plant)) {
+                        plot.growth = getGrowthTime(plot.plant); // Cap at max growth
+                    }
+                    updatePlotUI(index);
+                }
+            });
+        }
+
+        // Update time display
+        function updateTimeDisplay() {
+            const progressPercent = (gameState.time / gameState.dayDuration) * 100;
+            timeProgressBar.style.width = `${progressPercent}%`;
+        }
+
+        // Advance to next day
+        function advanceDay() {
+            gameState.day++;
+
+            // Grow plants by a full day
+            gameState.plots.forEach((plot, index) => {
+                if (plot.plant) {
+                    plot.growth++;
+                    if (plot.growth > getGrowthTime(plot.plant)) {
+                        plot.growth = getGrowthTime(plot.plant); // Cap at max growth
+                    }
+                    updatePlotUI(index);
+                }
+            });
+        }
+
+        // Complete day transition
+        function nextDay() {
+            advanceDay();
+            gameState.time = 0;
+            updateTimeDisplay();
+            updateUI();
+            // showNotification(`Day ${gameState.day} begins!`);
+            saveGame();
+        }
+
+        // Clear all plants
+        function clearAllPlants() {
+            if (confirm('Are you sure you want to clear all plants?')) {
+                gameState.plots.forEach(plot => {
+                    plot.plant = null;
+                    plot.growth = 0;
+                    plot.plantedAt = null;
+                });
+
+                for (let i = 0; i < gameState.plotCount; i++) {
+                    updatePlotUI(i);
+                }
+
+                showNotification('Cleared all plants!');
+                saveGame();
+            }
+        }
+
+        // Update a single plot's UI
+        function updatePlotUI(index) {
+            if (farmGrid.children[index] != null) {
+                const plotElement = farmGrid.children[index];
+                const plot = gameState.plots[index];
+                const plantElement = plotElement.querySelector('.plant');
+                const progressBar = plotElement.querySelector('.progress-bar');
+
+                if (plot.plant) {
+                    // Show seedling if not fully grown
+                    if (plot.growth < getGrowthTime(plot.plant)) {
+                        plantElement.textContent = '🌱';
+                        plantElement.classList.add('grow-animation');
+                        setTimeout(() => {
+                            plantElement.classList.remove('grow-animation');
+                        }, 500);
+                    } else {
+                        plantElement.textContent = plot.plant;
+                    }
+
+                    progressBar.style.width = `${(plot.growth / getGrowthTime(plot.plant)) * 100}%`;
+                } else {
+                    plantElement.textContent = '';
+                    progressBar.style.width = '0%';
+                }
+            }
+        }
+
+        // Update all UI elements
+        function updateUI() {
+            moneyDisplay.textContent = gameState.money;
+            dayDisplay.textContent = gameState.day;
+            levelDisplay.textContent = gameState.level;
+            const pointsNeeded = getPointsNeededForNextLevel(gameState.level);
+            pointsProgress.style.width = `${(gameState.points / pointsNeeded) * 100}%`;
+            pointsText.textContent = `${gameState.points}/${pointsNeeded}`;
+
+            // Update inventory display
+            inventoryDisplay.innerHTML = '';
+            Object.entries(gameState.inventory).forEach(([emoji, count]) => {
+                if (count > 0) {
+                    const item = document.createElement('div');
+                    item.className = 'inventory-item';
+                    item.innerHTML = `
+                            <span>${emoji}</span>
+                            <span class="inventory-count">${count}</span>
+                        `;
+                    inventoryDisplay.appendChild(item);
+                }
+            });
+
+            // Perbarui quest UI untuk memeriksa ketersediaan inventory
+            updateQuestUI();
+        }
+
+        // Update last played display
+        function updateLastPlayedDisplay() {
+            if (gameState.lastPlayed) {
+                const lastPlayed = new Date(gameState.lastPlayed);
+                lastPlayedDisplay.textContent = `Last played: ${lastPlayed.toLocaleString()}`;
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show-notification');
+
+            setTimeout(() => {
+                notification.classList.remove('show-notification');
+            }, 3000);
+        }
+
+        // Helper functions to get plant info
+        function getGrowthTime(emoji) {
+            const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+            return plant ? plant.growthTime : 0;
+        }
+
+        function getPlantValue(emoji) {
+            const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+            return plant ? plant.value : 0;
+        }
+
+        function getPlantCost(emoji) {
+            const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+            return plant ? plant.cost : 0;
+        }
+
+        function getPlantName(emoji) {
+            const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+            return plant ? plant.name : 'Unknown Plant';
+        }
+
+        // Save game to localStorage
+        function saveGame() {
+            gameState.lastPlayed = new Date().toISOString();
+            localStorage.setItem('emojiFarm', JSON.stringify(gameState));
+            updateLastPlayedDisplay();
+        }
+
+        // Load game from localStorage
+        function loadGame() {
+            const savedGame = localStorage.getItem('emojiFarm');
+            if (savedGame) {
+                try {
+                    const parsed = JSON.parse(savedGame);
+
+                    // Migrate old save format if needed
+                    if (!parsed.plots) {
+                        parsed.plots = Array(parsed.plotCount || 4).fill().map(() => ({ plant: null, growth: 0, plantedAt: null }));
+                    }
+
+                    // Migrate quests if not present or old format (single quest)
+                    if (!parsed.quests) {
+                        parsed.quests = parsed.quest ? [parsed.quest] : [];
+                        delete parsed.quest;
+                    }
+
+                    // Migrate questCompletedCount if not present
+                    if (!parsed.questCompletedCount) {
+                        parsed.questCompletedCount = parsed.quests.reduce((sum, q) => sum + (q.completedCount || 0), 0);
+                    }
+
+                    // Migrate level and points if not present
+                    if (!parsed.level) {
+                        parsed.level = 1;
+                    }
+                    if (!parsed.points) {
+                        parsed.points = 0;
+                    }
+
+                    // Ensure each plot has plantedAt property
+                    parsed.plots.forEach(plot => {
+                        if (!plot.plantedAt && plot.plant) {
+                            plot.plantedAt = new Date().toISOString();
+                        }
+                    });
+
+                    Object.assign(gameState, parsed);
+                } catch (e) {
+                    console.error('Failed to load save:', e);
+                }
+            }
+
+            // Pastikan ada hingga 3 quest saat memuat
+            generateQuests();
+        }
+
+        // Show popup with message and return a Promise
+        function showPopup(message) {
+            return new Promise((resolve) => {
+                popupMessage.innerHTML = message;
+                popupOverlay.classList.add('show');
+
+                // Event listener untuk tombol Confirm
+                const confirmHandler = () => {
+                    popupOverlay.classList.remove('show');
+                    popupConfirm.removeEventListener('click', confirmHandler);
+                    popupCancel.removeEventListener('click', cancelHandler);
+                    resolve(true);
+                };
+
+                // Event listener untuk tombol Cancel
+                const cancelHandler = () => {
+                    popupOverlay.classList.remove('show');
+                    popupConfirm.removeEventListener('click', confirmHandler);
+                    popupCancel.removeEventListener('click', cancelHandler);
+                    resolve(false);
+                };
+
+                popupConfirm.addEventListener('click', confirmHandler);
+                popupCancel.addEventListener('click', cancelHandler);
+            });
+        }
+
+        // Event listeners
+        clearPlantsBtn.addEventListener('click', clearAllPlants);
+
+        cancelmarket.addEventListener('click', async () => {
+            gameState.selectedSeed = null;
+            document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+            cancelmarket.style.display = "none";
+        });
+
+        // Generate new quest
+        // Generate single quest
+        function generateSingleQuest() {
+            const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+            const plant = availablePlants[Math.floor(Math.random() * availablePlants.length)];
+            const baseQuantity = Math.floor(Math.random() * 3) + 1;
+            const quantity = Math.min(baseQuantity + gameState.questCompletedCount, 10);
+            const usedNPCs = gameState.quests.map(q => q.npc);
+            const availableNPCs = gameState.npcs.filter(npc => !usedNPCs.includes(npc));
+            if (availableNPCs.length === 0) return null; // Cegah quest jika tidak ada NPC
+            const npc = availableNPCs[Math.floor(Math.random() * availableNPCs.length)];
+            return { npc, plantEmoji: plant.emoji, quantity };
+        }
+
+        // Generate quests up to 3
+        function generateQuests() {
+            while (gameState.quests.length < 3 && gameState.npcs.length > gameState.quests.length) {
+                const quest = generateSingleQuest();
+                if (quest) gameState.quests.push(quest);
+            }
+            updateQuestUI();
+            saveGame();
+        }
+
+        // Complete quest by index
+        function completeQuest(index) {
+            const quest = gameState.quests[index];
+            const { plantEmoji, quantity } = quest;
+            const inventoryCount = gameState.inventory[plantEmoji] || 0;
+
+            if (inventoryCount >= quantity) {
+                // Kurangi inventory
+                gameState.inventory[plantEmoji] -= quantity;
+                if (gameState.inventory[plantEmoji] <= 0) {
+                    delete gameState.inventory[plantEmoji];
+                }
+
+                // Tambah poin dan uang
+                gameState.points += 2; // 2 poin per quest
+                const plantValue = getPlantValue(plantEmoji);
+                const reward = (plantValue * quantity);// + (gameState.level * 10);
+                gameState.money += reward;
+
+                // Tingkatkan questCompletedCount
+                gameState.questCompletedCount += 1;
+
+                // Periksa kenaikan level
+                checkLevelUp();
+
+                // Notifikasi dan update
+                showNotification(`Quest completed! Gained $${reward}!`);
+
+                // Hapus quest dan tambahkan quest baru
+                gameState.quests.splice(index, 1);
+                generateQuests();
+
+                updateUI();
+            } else {
+                showNotification(`Not enough ${getPlantName(plantEmoji)}! Need ${quantity}, have ${inventoryCount}.`);
+            }
+        }
+
+        // Update quest UI
+        function updateQuestUI() {
+            questContent.innerHTML = '';
+
+            gameState.quests.forEach((quest, index) => {
+                const { npc, plantEmoji, quantity } = quest;
+                const inventoryCount = gameState.inventory[plantEmoji] || 0;
+                const isCompletable = inventoryCount >= quantity;
+
+                const questItem = document.createElement('div');
+                questItem.className = 'quest-item';
+                questItem.innerHTML = `
+                        <div class="quest-npc">${npc}</div>
+                        <div class="quest-details">
+                            ${quantity} ${plantEmoji} ${getPlantName(plantEmoji)}
+                        </div>
+                        <button class="quest-button" ${isCompletable ? '' : 'disabled'}>Complete</button>
+                    `;
+
+                const completeButton = questItem.querySelector('.quest-button');
+                completeButton.addEventListener('click', () => completeQuest(index));
+
+                questContent.appendChild(questItem);
+            });
+        }
+
+        // Hitung poin yang dibutuhkan untuk level berikutnya
+        function getPointsNeededForNextLevel(currentLevel) {
+            return 5 * currentLevel; // 5 untuk level 2, 10 untuk level 3, 15 untuk level 4, dst.
+        }
+
+        // Periksa dan naikkan level jika poin cukup
+        function checkLevelUp() {
+            let pointsNeeded = getPointsNeededForNextLevel(gameState.level);
+            while (gameState.points >= pointsNeeded) {
+                gameState.points -= pointsNeeded; // Kurangi poin yang digunakan
+                gameState.level += 1; // Naik level
+                pointsNeeded = getPointsNeededForNextLevel(gameState.level); // Hitung poin untuk level berikutnya
+                showNotification(`Level up! Reached Level ${gameState.level}!`);
+                populateMarket(); // Perbarui market dengan tanaman baru
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            createFarmPlots();
+        });
+
+        // Save game when page is closed
+        window.addEventListener('beforeunload', () => {
+            saveGame();
+        });
+
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+
+</html>
