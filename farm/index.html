@@ -3,8 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#ffffff" />
     <title>Cozy Emoji Farm</title>
+    <link rel="shortcut icon" type="image/png" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icon.png" />
+    <link rel="shortcut icon" type="image/png" href="icon.png" />
     <style>
         :root {
             --soil-color: #8B4513;
@@ -15,24 +23,52 @@
             --button-hover: #7BA05B;
         }
 
+        @font-face {
+            font-family: "Delius";
+            font-style: "normal";
+            src: url("Delius.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: "notoemoji";
+            font-style: "normal";
+            src: url("NotoColorEmoji.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: "twemoji";
+            font-style: "normal";
+            src: url("twemoji.ttf") format("truetype");
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
         }
 
         body {
+            user-select: none;
             background-color: #f0f8ff;
             color: #333;
             padding: 20px;
-            min-height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
+            font-size: 14px;
+            font-family: "Delius", Arial, Helvetica, sans-serif;
         }
 
-        h1 {
+        .notoemoji {
+            font-family: 'Delius', 'notoemoji', sans-serif;
+        }
+
+        .twemoji {
+            font-family: 'Delius', 'twemoji', sans-serif;
+        }
+
+        .title {
             color: #2E8B57;
             margin-bottom: 20px;
             text-align: center;
@@ -96,6 +132,7 @@
             position: relative;
             justify-self: center;
             overflow: hidden;
+            box-shadow: 0px 1px 2px #7a5f4b;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -105,7 +142,7 @@
         }
 
         .plant {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 5px;
             transition: all 0.5s ease;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
@@ -126,14 +163,6 @@
             transition: width 0.5s ease;
         }
 
-        .controls {
-            display: none;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
         button {
             background-color: var(--button-bg);
             color: white;
@@ -143,6 +172,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1rem;
+            font-family: 'Delius';
         }
 
         button:hover {
@@ -159,12 +189,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .inventory-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #2E8B57;
-        }
-
         .inventory-items {
             display: grid;
             grid-template-rows: repeat(2, auto);
@@ -177,6 +201,7 @@
             padding-bottom: 10px;
             scrollbar-width: thin;
             scrollbar-color: #4CAF50 #ddd;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .inventory-items::-webkit-scrollbar {
@@ -240,6 +265,29 @@
             opacity: 1;
         }
 
+
+        .wave-animation {
+            animation: wavePlant 3s ease infinite;
+        }
+
+        @keyframes wavePlant {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .grow-animation {
+            animation: plantGrow 1s ease infinite;
+        }
+
         @keyframes plantGrow {
             0% {
                 transform: scale(0.8);
@@ -252,17 +300,6 @@
             100% {
                 transform: scale(1);
             }
-        }
-
-        .grow-animation {
-            animation: plantGrow 0.5s ease;
-        }
-
-        .day-counter {
-            display: none;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: #555;
         }
 
         .time-display {
@@ -304,12 +341,6 @@
             padding: 15px;
             width: 100%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .market-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #2E8B57;
         }
 
         .market-items {
@@ -409,12 +440,6 @@
             opacity: 1;
         }
 
-        .popup-title {
-            font-size: 1.5rem;
-            color: #2E8B57;
-            margin-bottom: 10px;
-        }
-
         .popup-message {
             font-size: 1rem;
             color: #333;
@@ -461,7 +486,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .quest-title {
+        .panel-title {
             font-size: 1.2rem;
             margin-bottom: 10px;
             color: #2E8B57;
@@ -473,10 +498,12 @@
 
         .quest-item {
             display: flex;
+            position: relative;
             gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 10px;
             padding: 5px;
+            padding-bottom: 10px;
             background-color: #f9f9f9;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
@@ -500,7 +527,7 @@
             cursor: pointer;
             font-size: 0.9rem;
             position: absolute;
-            right: 60px;
+            right: 8px;
         }
 
         .quest-button:hover {
@@ -516,7 +543,7 @@
 
         .points-progress-container {
             position: relative;
-            top: 1px;
+            top: 4px;
             width: 70px;
             /* Lebar progress bar */
             height: 20px;
@@ -539,6 +566,7 @@
 
         .points-text {
             position: absolute;
+            top: 2px;
             left: 10px;
             font-size: 0.8rem;
             color: #333;
@@ -548,11 +576,8 @@
     </style>
 </head>
 
-<body>
-    <h1>🌱 Cozy Emoji Farm 🌻</h1>
-
-    <div class="game-container">
-        <div class="day-counter">Day: <span id="day">1</span></div>
+<body class="twemoji">
+    <div class=" game-container">
         <div class="time-display">
             <span>🕒</span>
             <div class="time-progress">
@@ -567,13 +592,9 @@
                     <div class="points-progress-bar" id="points-progress"></div>
                     <span class="points-text" id="points-text">0/5</span>
                 </div>
-                <span style="float:right;">💰 <span id="money" style="padding-top: 5px;">50</span></span>
+                <span style="float:right;">🪙 <span id="money" style="padding-top: 5px;">50</span></span>
             </div>
 
-        </div>
-
-        <div class="controls">
-            <button id="clear-plants">Clear All</button>
         </div>
 
         <div class="farm-grid" id="farm-grid">
@@ -581,8 +602,8 @@
         </div>
 
         <div class="market">
-            <div class="market-title">
-                🛒 Market
+            <div class="panel-title">
+                🌱 Seed
                 <span id="cancelmarket" style="display:none;float:right;">❌</span>
             </div>
             <div class="market-items" id="market-items">
@@ -591,14 +612,14 @@
         </div>
 
         <div class="quest">
-            <div class="quest-title">📜 Quest</div>
+            <div class="panel-title">📜 Quest</div>
             <div class="quest-content" id="quest-content">
                 <!-- Quest details will be added here by JavaScript -->
             </div>
         </div>
 
         <div class="inventory">
-            <div class="inventory-title">📦 Inventory</div>
+            <div class="panel-title">📦 Inventory</div>
             <div class="inventory-items" id="inventory">
                 <!-- Inventory items will be added here by JavaScript -->
             </div>
@@ -611,7 +632,7 @@
 
     <div class="popup-overlay" id="popup-overlay">
         <div class="popup">
-            <div class="popup-title">Confirm</div>
+            <div class="panel-title">Confirm</div>
             <div class="popup-message" id="popup-message"></div>
             <div class="popup-buttons">
                 <button class="popup-button" id="popup-confirm">✔️</button>
@@ -624,7 +645,6 @@
         // Game state
         const gameState = {
             money: 100,
-            day: 1,
             time: 0,
             dayDuration: 60, // seconds per in-game day
             realTimeScale: 60, // 1 real second = 60 game seconds (1:60 ratio)
@@ -694,9 +714,7 @@
         // DOM elements
         const farmGrid = document.getElementById('farm-grid');
         const marketItems = document.getElementById('market-items');
-        const clearPlantsBtn = document.getElementById('clear-plants');
         const moneyDisplay = document.getElementById('money');
-        const dayDisplay = document.getElementById('day');
         const inventoryDisplay = document.getElementById('inventory');
         const notification = document.getElementById('notification');
         const timeProgressBar = document.getElementById('time-progress');
@@ -731,8 +749,22 @@
             // Tambah 1 tanaman per level setelah Level 1
             const additionalPlants = level > 1 ? gameState.plantTypes.slice(2, 2 + (level - 1)) : [];
             // Selalu sertakan Land
-            const landPlant = gameState.plantTypes.find(p => p.emoji === '🟫');
-            return [...basePlants, ...additionalPlants, landPlant];
+            const landPlant = gameState.plotCount < 12 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
+            if (landPlant.length == 0) {
+                if (additionalPlants.length == 0) {
+                    return [...basePlants];
+                } else {
+                    return [...basePlants, ...additionalPlants];
+                }
+            } else if (additionalPlants.length == 0) {
+                if (landPlant.length == 0) {
+                    return [...basePlants];
+                } else {
+                    return [...basePlants, landPlant];
+                }
+            } else {
+                return [...basePlants, ...additionalPlants, landPlant];
+            }
         }
 
         // Populate market items
@@ -748,7 +780,7 @@
                 item.innerHTML = `
                     <div class="market-item-emoji">${plant.emoji}</div>
                     <div class="market-item-name">${plant.name}</div>
-                    <div class="market-item-cost">$${plant.cost}</div>
+                    <div class="market-item-cost">🪙${plant.cost}</div>
                 `;
                 item.addEventListener('click', async () => {
                     // Remove selected class from all items
@@ -766,7 +798,7 @@
                                 createFarmPlots();
                                 showNotification(`New Land 🟫 Added!`);
                             } else {
-                                showNotification(`Not enough money to buy Land!`);
+                                showNotification(`Not enough 🪙 to buy Land!`);
                             }
                         }
                     } else {
@@ -795,7 +827,7 @@
                     for (let i = 0; i < daysPassed; i++) {
                         advanceDay();
                     }
-                    showNotification(`Welcome back! ${daysPassed} day${daysPassed > 1 ? 's' : ''} passed.`);
+                    showNotification(`Welcome back!`);
                 }
                 gameState.time = remainingSeconds;
             }
@@ -822,7 +854,7 @@
                 plot.dataset.index = i;
 
                 const plant = document.createElement('div');
-                plant.className = 'plant';
+                plant.className = 'plant grow-animation';
                 plant.textContent = gameState.plots[i].plant || '';
 
                 const progressContainer = document.createElement('div');
@@ -865,14 +897,14 @@
                         gameState.money -= seedCost;
                         updatePlotUI(index);
                         updateUI();
-                        showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for $${seedCost}!`);
+                        // showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for 🪙${seedCost}!`);
                         gameState.selectedSeed = null;
                         // Reset selected item in market
                         document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                         cancelmarket.style.display = "none";
                         saveGame();
                     } else {
-                        showNotification(`Not enough money to buy ${getPlantName(gameState.selectedSeed)}!`);
+                        showNotification(`Not enough 🪙 to buy ${getPlantName(gameState.selectedSeed)}!`);
                     }
                 }
             } else if (isReadyToHarvest(index)) {
@@ -912,7 +944,7 @@
             updateUI();
 
             // Show notification
-            // showNotification(`Harvested ${getPlantName(plantEmoji)} for $${plantValue}!`);
+            // showNotification(`Harvested ${getPlantName(plantEmoji)} for 🪙${plantValue}!`);
             saveGame();
         }
 
@@ -949,7 +981,6 @@
 
         // Advance to next day
         function advanceDay() {
-            gameState.day++;
 
             // Grow plants by a full day
             gameState.plots.forEach((plot, index) => {
@@ -973,24 +1004,6 @@
             saveGame();
         }
 
-        // Clear all plants
-        function clearAllPlants() {
-            if (confirm('Are you sure you want to clear all plants?')) {
-                gameState.plots.forEach(plot => {
-                    plot.plant = null;
-                    plot.growth = 0;
-                    plot.plantedAt = null;
-                });
-
-                for (let i = 0; i < gameState.plotCount; i++) {
-                    updatePlotUI(i);
-                }
-
-                showNotification('Cleared all plants!');
-                saveGame();
-            }
-        }
-
         // Update a single plot's UI
         function updatePlotUI(index) {
             if (farmGrid.children[index] != null) {
@@ -1003,11 +1016,11 @@
                     // Show seedling if not fully grown
                     if (plot.growth < getGrowthTime(plot.plant)) {
                         plantElement.textContent = '🌱';
+                        plantElement.classList.remove('wave-animation');
                         plantElement.classList.add('grow-animation');
-                        setTimeout(() => {
-                            plantElement.classList.remove('grow-animation');
-                        }, 500);
                     } else {
+                        plantElement.classList.add('wave-animation');
+                        plantElement.classList.remove('grow-animation');
                         plantElement.textContent = plot.plant;
                     }
 
@@ -1022,7 +1035,6 @@
         // Update all UI elements
         function updateUI() {
             moneyDisplay.textContent = gameState.money;
-            dayDisplay.textContent = gameState.day;
             levelDisplay.textContent = gameState.level;
             const pointsNeeded = getPointsNeededForNextLevel(gameState.level);
             pointsProgress.style.width = `${(gameState.points / pointsNeeded) * 100}%`;
@@ -1034,10 +1046,41 @@
                 if (count > 0) {
                     const item = document.createElement('div');
                     item.className = 'inventory-item';
+                    item.style.cursor = 'pointer'; // Visual feedback bahwa item bisa diklik
                     item.innerHTML = `
                             <span>${emoji}</span>
                             <span class="inventory-count">${count}</span>
                         `;
+                    // Tambahkan event listener untuk penjualan
+                    item.addEventListener('click', () => {
+                        const plantName = getPlantName(emoji);
+                        const totalValue = count * (getPlantCost(emoji) + 2);
+                        showPopup(`
+                                Sell ${plantName} (${emoji}) for 🪙${(getPlantCost(emoji) + 2)} each?<br>
+                                <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:right;outline:none;">
+                                <div>Total: 🪙<span id="sell-total">${count * (getPlantCost(emoji) + 2)}</span></div>
+                            `).then(confirmed => {
+                            if (confirmed) {
+                                const quantityInput = document.getElementById('sell-quantity');
+                                const quantity = parseInt(quantityInput.value);
+                                if (quantity > 0 && quantity <= count) {
+                                    gameState.money += quantity * (getPlantCost(emoji) + 2) || 0;
+                                    gameState.inventory[emoji] -= quantity;
+                                    if (gameState.inventory[emoji] <= 0) {
+                                        delete gameState.inventory[emoji];
+                                    }
+                                    updateUI();
+                                    saveGame();
+                                    showNotification(`Sold ${quantity} ${plantName} for 🪙${quantity * getPlantValue(emoji)}!`);
+                                }
+                            }
+                        });
+
+                        document.getElementById('sell-quantity').addEventListener('input', (e) => {
+                            const quantity = parseInt(e.target.value);
+                            document.getElementById('sell-total').textContent = quantity * (getPlantCost(emoji) + 2) || 0;
+                        });
+                    });
                     inventoryDisplay.appendChild(item);
                 }
             });
@@ -1056,6 +1099,8 @@
 
         // Show notification
         function showNotification(message) {
+            notification.classList.remove('show-notification');
+
             notification.textContent = message;
             notification.classList.add('show-notification');
 
@@ -1167,9 +1212,6 @@
             });
         }
 
-        // Event listeners
-        clearPlantsBtn.addEventListener('click', clearAllPlants);
-
         cancelmarket.addEventListener('click', async () => {
             gameState.selectedSeed = null;
             document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
@@ -1179,10 +1221,11 @@
         // Generate new quest
         // Generate single quest
         function generateSingleQuest() {
+            gameState.questCompletedCount = gameState.questCompletedCount == undefined ? 0 : gameState.questCompletedCount;
             const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
             const plant = availablePlants[Math.floor(Math.random() * availablePlants.length)];
-            const baseQuantity = Math.floor(Math.random() * 3) + 1;
-            const quantity = Math.min(baseQuantity + gameState.questCompletedCount, 10);
+            const baseQuantity = gameState.questCompletedCount > 10 ? Math.floor(Math.random() * 10) + 1 : Math.floor(Math.random() * 3) + 1;
+            const quantity = baseQuantity;
             const usedNPCs = gameState.quests.map(q => q.npc);
             const availableNPCs = gameState.npcs.filter(npc => !usedNPCs.includes(npc));
             if (availableNPCs.length === 0) return null; // Cegah quest jika tidak ada NPC
@@ -1222,11 +1265,11 @@
                 // Tingkatkan questCompletedCount
                 gameState.questCompletedCount += 1;
 
+                // Notifikasi dan update
+                showNotification(`Quest completed! Gained 🪙${reward}!`);
+
                 // Periksa kenaikan level
                 checkLevelUp();
-
-                // Notifikasi dan update
-                showNotification(`Quest completed! Gained $${reward}!`);
 
                 // Hapus quest dan tambahkan quest baru
                 gameState.quests.splice(index, 1);
@@ -1277,14 +1320,17 @@
                 gameState.level += 1; // Naik level
                 pointsNeeded = getPointsNeededForNextLevel(gameState.level); // Hitung poin untuk level berikutnya
                 showNotification(`Level up! Reached Level ${gameState.level}!`);
+
+                const availablePlants = getAvailablePlants(gameState.level);
+                const numplantnow = document.getElementsByClassName("market-item").length;
+                if (availablePlants.length > numplantnow && numplantnow > 0) {
+                    setTimeout(() => {
+                        showNotification(`New Plant Added!`);
+                    }, 2000);
+                }
                 populateMarket(); // Perbarui market dengan tanaman baru
             }
         }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            createFarmPlots();
-        });
 
         // Save game when page is closed
         window.addEventListener('beforeunload', () => {
