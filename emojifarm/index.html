@@ -1092,8 +1092,11 @@
                         });
 
                         document.getElementById('sell-quantity').addEventListener('input', (e) => {
-                            const quantity = parseInt(e.target.value);
-                            document.getElementById('sell-total').textContent = quantity * (getPlantCost(emoji) + 2) || 0;
+                            let quantity = parseInt(e.target.value);
+                            if (isNaN(quantity) || quantity < 1) quantity = 1;
+                            if (quantity > count) quantity = count;
+                            e.target.value = quantity;
+                            document.getElementById('sell-total').textContent = quantity * (getPlantCost(emoji) + 2);
                         });
                     });
                     inventoryDisplay.appendChild(item);
@@ -1113,16 +1116,16 @@
         }
 
         // Show notification
+        let notificationTimeout;
         const showNotification = (message) => {
+            clearTimeout(notificationTimeout);
             notification.classList.remove('show-notification');
-
             notification.textContent = message;
             notification.classList.add('show-notification');
-
-            setTimeout(() => {
+            notificationTimeout = setTimeout(() => {
                 notification.classList.remove('show-notification');
             }, 3000);
-        }
+        };
 
         // Helper functions to get plant info
         const getGrowthTime = (emoji) => {
