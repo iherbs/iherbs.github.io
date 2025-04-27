@@ -117,6 +117,7 @@ body {
     justify-self: center;
     overflow: hidden;
     box-shadow: 0px 1px 2px #7a5f4b;
+    touch-action: pan-x;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -423,6 +424,7 @@ input:checked+.slider:before {
     transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     width: 100px;
+    touch-action: pan-x;
     -webkit-tap-highlight-color: transparent;
 }
 
