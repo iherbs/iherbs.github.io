@@ -178,12 +178,13 @@
             item.className = 'market-item';
             item.dataset.emoji = plant.emoji;
             item.innerHTML = `
-            <div class="market-item-emoji">${plant.emoji}</div>
-            <div class="market-item-name">${plant.name}</div>
-            <div class="market-item-cost">🪙${plant.cost}</div>
-        `;
+                <div class="market-item-emoji">${plant.emoji}</div>
+                <div class="market-item-name">${plant.name}</div>
+                <div class="market-item-cost">🪙${plant.cost}</div>
+            `;
             item.addEventListener('click', async () => {
                 // Remove selected class from all items
+                _('#pet-items').style.display = 'none';
                 document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 cancelmarket.style.display = "block";
                 if (plant.emoji == "🟫") {
@@ -233,7 +234,9 @@
                 for (let i = 0; i < daysPassed; i++) {
                     advanceDay();
                 }
-                showNotification(`Welcome back!`);
+                setTimeout(() => {
+                    showNotification(`Welcome back!`);
+                }, 300);
             }
             gameState.time = remainingSeconds;
         }
@@ -315,7 +318,10 @@
                     cancelmarket.style.display = "none";
                     saveGame();
                 } else {
-                    showNotification(`Not enough 🪙 to buy ${getPlantName(gameState.selectedSeed)}!`);
+                    showNotification(`Not enough 🪙 to buy ${gameState.selectedSeed}!`);
+                    // Reset selected item in market
+                    document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                    cancelmarket.style.display = "none";
                 }
             }
         } else if (isReadyToHarvest(index)) {
@@ -331,7 +337,7 @@
     }
 
     // Harvest a plant
-    const harvestPlant = (index) => {
+    const harvestPlant = (index, ispet = false) => {
         const plot = gameState.plots[index];
         const plantEmoji = plot.plant;
         const plantValue = getPlantValue(plantEmoji);
@@ -346,10 +352,25 @@
         // gameState.money += plantValue;
 
         // Clear the plot
-        if (gameState.pet && gameState.pet.hunger >= 20) {
-            plot.plant = '🐾';
-        }
-        setTimeout(() => {
+        if (ispet) {
+            if (gameState.pet && gameState.pet.hunger >= 20) {
+                plot.plant = '🐾';
+            }
+
+            setTimeout(() => {
+                plot.plant = null;
+                plot.growth = 0;
+                plot.plantedAt = null;
+
+                // Update UI
+                updatePlotUI(index);
+                updateUI();
+
+                // Show notification
+                // showNotification(`Harvested ${getPlantName(plantEmoji)} for 🪙${plantValue}!`);
+                saveGame();
+            }, 300);
+        } else {
             plot.plant = null;
             plot.growth = 0;
             plot.plantedAt = null;
@@ -361,7 +382,7 @@
             // Show notification
             // showNotification(`Harvested ${getPlantName(plantEmoji)} for 🪙${plantValue}!`);
             saveGame();
-        }, 300);
+        }
     }
 
     // Start the game loop for automatic day progression
@@ -503,6 +524,7 @@
                             const quantity = parseInt(quantityInput.value);
                             if (quantity > 0 && quantity <= count) {
                                 gameState.money += quantity * (getPlantCost(emoji) + 2) || 0;
+                                gameState.money = gameState.money > 999999 ? 999999 : gameState.money;
                                 gameState.inventory[emoji] -= quantity;
                                 if (gameState.inventory[emoji] <= 0) {
                                     delete gameState.inventory[emoji];
@@ -796,6 +818,7 @@
             const plantValue = getPlantValue(plantEmoji);
             const reward = (plantValue * quantity);// + (gameState.level * 10);
             gameState.money += reward;
+            gameState.money = gameState.money > 999999 ? 999999 : gameState.money;
 
             // Tingkatkan questCompletedCount
             gameState.questCompletedCount += 1;
@@ -832,7 +855,7 @@
                 <div class="quest-details">
                     ${quantity} ${plantEmoji} ${getPlantName(plantEmoji)}
                 </div>
-                <button class="quest-button" ${isCompletable ? '' : 'disabled'}>Complete</button>
+                <button class="quest-button" ${isCompletable ? '' : 'disabled'}><span class="check-icon"></span></button>
             `;
 
             const completeButton = questItem.querySelector('.quest-button');
@@ -912,6 +935,7 @@
 
     // Fungsi untuk memberi makan hewan
     const feedPet = async () => {
+        _('#pet-items').style.display = 'none';
         if (!gameState.pet) {
             showNotification('No pet to feed!');
             return;
@@ -961,7 +985,7 @@
             }
             const option = options.find(opt => opt.emoji === selectedOption.value);
             if (option.type === 'buy' && gameState.money < option.cost) {
-                showNotification(`Not enough 🪙 to buy ${option.name}!`);
+                showNotification(`Not enough 🪙 to buy ${option.emoji}!`);
                 return;
             }
             if (option.type === 'inventory' && !gameState.inventory[option.emoji]) {
@@ -1017,14 +1041,15 @@
 
         const readyPlotIndex = gameState.plots.findIndex((plot, index) => plot.plant && isReadyToHarvest(index));
         if (readyPlotIndex !== -1) {
-            harvestPlant(readyPlotIndex);
+            harvestPlant(readyPlotIndex, true);
             // showNotification(`${gameState.pet.emoji} harvested a plant!`);
         }
     };
 
     _('#buy-pet').addEventListener('click', buyPet);
     _('#feed-pet').addEventListener('click', feedPet);
-    _('#pet-emoji').addEventListener('click', (e) => {
+    _('#pet-emoji').addEventListener('click', () => {
+        _('#pet-items').style.display = 'none';
         if (gameState.pet) {
             _('#love-animation').classList.add('love-heart');
             setTimeout(() => {

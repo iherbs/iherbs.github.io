@@ -497,7 +497,7 @@ button:hover {
     flex-wrap: wrap;
     margin-bottom: 10px;
     padding: 5px;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -512,11 +512,20 @@ button:hover {
     padding-top: 5px;
 }
 
+.check-icon {
+    display: inline-block;
+    transform: rotate(45deg);
+    height: 14px;
+    width: 8px;
+    border-bottom: 4px solid #FFFFFF;
+    border-right: 4px solid #FFFFFF;
+}
+
 .quest-button {
     background-color: var(--button-bg);
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 7px 15px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9rem;
