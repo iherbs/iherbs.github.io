@@ -93,7 +93,7 @@
             { emoji: '🌽', hungerValue: 3 },
             { emoji: '🥕', hungerValue: 4 }
         ], // Tanaman yang bisa digunakan untuk memberi makan
-        autoHarvestInterval: 2,
+        autoHarvestInterval: 1,
         checksum: '',
         music: true
     };
@@ -144,7 +144,7 @@
     }
 
     const music = _("#background-audio");
-    music.volume = 0.1; // Atur volume (0.1 - 1)
+    music.volume = 0.5; // Atur volume (0.1 - 1)
     document.addEventListener("click", function () {
         if (gameState.music) {
             music.play().catch(e => {
