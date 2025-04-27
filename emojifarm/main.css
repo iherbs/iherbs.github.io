@@ -628,6 +628,7 @@ button:hover {
     display: flex;
     overflow-x: auto;
     gap: 10px;
+    padding-top: 5px;
     padding-bottom: 10px;
     scrollbar-width: thin;
     scrollbar-color: #4CAF50 #ddd;
