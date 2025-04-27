@@ -133,7 +133,6 @@
     // Initialize the game
     const initGame = () => {
         loadGame();
-        calculateOfflineProgress();
         createFarmPlots();
         populateMarket();
         updatePetUI();
@@ -675,6 +674,8 @@
                 });
 
                 Object.assign(gameState, parsed);
+
+                calculateOfflineProgress();
             } catch (e) {
                 console.error('Failed to load save:', e);
             }
@@ -876,24 +877,28 @@
                 const item = document.createElement('div');
                 item.className = 'pet-item';
                 item.innerHTML = `
-            <div class="market-item-emoji">${pet.emoji}</div>
-            <div class="market-item-name">${pet.name}</div>
-            <div class="market-item-cost">🪙${pet.cost}</div>
-        `;
+                    <div class="market-item-emoji">${pet.emoji}</div>
+                    <div class="market-item-name">${pet.name}</div>
+                    <div class="market-item-cost">🪙${pet.cost}</div>
+                `;
                 item.addEventListener('click', async () => {
                     const action = gameState.pet ? 'replace' : 'buy';
                     const confirmed = await showPopup(`${action === 'buy' ? 'Buy' : 'Replace pet with'} ${pet.name} ${pet.emoji} for 🪙${pet.cost}?`);
                     if (confirmed) {
                         if (gameState.money >= pet.cost) {
-                            gameState.money -= pet.cost;
-                            gameState.pet = { id: pet.id, emoji: pet.emoji, hunger: 100 };
-                            petItems.style.display = 'none';
-                            updatePetUI();
-                            updateUI();
-                            showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
-                            saveGame();
+                            if ((gameState.money - pet.cost) >= 50) {
+                                gameState.money -= pet.cost;
+                                gameState.pet = { id: pet.id, emoji: pet.emoji, hunger: 100 };
+                                petItems.style.display = 'none';
+                                updatePetUI();
+                                updateUI();
+                                showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
+                                saveGame();
+                            } else {
+                                showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                            }
                         } else {
-                            showNotification(`Not enough 🪙 to ${action} ${pet.name}!`);
+                            showNotification(`Not enough 🪙 to ${action} ${pet.emoji}!`);
                         }
                     }
                 });
@@ -965,11 +970,21 @@
             }
 
             if (option.type === 'buy') {
-                gameState.money -= option.cost;
+                if ((gameState.money - option.cost) >= 50) {
+                    gameState.money -= option.cost;
+                } else {
+                    showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                    return;
+                }
             } else {
-                gameState.inventory[option.emoji]--;
-                if (gameState.inventory[option.emoji] <= 0) {
-                    delete gameState.inventory[option.emoji];
+                if ((gameState.money - option.cost) >= 50) {
+                    gameState.inventory[option.emoji]--;
+                    if (gameState.inventory[option.emoji] <= 0) {
+                        delete gameState.inventory[option.emoji];
+                    }
+                } else {
+                    showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                    return;
                 }
             }
 
@@ -991,7 +1006,7 @@
             hungerProgress.style.width = `${gameState.pet.hunger}%`;
             hungerProgress.style.backgroundColor = gameState.pet.hunger >= 20 ? '#1b83f2' : '#999';
         } else {
-            petEmoji.innerHTML = '<div style="height:12px;"></div><span style="position:absolute;top:-14px;transform: rotate(-90deg);">🐾</span>';
+            petEmoji.innerHTML = '<div style="height:12px;"></div><span style="font-size:2rem;position:absolute;top:-14px;transform: rotate(-90deg);">🐾</span>';
             hungerProgress.style.width = '0%';
         }
     };
