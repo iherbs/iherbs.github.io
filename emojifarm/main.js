@@ -66,6 +66,34 @@ const gameState = {
         '👨🏻‍⚖️', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍🍳', '🧕🏻', '👳🏻‍♂️',
         '👲🏻', '👨🏻‍🦳', '👨🏻‍🦱', '👨🏻‍🦲', '🕴🏻', '💃🏻', '🕺🏻'
     ],
+    pet: null,
+    petTypes: [
+        { id: 'dog', name: 'Dog', emoji: '🐕', cost: 500 },
+        { id: 'cat', name: 'Cat', emoji: '🐈', cost: 500 },
+        { id: 'rabbit', name: 'Rabbit', emoji: '🐇', cost: 700 },
+        { id: 'butterfly', name: 'Butterfly', emoji: '🦋', cost: 1100 },
+        { id: 'swan', name: 'Swan', emoji: '🦢', cost: 1300 },
+        { id: 'snail', name: 'Snail', emoji: '🐌', cost: 1500 },
+        { id: 'poodle', name: 'Poodle', emoji: '🐩', cost: 1800 },
+        { id: 'black_cat', name: 'Black Cat', emoji: '🐈‍⬛', cost: 2100 },
+        { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', cost: 2500 },
+        { id: 'crab', name: 'Crab', emoji: '🦀', cost: 2900 },
+        { id: 'pufferfish', name: 'Pufferfish', emoji: '🐡', cost: 3300 },
+        { id: 'tropical_fish', name: 'Tropicfish', emoji: '🐠', cost: 3700 },
+        { id: 'dodo', name: 'Dodo', emoji: '🦤', cost: 4100 },
+        { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', cost: 4500 },
+        { id: 'dinosaur', name: 'Dinosaur', emoji: '🦖', cost: 5000 }
+    ],
+    petFoods: [
+        { id: 'lollipop', name: 'Lollipop', emoji: '🍭', cost: 50, hungerValue: 20 },
+        { id: 'chocolate', name: 'Chocolate', emoji: '🍫', cost: 100, hungerValue: 40 }
+    ],
+    petFeedItems: [
+        { emoji: '🌾', hungerValue: 2 },
+        { emoji: '🌽', hungerValue: 3 },
+        { emoji: '🥕', hungerValue: 4 }
+    ], // Tanaman yang bisa digunakan untuk memberi makan
+    autoHarvestInterval: 2,
     checksum: ''
 };
 
@@ -108,6 +136,7 @@ const initGame = () => {
     calculateOfflineProgress();
     createFarmPlots();
     populateMarket();
+    updatePetUI();
     updateUI();
     startGameLoop();
     updateLastPlayedDisplay();
@@ -318,30 +347,51 @@ const harvestPlant = (index) => {
     // gameState.money += plantValue;
 
     // Clear the plot
-    plot.plant = null;
-    plot.growth = 0;
-    plot.plantedAt = null;
+    plot.plant = '🐾';
+    setTimeout(() => {
+        plot.plant = null;
+        plot.growth = 0;
+        plot.plantedAt = null;
 
-    // Update UI
-    updatePlotUI(index);
-    updateUI();
+        // Update UI
+        updatePlotUI(index);
+        updateUI();
 
-    // Show notification
-    // showNotification(`Harvested ${getPlantName(plantEmoji)} for 🪙${plantValue}!`);
-    saveGame();
+        // Show notification
+        // showNotification(`Harvested ${getPlantName(plantEmoji)} for 🪙${plantValue}!`);
+        saveGame();
+    }, 300);
 }
 
 // Start the game loop for automatic day progression
 const startGameLoop = () => {
     if (gameState.gameInterval) { clearInterval(gameState.gameInterval); }
+    let lastAutoHarvest = 0;
     gameState.gameInterval = setInterval(() => {
         gameState.time += 0.1;
+
+        // Kurangi hunger setiap hari (10 per hari, 60 detik)
+        if (gameState.pet) {
+            gameState.pet.hunger = Math.max(gameState.pet.hunger - (10 / (gameState.dayDuration / 0.1)), 0);
+            updatePetUI();
+            if (gameState.pet.hunger < 20 && gameState.pet.hunger >= 19.9) {
+                showNotification(`${gameState.pet.emoji} is hungry! Feed your pet.`);
+            }
+        }
+
+        // Panen otomatis setiap 2 detik
+        lastAutoHarvest += 0.1;
+        if (lastAutoHarvest >= gameState.autoHarvestInterval) {
+            autoHarvest();
+            lastAutoHarvest = 0;
+        }
+
         updateTimeDisplay();
         const hasGrowingPlants = gameState.plots.some(plot => plot.plant);
         if (hasGrowingPlants) { updatePlantGrowth(0.1); }
         if (gameState.time >= gameState.dayDuration) { nextDay(); }
     }, 100);
-}
+};
 
 // Update plant growth based on elapsed time
 const updatePlantGrowth = (seconds) => {
@@ -553,7 +603,8 @@ const calculateChecksum = (data) => {
         inventory: data.inventory,
         plots: data.plots,
         plotCount: data.plotCount,
-        plantTypes: data.plantTypes
+        plantTypes: data.plantTypes,
+        pet: data.pet
     });
 
     let hash = 0;
@@ -608,6 +659,10 @@ const loadGame = () => {
 
             if (parsed.plotCount > 12) {
                 parsed.plotCount = 12;
+            }
+
+            if (!parsed.pet) {
+                parsed.pet = null;
             }
 
             // Ensure each plot has plantedAt property
@@ -808,6 +863,158 @@ const checkLevelUp = () => {
         populateMarket(); // Perbarui market dengan tanaman baru
     }
 }
+
+// Fungsi untuk membeli atau mengganti hewan
+const buyPet = async () => {
+    const petItems = document.getElementById('pet-items');
+    if (petItems.style.display == 'none') {
+        petItems.style.display = 'flex';
+        petItems.innerHTML = '';
+        gameState.petTypes.forEach(pet => {
+            const item = document.createElement('div');
+            item.className = 'pet-item';
+            item.innerHTML = `
+            <div class="market-item-emoji">${pet.emoji}</div>
+            <div class="market-item-name">${pet.name}</div>
+            <div class="market-item-cost">🪙${pet.cost}</div>
+        `;
+            item.addEventListener('click', async () => {
+                const action = gameState.pet ? 'replace' : 'buy';
+                const confirmed = await showPopup(`${action === 'buy' ? 'Buy' : 'Replace pet with'} ${pet.name} ${pet.emoji} for 🪙${pet.cost}?`);
+                if (confirmed) {
+                    if (gameState.money >= pet.cost) {
+                        gameState.money -= pet.cost;
+                        gameState.pet = { id: pet.id, emoji: pet.emoji, hunger: 100 };
+                        petItems.style.display = 'none';
+                        updatePetUI();
+                        updateUI();
+                        showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
+                        saveGame();
+                    } else {
+                        showNotification(`Not enough 🪙 to ${action} ${pet.name}!`);
+                    }
+                }
+            });
+            petItems.appendChild(item);
+        });
+    } else {
+        petItems.innerHTML = '';
+        petItems.style.display = 'none';
+    }
+};
+
+// Fungsi untuk memberi makan hewan
+const feedPet = async () => {
+    if (!gameState.pet) {
+        showNotification('No pet to feed!');
+        return;
+    }
+
+    const options = [
+        ...gameState.petFoods.map(food => ({
+            type: 'buy',
+            name: food.name,
+            emoji: food.emoji,
+            cost: food.cost,
+            hungerValue: food.hungerValue
+        })),
+        ...gameState.petFeedItems.map(item => ({
+            type: 'inventory',
+            name: getPlantName(item.emoji),
+            emoji: item.emoji,
+            cost: 0,
+            hungerValue: item.hungerValue,
+            available: (gameState.inventory[item.emoji] || 0) > 0
+        }))
+    ].filter(opt => opt.type === 'buy' || opt.available);
+
+    if (options.length === 0) {
+        showNotification('No food available! Buy pet food or harvest more crops.');
+        return;
+    }
+
+    const message = `
+        Feed ${gameState.pet.emoji} with:<br>
+            <div style="text-align:left;margin-top:10px;">
+            ${options.map(opt => `
+                <div class="feeditem">
+                    <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
+                    <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === 'buy' ? `🪙${opt.cost}` : 'From Inventory'})</label>
+                </div>
+            `).join('')}
+            </div>
+        `;
+
+    const confirmed = await showPopup(message, 'Feed', true, false);
+    if (confirmed) {
+        const selectedOption = document.querySelector('input[name="feed-option"]:checked');
+        if (!selectedOption) {
+            showNotification('Please select a food option!');
+            return;
+        }
+        const option = options.find(opt => opt.emoji === selectedOption.value);
+        if (option.type === 'buy' && gameState.money < option.cost) {
+            showNotification(`Not enough 🪙 to buy ${option.name}!`);
+            return;
+        }
+        if (option.type === 'inventory' && !gameState.inventory[option.emoji]) {
+            showNotification(`No ${option.name} in inventory!`);
+            return;
+        }
+
+        if (option.type === 'buy') {
+            gameState.money -= option.cost;
+        } else {
+            gameState.inventory[option.emoji]--;
+            if (gameState.inventory[option.emoji] <= 0) {
+                delete gameState.inventory[option.emoji];
+            }
+        }
+
+        gameState.pet.hunger = Math.min(gameState.pet.hunger + option.hungerValue, 100);
+        updatePetUI();
+        updateUI();
+        showNotification(`Fed ${gameState.pet.emoji} with ${option.name}! Hunger: ${Math.round(gameState.pet.hunger)}`);
+        saveGame();
+        feedPet();
+    }
+};
+
+// Fungsi untuk memperbarui UI hewan
+const updatePetUI = () => {
+    const petEmoji = document.getElementById('pet-emoji');
+    const hungerProgress = document.getElementById('hunger-progress');
+    if (gameState.pet) {
+        petEmoji.textContent = gameState.pet.emoji;
+        hungerProgress.style.width = `${gameState.pet.hunger}%`;
+        hungerProgress.style.backgroundColor = gameState.pet.hunger >= 20 ? '#1b83f2' : '#999';
+    } else {
+        petEmoji.innerHTML = '<div style="height:12px;"></div><span style="position:absolute;top:-14px;transform: rotate(-90deg);">🐾</span>';
+        hungerProgress.style.width = '0%';
+    }
+};
+
+// Fungsi untuk panen otomatis
+const autoHarvest = () => {
+    if (!gameState.pet || gameState.pet.hunger < 20) return;
+
+    const readyPlotIndex = gameState.plots.findIndex((plot, index) => plot.plant && isReadyToHarvest(index));
+    if (readyPlotIndex !== -1) {
+        harvestPlant(readyPlotIndex);
+        // showNotification(`${gameState.pet.emoji} harvested a plant!`);
+    }
+};
+
+_('#buy-pet').addEventListener('click', buyPet);
+_('#feed-pet').addEventListener('click', feedPet);
+_('#pet-emoji').addEventListener('click', (e) => {
+    if (gameState.pet) {
+        _('#love-animation').classList.add('love-heart');
+        setTimeout(() => {
+            _('#love-animation').classList.remove('love-heart');
+        }, 1500);
+    }
+});
 
 // Save game when page is closed
 window.addEventListener('beforeunload', () => {
