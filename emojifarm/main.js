@@ -352,15 +352,15 @@
         const plot = gameState.plots[index];
         const plantEmoji = plot.plant;
         const plantValue = getPlantValue(plantEmoji);
-
-        // Add to inventory
-        if (!gameState.inventory[plantEmoji]) {
-            gameState.inventory[plantEmoji] = 0;
+        if (plantEmoji != '🐾') {
+            // Add to inventory
+            if (!gameState.inventory[plantEmoji]) {
+                gameState.inventory[plantEmoji] = 0;
+            }
+            gameState.inventory[plantEmoji]++;
+            // Add money
+            // gameState.money += plantValue;
         }
-        gameState.inventory[plantEmoji]++;
-
-        // Add money
-        // gameState.money += plantValue;
 
         // Clear the plot
         if (ispet) {
