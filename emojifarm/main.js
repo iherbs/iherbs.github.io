@@ -706,7 +706,11 @@
                     }
                 });
 
+                const plantTypes = gameState.plantTypes;
+                plantTypes.find(p => p.emoji === '🟫').cost = parsed.plantTypes.find(p => p.emoji === '🟫').cost;
+
                 Object.assign(gameState, parsed);
+                gameState.plantTypes = plantTypes;
 
                 calculateOfflineProgress();
             } catch (e) {
