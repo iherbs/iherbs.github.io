@@ -347,7 +347,9 @@
         // gameState.money += plantValue;
 
         // Clear the plot
-        plot.plant = '🐾';
+        if (gameState.pet && gameState.pet.hunger >= 20) {
+            plot.plant = '🐾';
+        }
         setTimeout(() => {
             plot.plant = null;
             plot.growth = 0;
