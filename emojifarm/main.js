@@ -94,7 +94,8 @@
             { emoji: '🥕', hungerValue: 4 }
         ], // Tanaman yang bisa digunakan untuk memberi makan
         autoHarvestInterval: 2,
-        checksum: ''
+        checksum: '',
+        music: true
     };
 
     const _ = (id) => {
@@ -141,6 +142,16 @@
         updateLastPlayedDisplay();
         generateQuests();
     }
+
+    const music = _("#background-audio");
+    music.volume = 0.1; // Atur volume (0.1 - 1)
+    document.addEventListener("click", function () {
+        if (gameState.music) {
+            music.play().catch(e => {
+                console.log("Autoplay blocked, but user clicked!");
+            });
+        }
+    });
 
     // Dapatkan tanaman yang tersedia di market berdasarkan level
     const getAvailablePlants = (level) => {
@@ -754,7 +765,21 @@
             <button type="button" id="resetgame">
                 Reset Game
             </button>
+            <div style="margin-top:10px">
+                Music
+                <label class="switch">
+                    <input type="checkbox" id="btnmusic" ${gameState.music ? 'checked' : ''}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
         `, 'Setting', false);
+
+        _('#btnmusic').addEventListener('click', () => {
+            gameState.music = _('#btnmusic').checked;
+            if (!_('#btnmusic').checked) {
+                music.pause();
+            }
+        });
 
         _('#resetgame').addEventListener('click', async () => {
             const confirmed = await showPopup(`
