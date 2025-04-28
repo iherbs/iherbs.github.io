@@ -57,6 +57,11 @@
             { emoji: '🌸', name: 'Sakura', growthTime: 110, value: 100, cost: 80 },
             { emoji: '🟫', name: 'Land', growthTime: 0, value: 0, cost: 300 }
         ],
+        growthItems: [
+            { emoji: '💧', name: 'Water', growthBoost: 2, cost: 20 },
+            { emoji: '🧴', name: 'Fertilizer', growthBoost: 5, cost: 50 },
+            { emoji: '🧪', name: 'Potion', growthBoost: 10, cost: 100 }
+        ],
         gameInterval: null,
         npcs: [
             '🧔🏻‍♂️', '🧔🏻', '🤡', '👻', '🤖', '👽', '🧜🏻‍♂️', '🧚🏻‍♂️',
@@ -107,6 +112,7 @@
         } else if (id.substr(0, 1) == "@") {
             el = document.getElementsByName(id.substr(1, id.length));
         }
+        if (!el) { console.warn(`Element ${id} not found`); }
         return el;
     }
 
@@ -118,7 +124,6 @@
     const notification = _('#notification');
     const timeProgressBar = _('#time-progress');
     const lastPlayedDisplay = _('#last-played');
-    const cancelmarket = _('#cancelmarket');
     const levelDisplay = _('#level');
     const pointsProgress = _('#points-progress');
     const pointsText = _('#points-text');
@@ -135,7 +140,9 @@
     const initGame = () => {
         loadGame();
         createFarmPlots();
+        setupMarketTabs();
         populateMarket();
+        populateGrowthItems();
         updatePetUI();
         updateUI();
         startGameLoop();
@@ -152,6 +159,46 @@
             });
         }
     });
+
+    const setupMarketTabs = () => {
+        document.querySelectorAll('.market-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Hapus class active dari semua tab
+                document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
+                // Tambahkan class active ke tab yang diklik
+                tab.classList.add('active');
+                // Tampilkan konten yang sesuai
+                const tabType = tab.dataset.tab;
+                _('#market-items').style.display = tabType === 'seed' ? 'flex' : 'none';
+                _('#growth-items').style.display = tabType === 'growth' ? 'flex' : 'none';
+            });
+        });
+    };
+
+    const populateGrowthItems = () => {
+        const growthItemsContainer = _('#growth-items');
+        growthItemsContainer.innerHTML = '';
+
+        gameState.growthItems.forEach(item => {
+            const marketItem = document.createElement('div');
+            marketItem.className = 'market-item';
+            marketItem.dataset.emoji = item.emoji;
+            marketItem.innerHTML = `
+                <div class="market-item-emoji">${item.emoji}</div>
+                <div class="market-item-name">${item.name}</div>
+                <div class="market-item-cost">🪙${item.cost}</div>
+            `;
+            marketItem.addEventListener('click', () => {
+                // Hapus class selected dari semua item
+                document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                _('#pet-items').style.display = 'none';
+                // Tambahkan class selected ke item yang diklik
+                marketItem.classList.add('selected');
+                gameState.selectedSeed = item.emoji;
+            });
+            growthItemsContainer.appendChild(marketItem);
+        });
+    };
 
     // Dapatkan tanaman yang tersedia di market berdasarkan level
     const getAvailablePlants = (level) => {
@@ -197,9 +244,7 @@
                 // Remove selected class from all items
                 _('#pet-items').style.display = 'none';
                 document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
-                cancelmarket.style.display = "block";
                 if (plant.emoji == "🟫") {
-                    cancelmarket.style.display = "none";
                     let confirmed = await showPopup('<span style="font-size:20px;">Buy Land 🟫?</span>');
                     if (confirmed) {
                         const seedCost = getPlantCost(plant.emoji);
@@ -307,37 +352,66 @@
     }
 
     // Handle plot click
-    const handlePlotClick = (index) => {
+    const handlePlotClick = async (index) => {
         const plot = gameState.plots[index];
 
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
             if (gameState.selectedSeed) {
-                const seedCost = getPlantCost(gameState.selectedSeed);
+                const item = gameState.plantTypes.find(i => i.emoji === gameState.selectedSeed);
+                if (item != undefined) {
+                    const seedCost = getPlantCost(gameState.selectedSeed);
 
-                if (gameState.money >= seedCost) {
-                    plot.plant = gameState.selectedSeed;
-                    plot.growth = 0;
-                    plot.plantedAt = new Date().toISOString();
-                    gameState.money -= seedCost;
-                    updatePlotUI(index);
-                    updateUI();
-                    // showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for 🪙${seedCost}!`);
-                    gameState.selectedSeed = null;
-                    // Reset selected item in market
-                    document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
-                    cancelmarket.style.display = "none";
-                    saveGame();
+                    if (gameState.money >= seedCost) {
+                        plot.plant = gameState.selectedSeed;
+                        plot.growth = 0;
+                        plot.plantedAt = new Date().toISOString();
+                        gameState.money -= seedCost;
+                        updatePlotUI(index);
+                        updateUI();
+                        // showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for 🪙${seedCost}!`);
+                        gameState.selectedSeed = null;
+                        // Reset selected item in market
+                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        saveGame();
+                    } else {
+                        showNotification(`Not enough 🪙 to buy ${gameState.selectedSeed}!`);
+                        // Reset selected item in market
+                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                    }
                 } else {
-                    showNotification(`Not enough 🪙 to buy ${gameState.selectedSeed}!`);
-                    // Reset selected item in market
+                    gameState.selectedSeed = null;
                     document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
-                    cancelmarket.style.display = "none";
                 }
             }
-        } else if (isReadyToHarvest(index)) {
+        } else if (plot.plant && isReadyToHarvest(index)) {
             // Harvest if ready
             harvestPlant(index);
+        } else if (plot.plant && gameState.selectedSeed) {
+            // Gunakan item percepatan jika tanaman ada dan item dipilih
+            const item = gameState.growthItems.find(i => i.emoji === gameState.selectedSeed);
+            if (item != undefined) {
+                if (gameState.money >= item.cost) {
+                    if (gameState.money - item.cost >= 50) {
+                        gameState.money -= item.cost;
+                        plot.growth += item.growthBoost;
+                        if (plot.growth > getGrowthTime(plot.plant)) {
+                            plot.growth = getGrowthTime(plot.plant); // Batasi pertumbuhan maksimum
+                        }
+                        updatePlotUI(index);
+                        updateUI();
+                        showNotification(`Used ${item.name} ${item.emoji} to boost growth!`);
+                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        saveGame();
+                    } else {
+                        showNotification(`Can't use, remaining 🪙 must be at least 50`);
+                    }
+                } else {
+                    showNotification(`Not enough 🪙 to use ${item.emoji}!`);
+                }
+            }
+            gameState.selectedSeed = null;
+            document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
     }
 
@@ -672,6 +746,11 @@
                     parsed.plots = Array(parsed.plotCount || 4).fill().map(() => ({ plant: null, growth: 0, plantedAt: null }));
                 }
 
+                // Migrate growth if not present        
+                if (!parsed.growthItems) {
+                    parsed.growthItems = gameState.growthItems;
+                }
+
                 // Migrate quests if not present or old format (single quest)
                 if (!parsed.quests) {
                     parsed.quests = parsed.quest ? [parsed.quest] : [];
@@ -706,6 +785,7 @@
                     }
                 });
 
+                // Migrate plantTypes
                 const plantTypes = gameState.plantTypes;
                 plantTypes.find(p => p.emoji === '🟫').cost = parsed.plantTypes.find(p => p.emoji === '🟫').cost;
 
@@ -757,11 +837,13 @@
         });
     }
 
-    cancelmarket.addEventListener('click', async () => {
-        gameState.selectedSeed = null;
-        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
-        cancelmarket.style.display = "none";
-    });
+    window.onclick = function (event) {
+        // console.log(event.target);
+        if (!event.target.matches('.plot') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost')) {
+            gameState.selectedSeed = null;
+            document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+        }
+    };
 
     let reset = false;
     setting.addEventListener('click', async () => {

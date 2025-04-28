@@ -43,12 +43,15 @@
         </div>
 
         <div class="market">
-            <div class="panel-title">
-                🌱 Seed
-                <span id="cancelmarket" style="display:none;float:right;">❌</span>
+            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
+                <span class="market-tab active" id="market-title" data-tab="seed">🌱 Seed</span>
+                <span class="market-tab" data-tab="growth">💧 Growth</span>
             </div>
             <div class="market-items" id="market-items">
                 <!-- Market items will be added here by JavaScript -->
+            </div>
+            <div class="market-items" id="growth-items" style="display: none;">
+                <!-- Growth items will be added here by JavaScript -->
             </div>
         </div>
 

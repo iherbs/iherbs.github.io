@@ -163,7 +163,7 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
-    font-family: 'Delius';
+    font-family: inherit;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -385,6 +385,54 @@ input:checked+.slider:before {
     padding: 15px;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.market-tab {
+    display: inline-block;
+    position: relative;
+    top: 0.8px;
+    left: 2px;
+    width: 49.1%;
+    background-color: transparent;
+    padding: 8px 15px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    cursor: pointer;
+    font-size: 1rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.market-tab.active {
+    border-top: 1px solid #dddddd;
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    border-bottom: 1px solid #ffffff;
+    background: #ffffff;
+    box-shadow: 0 -2px 3px rgba(50, 50, 50, 0.1);
+}
+
+#growth-items {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-top: 5px;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #4CAF50 #ddd;
+}
+
+#growth-items::-webkit-scrollbar {
+    height: 8px;
+}
+
+#growth-items::-webkit-scrollbar-track {
+    background: #ddd;
+    border-radius: 5px;
+}
+
+#growth-items::-webkit-scrollbar-thumb {
+    background: #4CAF50;
+    border-radius: 5px;
 }
 
 .market-items {
@@ -677,7 +725,6 @@ input:checked+.slider:before {
     color: white;
     padding: 5px 9px;
     font-size: 0.9rem;
-    font-family: 'Delius';
 }
 
 .pet-actions button:hover {
