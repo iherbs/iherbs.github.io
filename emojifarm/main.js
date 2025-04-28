@@ -807,18 +807,9 @@
     // Generate new quest
     // Generate single quest
     const generateSingleQuest = () => {
-        gameState.questCompletedCount = gameState.questCompletedCount === undefined ? 0 : gameState.questCompletedCount;
+        gameState.questCompletedCount = gameState.questCompletedCount == undefined ? 0 : gameState.questCompletedCount;
         const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
-        let startIndex = 0;
-        if (gameState.level >= 6) {
-            startIndex = gameState.level % 2 === 0 ? gameState.level - 3 : gameState.level - 4;
-            if (gameState.level > 40) {
-                startIndex = 5;
-            }
-        }
-        const numPlant = Math.floor(Math.random() * availablePlants.length) + startIndex;
-        const avplant = numPlant > availablePlants.length ? availablePlants.length - 1 : numPlant;
-        const plant = availablePlants[avplant];
+        const plant = availablePlants[Math.floor(Math.random() * availablePlants.length)];
         const baseQuantity = gameState.questCompletedCount > 10 ? Math.floor(Math.random() * 10) + 1 : Math.floor(Math.random() * 3) + 1;
         const quantity = gameState.level > 6 ? baseQuantity + 2 : baseQuantity;
         const usedNPCs = gameState.quests.map(q => q.npc);
