@@ -151,7 +151,7 @@
     }
 
     const music = _("#background-audio");
-    music.volume = 0.5; // Atur volume (0.1 - 1)
+    music.volume = 0.5;
     document.addEventListener("click", function () {
         if (gameState.music) {
             music.play().catch(e => {
@@ -892,6 +892,7 @@
                     clearInterval(gameState.gameInterval);
                     localStorage.removeItem('emojiFarm');
                     reset = true;
+                    window.scrollTo(0, 0);
                     location.reload();
                 } else {
                     showNotification(`Failed to reset game!`);
@@ -1014,8 +1015,8 @@
             pointsNeeded = getPointsNeededForNextLevel(gameState.level); // Hitung poin untuk level berikutnya
             showNotification(`Level up! Reached Level ${gameState.level}!`);
 
+            const numplantnow = parseInt(_(".market-item").length) - 3;
             const availablePlants = getAvailablePlants(gameState.level);
-            const numplantnow = _(".market-item").length;
             if (availablePlants.length > numplantnow && numplantnow > 0) {
                 setTimeout(() => {
                     showNotification(`New Plant Added!`);
