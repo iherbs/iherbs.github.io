@@ -346,6 +346,28 @@ input:checked+.slider:before {
     }
 }
 
+.power-growth-animation {
+    animation: powerGrowth 0.5s ease;
+}
+
+@keyframes powerGrowth {
+    0% {
+        background-color: #5dadec;
+    }
+
+    50% {
+        background-color: #5ddeec;
+    }
+
+    80% {
+        background-color: #5dadec;
+    }
+
+    100% {
+        background-color: #5ddeec;
+    }
+}
+
 .time-display {
     margin-bottom: 15px;
     font-size: 1rem;

@@ -207,7 +207,7 @@
         // Tambah 1 tanaman per level setelah Level 1
         const additionalPlants = level > 1 ? gameState.plantTypes.slice(2, 2 + (level - 1)) : [];
         // Selalu sertakan Land
-        const landPlant = gameState.plotCount < 12 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
+        const landPlant = gameState.plotCount < 14 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
         if (landPlant.length == 0) {
             if (additionalPlants.length == 0) {
                 return [...basePlants];
@@ -252,13 +252,13 @@
                             if ((gameState.money - seedCost) >= 50) {
                                 gameState.money -= seedCost;
                                 gameState.plotCount++;
-                                gameState.plantTypes.find(p => p.emoji === '🟫').cost = gameState.plantTypes.find(p => p.emoji === '🟫').cost + 100;
+                                gameState.plantTypes.find(p => p.emoji === '🟫').cost = gameState.plantTypes.find(p => p.emoji === '🟫').cost + 300;
                                 updateUI();
                                 createFarmPlots();
                                 populateMarket();
                                 showNotification(`New Land 🟫 Added!`);
                             } else {
-                                showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                                showNotification(`can't buy, not good for your 🪙 health`);
                             }
                         } else {
                             showNotification(`Not enough 🪙 to buy Land!`);
@@ -400,11 +400,20 @@
                         }
                         updatePlotUI(index);
                         updateUI();
-                        showNotification(`Used ${item.name} ${item.emoji} to boost growth!`);
+                        // showNotification(`Used ${item.name} ${item.emoji} to boost growth!`);
+
+                        if (farmGrid.children[index] != null) {
+                            const plotElement = farmGrid.children[index];
+                            const progressCont = plotElement.querySelector('.progress-container');
+                            progressCont.classList.add('power-growth-animation');
+                            setTimeout(() => {
+                                progressCont.classList.remove('power-growth-animation');
+                            }, 500);
+                        }
                         document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                         saveGame();
                     } else {
-                        showNotification(`Can't use, remaining 🪙 must be at least 50`);
+                        showNotification(`can't buy, not good for your 🪙 health`);
                     }
                 } else {
                     showNotification(`Not enough 🪙 to use ${item.emoji}!`);
@@ -770,8 +779,8 @@
                     parsed.points = 0;
                 }
 
-                if (parsed.plotCount > 12) {
-                    parsed.plotCount = 12;
+                if (parsed.plotCount > 14) {
+                    parsed.plotCount = 14;
                 }
 
                 if (!parsed.pet) {
@@ -839,7 +848,7 @@
 
     window.onclick = function (event) {
         // console.log(event.target);
-        if (!event.target.matches('.plot') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost')) {
+        if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost')) {
             gameState.selectedSeed = null;
             document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
@@ -892,9 +901,9 @@
         gameState.questCompletedCount = gameState.questCompletedCount == undefined ? 0 : gameState.questCompletedCount;
         const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
         let startIndex = 0;
-        if (gameState.level >= 6) {
-            startIndex = gameState.level % 2 === 0 ? gameState.level - 10 : gameState.level - 11;
-            if (gameState.level > 40) {
+        if (parseInt(gameState.level) >= 6) {
+            startIndex = parseInt(gameState.level) % 2 === 0 ? parseInt(gameState.level) - 10 : parseInt(gameState.level) - 11;
+            if (parseInt(gameState.level) > 40) {
                 startIndex = 5;
             }
         }
@@ -1039,7 +1048,7 @@
                                 showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
                                 saveGame();
                             } else {
-                                showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                                showNotification(`can't buy, not good for your 🪙 health`);
                             }
                         } else {
                             showNotification(`Not enough 🪙 to ${action} ${pet.emoji}!`);
@@ -1118,7 +1127,7 @@
                 if ((gameState.money - option.cost) >= 50) {
                     gameState.money -= option.cost;
                 } else {
-                    showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                    showNotification(`can't buy, not good for your 🪙 health`);
                     return;
                 }
             } else {
@@ -1128,7 +1137,7 @@
                         delete gameState.inventory[option.emoji];
                     }
                 } else {
-                    showNotification(`can't buy, remaining 🪙 must be at least 50`);
+                    showNotification(`can't buy, not good for your 🪙 health`);
                     return;
                 }
             }
