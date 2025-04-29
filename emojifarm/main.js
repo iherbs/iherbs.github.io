@@ -879,7 +879,7 @@
         _('#resetgame').addEventListener('click', async () => {
             const confirmed = await showPopup(`
                 Are you sure you want to reset the game? This will erase all progress.<br>
-                Type reset "reset" to confirm. <input type="text" id="reset-input" style="width:100px;margin:10px;padding:5px 8px;border-radius:5px;border:2px solid #2E8B57;outline:none;" autocomplete="off">
+                Type "reset" to confirm. <input type="text" id="reset-input" style="width:100px;margin:10px;padding:5px 8px;border-radius:5px;border:2px solid #2E8B57;outline:none;" autocomplete="off">
             `);
             if (confirmed) {
                 const resetinput = _('#reset-input').value;
