@@ -329,6 +329,10 @@
             progressIcon.textContent = gameState.plots[i].plant || '';
             progressIcon.className = 'progress-icon';
 
+
+            const progressWrap = document.createElement('div');
+            progressWrap.className = 'progress-wrap';
+
             const progressBar = document.createElement('div');
             progressBar.className = 'progress-bar';
 
@@ -342,7 +346,8 @@
             }
 
             progressContainer.appendChild(progressIcon);
-            progressContainer.appendChild(progressBar);
+            progressContainer.appendChild(progressWrap);
+            progressWrap.appendChild(progressBar);
             plot.appendChild(plant);
             plot.appendChild(progressContainer);
 
@@ -404,10 +409,10 @@
 
                         if (farmGrid.children[index] != null) {
                             const plotElement = farmGrid.children[index];
-                            const progressCont = plotElement.querySelector('.progress-container');
-                            progressCont.classList.add('power-growth-animation');
+                            const progressWrap = plotElement.querySelector('.progress-wrap');
+                            progressWrap.classList.add('power-growth-animation');
                             setTimeout(() => {
-                                progressCont.classList.remove('power-growth-animation');
+                                progressWrap.classList.remove('power-growth-animation');
                             }, 500);
                         }
                         document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
