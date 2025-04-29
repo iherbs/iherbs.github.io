@@ -138,6 +138,7 @@ body {
     position: absolute;
     margin-top: -10px;
     font-size: 10px;
+    z-index: 1;
 }
 
 .progress-wrap {
