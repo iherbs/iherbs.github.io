@@ -799,6 +799,8 @@
                     }
                 });
 
+                parsed.money = parsed.money > 999999 ? 999999 : parsed.money;
+
                 // Migrate plantTypes
                 const plantTypes = gameState.plantTypes;
                 plantTypes.find(p => p.emoji === '🟫').cost = parsed.plantTypes.find(p => p.emoji === '🟫').cost;
