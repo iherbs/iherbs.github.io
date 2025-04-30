@@ -415,7 +415,7 @@ input:checked+.slider:before {
 .market-tab {
     display: inline-block;
     position: relative;
-    top: 0.8px;
+    top: 0.9px;
     left: 2px;
     width: 49.1%;
     background-color: transparent;
@@ -812,8 +812,8 @@ input:checked+.slider:before {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    -webkit-tap-highlight-color: transparent;
     margin-bottom: 7px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .feeditem input[type="radio"] {
@@ -882,6 +882,13 @@ input:checked+.slider:before {
 #play-minigame {
     float: right;
     cursor: pointer;
+    background-color: #c8f56d;
+    color: #000000;
+    padding: 5px 9px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    box-shadow: 0px 1px 2px #ddd;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #minigame-container {

@@ -1509,10 +1509,10 @@
 
             if (minigameState.score >= minigameState.targetScore) {
                 message = `Great job! You scored ${minigameState.score} points!`;
-                reward = Math.floor(minigameState.score / 8);
+                reward = Math.floor(minigameState.score / 5);
             } else {
                 message = `Game over! You scored ${minigameState.score} points.`;
-                reward = Math.floor(minigameState.score / 15);
+                reward = Math.floor(minigameState.score / 8);
             }
 
             gameState.money += reward;
@@ -1530,13 +1530,13 @@
     // Open minigame
     const openMinigame = async () => {
         const entryCost = 50;
-        const confirmed = await showPopup(`Play Plant Match minigame for 🪙${entryCost}?`);
+        const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
         if (confirmed) {
             if (gameState.money >= entryCost) {
                 if (gameState.money - entryCost >= 50) {
                     gameState.money -= entryCost;
-                    // updateUI();
-                    // saveGame();
+                    updateUI();
+                    saveGame();
                     initMinigame();
                     _('#minigame-popup-overlay').classList.add('show');
                 } else {
