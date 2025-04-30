@@ -100,7 +100,8 @@
         ], // Tanaman yang bisa digunakan untuk memberi makan
         autoHarvestInterval: 1,
         checksum: '',
-        music: true
+        music: true,
+        sfx: true
     };
     const maxmoney = 999999;
 
@@ -139,6 +140,9 @@
 
     // Initialize the game
     const initGame = () => {
+        if (!localStorage.getItem('emojiFarm')) {
+            setTimeout(() => showTutorial(), 100); // Delay to ensure UI loads
+        }
         loadGame();
         createFarmPlots();
         setupMarketTabs();
@@ -151,9 +155,85 @@
         generateQuests();
     }
 
+    // Show tutorial popup
+    const showTutorial = () => {
+        // Tutorial content
+        const tutorialContent = `
+        <div style="text-align: left; font-size: 0.9rem; max-height: 400px; overflow-y: auto;line-height: 1.6;">
+            <h2>How to Play Cozy Emoji Farm 🌱</h2>
+            <p>Welcome to <em>Cozy Emoji Farm</em>, a relaxing farming adventure where you grow crops, complete quests, care for pets, and enjoy a fun matching crops! Here’s how to get started:</p>
+            <br>
+            <h3>1. Manage Your Farm</h3>
+            <ul>
+                <li><strong>Plant Crops</strong>: Visit the <em>Market</em> (🌱 Seed tab) to buy seeds. Click a seed to select it, then tap an empty plot in the <em>Farm Grid</em> to plant. Each seed costs coins (🪙).</li>
+                <li><strong>Grow and Harvest</strong>: Crops grow over time, shown by a progress bar. When the bar is full, click the plot to harvest the crop. Harvested crops go to your <em>Inventory</em>.</li>
+                <li><strong>Boost Growth</strong>: Use items from the <em>Growth</em> tab (💧 Water, 🧴 Fertilizer, 🧪 Potion) to speed up crop growth. Select an item and click a growing plot to apply it.</li>
+            </ul>
+            <br>
+            <h3>2. Complete Quests</h3>
+            <ul>
+                <li>Check the <em>Quest</em> panel (📃) to see tasks from friendly NPCs. Each quest asks for a specific number of crops (e.g., 3 🌾 Wheat).</li>
+                <li>Deliver crops from your <em>Inventory</em> by clicking the checkmark button when you have enough. Completing quests earns coins (🪙), points, and helps you level up!</li>
+            </ul>
+            <br>
+            <h3>3. Care for Your Pet</h3>
+            <ul>
+                <li>Adopt a pet in the <em>Pet</em> panel (🐾) by clicking <em>Buy</em> and choosing a pet (e.g., 🐈 Cat). Pets cost coins.</li>
+                <li>Feed your pet with food (🍭 Lollipop, 🍫 Chocolate) or crops from your <em>Inventory</em> using the <em>Feed</em> button. Keep their hunger bar full!</li>
+                <li>A well-fed pet (hunger ≥ 20) will automatically harvest ripe crops for you.</li>
+            </ul>
+            <br>
+            <h3>4. Play the Plant Match</h3>
+            <ul>
+                <li>Access the Plant Match by clicking the <em>Match</em> button (🌿) in the <em>Quest</em> panel. It costs 50 coins to play.</li>
+                <li><strong>How to Play</strong>:
+                    <ul>
+                        <li>You’ll see a 6x6 grid filled with crop emojis (e.g., 🌾, 🌽).</li>
+                        <li>Swap adjacent crops by clicking one, then clicking a neighboring crop to form rows or columns of 3 or more identical crops.</li>
+                        <li>Matching 3 crops earns 10 points, 4 crops earns 20 points, and 5+ crops earns 30 points. Matching 4 or more also adds that crop to your <em>Inventory</em> (e.g., match 4 🌾 to get 1 Wheat).</li>
+                        <li>You have 20 moves to reach 500 points. If you succeed, you’ll earn coins.</li>
+                    </ul>
+                </li>
+                <li><strong>Tips</strong>:
+                    <ul>
+                        <li>Plan swaps to create bigger matches for more points and crops.</li>
+                        <li>Listen for sound effects and watch animations to know when matches are made!</li>
+                    </ul>
+                </li>
+            </ul>
+            <br>
+            <h3>5. Level Up and Expand</h3>
+            <ul>
+                <li>Earn points by completing quests to level up. Higher levels unlock new crops in the <em>Market</em>.</li>
+                <li>Buy additional plots (🟫 Land) in the <em>Market</em> to expand your farm.</li>
+                <li>Sell crops in your <em>Inventory</em> by clicking them and choosing a quantity to earn extra coins.</li>
+            </ul>
+            <br>
+            <h3>6. Save Your Progress</h3>
+            <ul>
+                <li>Your progress is automatically saved. Return anytime to continue farming!</li>
+            </ul>
+            <br>
+            <h3>Tips for Success</h3>
+            <ul>
+                <li>Keep planting and harvesting to build your <em>Inventory</em> for quests.</li>
+                <li>Feed your pet regularly to ensure automatic harvesting.</li>
+                <li>Play <em>Plant Match</em> to earn extra coins and crops, especially if you need specific crops for quests.</li>
+                <li>Manage your coins wisely—don’t spend all at once, as you’ll need some for seeds</li>
+            </ul>
+
+            <p>Ready to start your farming journey? Plant your first crop, adopt a pet, and dive into <em>Plant Match</em> for extra fun! Happy farming! 🌾🐾</p>
+        </div>
+        `;
+        showPopup(tutorialContent, 'How to Play', false);
+    };
+
+    // Add event listener for help button
+    _('#help').addEventListener('click', showTutorial);
+
     const music = _("#background-audio");
     music.volume = 0.5;
-    document.addEventListener("click", function () {
+    document.addEventListener("click", () => {
         if (gameState.music) {
             music.play().catch(e => {
                 console.log("Autoplay blocked, but user clicked!");
@@ -164,8 +244,10 @@
     // Play sound effect
     const sfx = _('#sfx');
     const playSound = (soundFile) => {
-        const audio = new Audio(`music/${soundFile}`);
-        audio.play();
+        if (gameState.sfx) {
+            const audio = new Audio(`music/${soundFile}`);
+            audio.play();
+        }
     };
 
     const setupMarketTabs = () => {
@@ -368,7 +450,7 @@
     const handlePlotClick = async (index) => {
         const plot = gameState.plots[index];
 
-        playSound('growth.wav');
+        playSound('tap.wav');
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
             if (gameState.selectedSeed) {
@@ -802,6 +884,14 @@
                     parsed.pet = null;
                 }
 
+                if (!parsed.hasOwnProperty('music')) {
+                    parsed.music = true;
+                }
+
+                if (!parsed.hasOwnProperty('sfx')) {
+                    parsed.sfx = true;
+                }
+
                 // Ensure each plot has plantedAt property
                 parsed.plots.forEach(plot => {
                     if (!plot.plantedAt && plot.plant) {
@@ -863,7 +953,7 @@
         });
     }
 
-    window.onclick = function (event) {
+    window.onclick = (event) => {
         // console.log(event.target);
         if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost')) {
             gameState.selectedSeed = null;
@@ -884,6 +974,13 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+            <div style="margin-top:10px">
+                SFX
+                <label class="switch">
+                    <input type="checkbox" id="btnsfx" ${gameState.sfx ? 'checked' : ''}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
         `, 'Setting', false);
 
         _('#btnmusic').addEventListener('click', () => {
@@ -891,6 +988,12 @@
             if (!_('#btnmusic').checked) {
                 music.pause();
             }
+            saveGame();
+        });
+
+        _('#btnsfx').addEventListener('click', () => {
+            gameState.sfx = _('#btnsfx').checked;
+            saveGame();
         });
 
         _('#resetgame').addEventListener('click', async () => {
@@ -1370,6 +1473,7 @@
     };
 
     // Find matches (3 or more in a row or column)
+    // Find matches (3 or more in a row or column) and group them
     const findMatches = () => {
         const matches = [];
 
@@ -1377,17 +1481,21 @@
         for (let i = 0; i < minigameState.gridSize; i++) {
             let count = 1;
             let startCol = 0;
+            let currentEmoji = minigameState.grid[i][0]?.emoji;
             for (let j = 1; j <= minigameState.gridSize; j++) {
-                if (j < minigameState.gridSize && minigameState.grid[i][j]?.emoji === minigameState.grid[i][j - 1]?.emoji) {
+                if (j < minigameState.gridSize && minigameState.grid[i][j]?.emoji === currentEmoji) {
                     count++;
                 } else {
                     if (count >= 3) {
+                        const group = [];
                         for (let k = startCol; k < startCol + count; k++) {
-                            matches.push({ row: i, col: k });
+                            group.push({ row: i, col: k });
                         }
+                        matches.push({ cells: group, count, emoji: currentEmoji });
                     }
                     count = 1;
                     startCol = j;
+                    currentEmoji = j < minigameState.gridSize ? minigameState.grid[i][j]?.emoji : null;
                 }
             }
         }
@@ -1396,17 +1504,21 @@
         for (let j = 0; j < minigameState.gridSize; j++) {
             let count = 1;
             let startRow = 0;
+            let currentEmoji = minigameState.grid[0][j]?.emoji;
             for (let i = 1; i <= minigameState.gridSize; i++) {
-                if (i < minigameState.gridSize && minigameState.grid[i][j]?.emoji === minigameState.grid[i - 1][j]?.emoji) {
+                if (i < minigameState.gridSize && minigameState.grid[i][j]?.emoji === currentEmoji) {
                     count++;
                 } else {
                     if (count >= 3) {
+                        const group = [];
                         for (let k = startRow; k < startRow + count; k++) {
-                            matches.push({ row: k, col: j });
+                            group.push({ row: k, col: j });
                         }
+                        matches.push({ cells: group, count, emoji: currentEmoji });
                     }
                     count = 1;
                     startRow = i;
+                    currentEmoji = i < minigameState.gridSize ? minigameState.grid[i][j]?.emoji : null;
                 }
             }
         }
@@ -1418,32 +1530,34 @@
     // Process matches with sound and inventory reward
     const processMatches = async (matches) => {
         // Tandai cell yang cocok
-        matches.forEach(({ row, col }) => {
-            minigameState.grid[row][col].matched = true;
+        matches.forEach(match => {
+            match.cells.forEach(({ row, col }) => {
+                minigameState.grid[row][col].matched = true;
+            });
         });
         updateMinigameUI();
 
-        // Hitung skor dan tentukan tanaman yang cocok
-        const matchCount = matches.length;
-        let points = 0;
-        if (matchCount === 3) points = 10;
-        else if (matchCount === 4) points = 20;
-        else if (matchCount >= 5) points = 30;
-        minigameState.score += points;
+        // Hitung skor dan tambahkan tanaman ke inventaris
+        let totalPoints = 0;
+        matches.forEach(match => {
+            const matchCount = match.count;
+            let points = 0;
+            if (matchCount === 3) points = 10;
+            else if (matchCount === 4) points = 20;
+            else if (matchCount >= 5) points = 30;
+            totalPoints += points;
 
-        // Tambahkan tanaman ke inventaris jika kecocokan 4 atau lebih
-        if (matchCount >= 4) {
-            // Ambil emoji dari salah satu sel yang cocok (semua sel dalam matches memiliki emoji yang sama)
-            const matchedEmoji = minigameState.grid[matches[0].row][matches[0].col].emoji;
-            // Tambahkan ke inventaris
-            gameState.inventory[matchedEmoji] = (gameState.inventory[matchedEmoji] || 0) + 1;
-            // Tampilkan notifikasi
-            const plantName = getPlantName(matchedEmoji);
-            showNotification(`Got 1 ${plantName} ${matchedEmoji}!`);
-            // Perbarui UI dan simpan game
-            updateUI();
-            saveGame();
-        }
+            // Tambahkan tanaman ke inventaris jika kecocokan 4 atau lebih
+            if (matchCount >= 4 || matches.length >= 2) {
+                const matchedEmoji = match.emoji;
+                gameState.inventory[matchedEmoji] = (gameState.inventory[matchedEmoji] || 0) + 1;
+                const plantName = getPlantName(matchedEmoji);
+                showNotification(`Got 1 ${plantName} ${matchedEmoji}!`);
+                updateUI();
+                saveGame();
+            }
+        });
+        minigameState.score += totalPoints;
 
         // Putar efek suara kecocokan
         playSound('match.wav');
@@ -1507,11 +1621,11 @@
             let reward = 0;
 
             if (minigameState.score >= minigameState.targetScore) {
-                message = `Great job! You scored ${minigameState.score} points!`;
-                reward = Math.floor(minigameState.score / 10);
+                reward = 10; // Math.floor(minigameState.score / 10);
+                message = `Great job! You scored ${minigameState.score} points!<br>Reward: 🪙${reward}!`;
             } else {
                 message = `Game over! You scored ${minigameState.score} points.`;
-                reward = Math.floor(minigameState.score / 15);
+                // reward = Math.floor(minigameState.score / 15);
             }
 
             gameState.money += reward;
@@ -1519,7 +1633,7 @@
             updateUI();
             saveGame();
 
-            const rewardMessage = `${message}<br>Reward: 🪙${reward}!`;
+            const rewardMessage = `${message}`;
 
             await showPopup(rewardMessage, 'Result');
             _('#minigame-popup-overlay').classList.remove('show');
@@ -1528,22 +1642,26 @@
 
     // Open minigame
     const openMinigame = async () => {
-        const entryCost = 50;
-        const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
-        if (confirmed) {
-            if (gameState.money >= entryCost) {
-                if (gameState.money - entryCost >= 50) {
-                    gameState.money -= entryCost;
-                    updateUI();
-                    saveGame();
-                    initMinigame();
-                    _('#minigame-popup-overlay').classList.add('show');
+        if (gameState.level >= 10) {
+            const entryCost = 50;
+            const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
+            if (confirmed) {
+                if (gameState.money >= entryCost) {
+                    if (gameState.money - entryCost >= 50) {
+                        gameState.money -= entryCost;
+                        updateUI();
+                        saveGame();
+                        initMinigame();
+                        _('#minigame-popup-overlay').classList.add('show');
+                    } else {
+                        showNotification(`Can't play, not good for your 🪙 health`);
+                    }
                 } else {
-                    showNotification(`Can't play, not good for your 🪙 health`);
+                    showNotification(`Not enough 🪙 to play!`);
                 }
-            } else {
-                showNotification(`Not enough 🪙 to play!`);
             }
+        } else {
+            showPopup(`Plant Match can be played at level 10`, 'Level Requirement', false);
         }
     };
 

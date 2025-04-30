@@ -177,6 +177,12 @@ button:hover {
     transform: translateY(-2px);
 }
 
+.buttonaddition {
+    padding: 5px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .switch {
     position: relative;
     display: inline-block;
