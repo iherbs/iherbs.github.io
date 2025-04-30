@@ -1508,10 +1508,10 @@
 
             if (minigameState.score >= minigameState.targetScore) {
                 message = `Great job! You scored ${minigameState.score} points!`;
-                reward = Math.floor(minigameState.score / 5);
+                reward = Math.floor(minigameState.score / 10);
             } else {
                 message = `Game over! You scored ${minigameState.score} points.`;
-                reward = Math.floor(minigameState.score / 8);
+                reward = Math.floor(minigameState.score / 15);
             }
 
             gameState.money += reward;
