@@ -1526,6 +1526,42 @@
         return matches;
     };
 
+    // Check if there are possible matches in the grid
+    const hasPossibleMatches = () => {
+        for (let i = 0; i < minigameState.gridSize; i++) {
+            for (let j = 0; j < minigameState.gridSize; j++) {
+                const currentEmoji = minigameState.grid[i][j].emoji;
+
+                // Check right swap
+                if (j < minigameState.gridSize - 1) {
+                    const rightEmoji = minigameState.grid[i][j + 1].emoji;
+                    // Swap temporarily
+                    minigameState.grid[i][j].emoji = rightEmoji;
+                    minigameState.grid[i][j + 1].emoji = currentEmoji;
+                    const matches = findMatches();
+                    // Undo swap
+                    minigameState.grid[i][j].emoji = currentEmoji;
+                    minigameState.grid[i][j + 1].emoji = rightEmoji;
+                    if (matches.length > 0) return true;
+                }
+
+                // Check down swap
+                if (i < minigameState.gridSize - 1) {
+                    const downEmoji = minigameState.grid[i + 1][j].emoji;
+                    // Swap temporarily
+                    minigameState.grid[i][j].emoji = downEmoji;
+                    minigameState.grid[i + 1][j].emoji = currentEmoji;
+                    const matches = findMatches();
+                    // Undo swap
+                    minigameState.grid[i][j].emoji = currentEmoji;
+                    minigameState.grid[i + 1][j].emoji = downEmoji;
+                    if (matches.length > 0) return true;
+                }
+            }
+        }
+        return false;
+    };
+
     // Process matches
     // Process matches with sound and inventory reward
     const processMatches = async (matches) => {
@@ -1576,7 +1612,12 @@
             await processMatches(newMatches);
         } else {
             minigameState.isProcessing = false;
-            checkMinigameEnd();
+            // Periksa deadlock
+            if (!hasPossibleMatches()) {
+                await checkMinigameEnd(true);
+            } else {
+                checkMinigameEnd();
+            }
         }
     };
 
@@ -1615,16 +1656,18 @@
     };
 
     // Check if minigame is over
-    const checkMinigameEnd = async () => {
-        if (minigameState.moves <= 0 || minigameState.score >= minigameState.targetScore) {
+    const checkMinigameEnd = async (isDeadlock = false) => {
+        if (minigameState.moves <= 0 || minigameState.score >= minigameState.targetScore || isDeadlock) {
             let message = '';
             let reward = 0;
 
             if (minigameState.score >= minigameState.targetScore) {
                 reward = 10; // Math.floor(minigameState.score / 10);
-                message = `Great job! You scored ${minigameState.score} points!<br>Reward: 🪙${reward}!`;
+                message = `Great job!<br>You scored ${minigameState.score} points!<br>Reward: 🪙${reward}!`;
+            } else if (isDeadlock) {
+                message = `Game over!<br>No more moves possible!<br>You scored ${minigameState.score} points.`;
             } else {
-                message = `Game over! You scored ${minigameState.score} points.`;
+                message = `Game over!<br>You scored ${minigameState.score} points.`;
                 // reward = Math.floor(minigameState.score / 15);
             }
 
@@ -1642,8 +1685,9 @@
 
     // Open minigame
     const openMinigame = async () => {
-        if (gameState.level >= 10) {
-            const entryCost = 50;
+        const levelrequire = 5;
+        if (gameState.level >= levelrequire) {
+            const entryCost = gameState.level * 10;
             const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
             if (confirmed) {
                 if (gameState.money >= entryCost) {
@@ -1661,7 +1705,7 @@
                 }
             }
         } else {
-            showPopup(`Plant Match can be played at level 10`, 'Level Requirement', false);
+            showPopup(`Plant Match can be played at level ${levelrequire}`, 'Level Requirement', false);
         }
     };
 
