@@ -160,7 +160,7 @@
         // Tutorial content
         const tutorialContent = `
         <div style="text-align: left; font-size: 0.9rem; max-height: 400px; overflow-y: auto;line-height: 1.6;">
-            <h2>How to Play Cozy Emoji Farm 🌱</h2>
+            <h2>Cozy Emoji Farm 🌱</h2>
             <p>Welcome to <em>Cozy Emoji Farm</em>, a relaxing farming adventure where you grow crops, complete quests, care for pets, and enjoy a fun matching crops! Here’s how to get started:</p>
             <br>
             <h3>1. Manage Your Farm</h3>
