@@ -1584,7 +1584,7 @@
             totalPoints += points;
 
             // Tambahkan tanaman ke inventaris jika kecocokan 4 atau lebih
-            if (matchCount >= 4 || matches.length >= 2) {
+            if (matchCount >= 4) {
                 const matchedEmoji = match.emoji;
                 gameState.inventory[matchedEmoji] = (gameState.inventory[matchedEmoji] || 0) + 1;
                 const plantName = getPlantName(matchedEmoji);
