@@ -232,7 +232,7 @@
     _('#help').addEventListener('click', showTutorial);
 
     const music = _("#background-audio");
-    music.volume = 0.5;
+    music.volume = 0.7;
     document.addEventListener("click", () => {
         if (gameState.music) {
             music.play().catch(e => {
