@@ -878,3 +878,120 @@ input:checked+.slider:before {
         transform: translateY(-30px) scale(1.5);
     }
 }
+
+#play-minigame {
+    float: right;
+    cursor: pointer;
+}
+
+#minigame-container {
+    text-align: center;
+    padding: 10px;
+}
+
+#minigame-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #2E8B57;
+}
+
+.minigame-cell {
+    width: 50px;
+    height: 50px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.minigame-cell:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.1);
+}
+
+.minigame-cell.selected {
+    border: 2px solid #4CAF50;
+}
+
+.minigame-cell.matched {
+    animation: matchFade 0.5s ease forwards;
+}
+
+@keyframes matchFade {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+/* Animasi untuk menukar sel */
+.minigame-cell.swap-right {
+    animation: swapRight 0.3s ease forwards;
+}
+
+.minigame-cell.swap-left {
+    animation: swapLeft 0.3s ease forwards;
+}
+
+.minigame-cell.swap-up {
+    animation: swapUp 0.3s ease forwards;
+}
+
+.minigame-cell.swap-down {
+    animation: swapDown 0.3s ease forwards;
+}
+
+@keyframes swapRight {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(55px);
+    }
+
+    /* 50px (lebar sel) + 5px (gap) */
+}
+
+@keyframes swapLeft {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-55px);
+    }
+}
+
+@keyframes swapUp {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-55px);
+    }
+}
+
+@keyframes swapDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(55px);
+    }
+}

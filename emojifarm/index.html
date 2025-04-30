@@ -56,7 +56,10 @@
         </div>
 
         <div class="quest">
-            <div class="panel-title">📜 Quest</div>
+            <div class="panel-title">
+                📜 Quest
+                <span id="play-minigame">🧩 Match</span>
+            </div>
             <div class="quest-content" id="quest-content">
                 <!-- Quest details will be added here by JavaScript -->
             </div>
@@ -96,6 +99,22 @@
         </div>
     </div>
 
+    <div class="popup-overlay" id="minigame-popup-overlay">
+        <div class="popup" style="max-width: 600px;">
+            <div class="panel-title" id="minigame-popup-title">🌱 Plant Match</div>
+            <div id="minigame-container">
+                <div id="minigame-stats">
+                    <span>Score: <span id="minigame-score">0</span></span>
+                    <span>Moves: <span id="minigame-moves">20</span></span>
+                </div>
+                <div id="minigame-grid"
+                    style="display: grid; grid-template-columns: repeat(6, 50px); gap: 5px; justify-content: center;">
+                </div>
+                <button id="minigame-close" style="margin-top: 15px;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div class="notification" id="notification"></div>
 
     <div class="popup-overlay" id="popup-overlay">
@@ -108,12 +127,11 @@
             </div>
         </div>
     </div>
+
     <audio id="background-audio" autoplay loop controls hidden>
         <source src="music/CozyGardenSerenity.mp3" type="audio/mpeg">
     </audio>
-    <audio id="sfx" controls hidden>
-        <source src="" type="audio/mpeg">
-    </audio>
+    <audio id="sfx" controlsList="nodownload" hidden></audio>
     <script src="main.js"></script>
 </body>
 

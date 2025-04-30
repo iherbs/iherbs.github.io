@@ -160,6 +160,13 @@
         }
     });
 
+    // Play sound effect
+    const sfx = _('#sfx');
+    const playSound = (soundFile) => {
+        const audio = new Audio(`music/${soundFile}`);
+        audio.play();
+    };
+
     const setupMarketTabs = () => {
         document.querySelectorAll('.market-tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -360,6 +367,7 @@
     const handlePlotClick = async (index) => {
         const plot = gameState.plots[index];
 
+        playSound('growth.wav');
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
             if (gameState.selectedSeed) {
@@ -398,6 +406,7 @@
             if (item != undefined) {
                 if (gameState.money >= item.cost) {
                     if (gameState.money - item.cost >= 50) {
+                        playSound('growth.wav');
                         gameState.money -= item.cost;
                         plot.growth += item.growthBoost;
                         if (plot.growth > getGrowthTime(plot.plant)) {
@@ -951,6 +960,8 @@
                 delete gameState.inventory[plantEmoji];
             }
 
+            playSound('done.wav');
+
             // Tambah poin dan uang
             gameState.points += 2; // 2 poin per quest
             const plantValue = getPlantValue(plantEmoji);
@@ -1016,6 +1027,8 @@
             gameState.level += 1; // Naik level
             pointsNeeded = getPointsNeededForNextLevel(gameState.level); // Hitung poin untuk level berikutnya
             showNotification(`Level up! Reached Level ${gameState.level}!`);
+
+            playSound('levelup.wav');
 
             const numplantnow = parseInt(_(".market-item").length) - 3;
             const availablePlants = getAvailablePlants(gameState.level);
@@ -1206,6 +1219,342 @@
     const numberFormat = (number) => {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
+
+    // ==========================================================================
+    // ==========================================================================
+    // Minigame state
+    const minigameState = {
+        gridSize: 6,
+        grid: [],
+        moves: 20,
+        score: 0,
+        targetScore: 500,
+        selectedCell: null,
+        isProcessing: false,
+        maxPlants: 5 // Maksimum jenis tanaman di grid
+    };
+
+    // Initialize minigame
+    const initMinigame = () => {
+        minigameState.grid = [];
+        minigameState.moves = 20;
+        minigameState.score = 0;
+        minigameState.selectedCell = null;
+        minigameState.isProcessing = false;
+        generateMinigameGrid();
+        updateMinigameUI();
+    };
+
+    // Generate minigame grid
+    const generateMinigameGrid = () => {
+        const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const plantPool = availablePlants.slice(0, Math.min(minigameState.maxPlants, availablePlants.length));
+        minigameState.grid = [];
+
+        for (let i = 0; i < minigameState.gridSize; i++) {
+            minigameState.grid[i] = [];
+            for (let j = 0; j < minigameState.gridSize; j++) {
+                let emoji;
+                let attempts = 0;
+                const maxAttempts = 10; // Batasi jumlah percobaan untuk mencegah loop tak terbatas
+
+                do {
+                    emoji = plantPool[Math.floor(Math.random() * plantPool.length)].emoji; // Perbaiki _ddd menjadi emoji
+                    attempts++;
+                    // Periksa apakah emoji membentuk tiga kecocokan berturut-turut
+                    if (attempts >= maxAttempts) {
+                        // Jika terlalu banyak percobaan, gunakan emoji acak untuk keluar dari loop
+                        break;
+                    }
+                } while (
+                    (i >= 2 && minigameState.grid[i - 1][j]?.emoji === emoji && minigameState.grid[i - 2][j]?.emoji === emoji) ||
+                    (j >= 2 && minigameState.grid[i][j - 1]?.emoji === emoji && minigameState.grid[i][j - 2]?.emoji === emoji)
+                );
+
+                minigameState.grid[i][j] = { emoji, matched: false };
+            }
+        }
+    };
+
+    // Update minigame UI
+    const updateMinigameUI = () => {
+        const gridElement = _('#minigame-grid');
+        gridElement.innerHTML = '';
+        for (let i = 0; i < minigameState.gridSize; i++) {
+            for (let j = 0; j < minigameState.gridSize; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'min-emoji minigame-cell';
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+                cell.textContent = minigameState.grid[i][j].emoji;
+                if (minigameState.grid[i][j].matched) {
+                    cell.classList.add('matched');
+                }
+                cell.addEventListener('click', () => handleMinigameCellClick(i, j));
+                gridElement.appendChild(cell);
+            }
+        }
+        _('#minigame-score').textContent = minigameState.score;
+        _('#minigame-moves').textContent = minigameState.moves;
+    };
+
+    // Handle cell click
+    const handleMinigameCellClick = (row, col) => {
+        if (minigameState.isProcessing || minigameState.moves <= 0) return;
+
+        const cellElement = document.querySelector(`.minigame-cell[data-row="${row}"][data-col="${col}"]`);
+        if (!minigameState.selectedCell) {
+            minigameState.selectedCell = { row, col };
+            cellElement.classList.add('selected');
+        } else {
+            const { row: prevRow, col: prevCol } = minigameState.selectedCell;
+            const prevCellElement = document.querySelector(`.minigame-cell[data-row="${prevRow}"][data-col="${prevCol}"]`);
+            prevCellElement.classList.remove('selected');
+
+            // Periksa apakah cell berdekatan
+            if (Math.abs(row - prevRow) + Math.abs(col - prevCol) === 1) {
+                minigameState.isProcessing = true;
+                swapCells(prevRow, prevCol, row, col, () => {
+                    const matches = findMatches();
+                    if (matches.length > 0) {
+                        minigameState.moves--;
+                        processMatches(matches);
+                    } else {
+                        // Swap back if no matches
+                        swapCells(prevRow, prevCol, row, col, () => {
+                            minigameState.isProcessing = false;
+                        });
+                    }
+                });
+            }
+            minigameState.selectedCell = null;
+        }
+    };
+
+    // Swap two cells with animation
+    const swapCells = (row1, col1, row2, col2, callback) => {
+        const cell1 = document.querySelector(`.minigame-cell[data-row="${row1}"][data-col="${col1}"]`);
+        const cell2 = document.querySelector(`.minigame-cell[data-row="${row2}"][data-col="${col2}"]`);
+
+        // Tentukan arah animasi berdasarkan posisi
+        let class1, class2;
+        if (row1 === row2) {
+            // Pertukaran horizontal
+            class1 = col1 < col2 ? 'swap-right' : 'swap-left';
+            class2 = col1 < col2 ? 'swap-left' : 'swap-right';
+        } else {
+            // Pertukaran vertikal
+            class1 = row1 < row2 ? 'swap-down' : 'swap-up';
+            class2 = row1 < row2 ? 'swap-up' : 'swap-down';
+        }
+
+        // Terapkan kelas animasi
+        cell1.classList.add(class1);
+        cell2.classList.add(class2);
+
+        // Tunggu animasi selesai
+        setTimeout(() => {
+            // Hapus kelas animasi
+            cell1.classList.remove(class1);
+            cell2.classList.remove(class2);
+
+            // Lakukan pertukaran data
+            const temp = minigameState.grid[row1][col1];
+            minigameState.grid[row1][col1] = minigameState.grid[row2][col2];
+            minigameState.grid[row2][col2] = temp;
+
+            // Perbarui UI
+            updateMinigameUI();
+
+            // Panggil callback jika ada
+            if (callback) callback();
+        }, 300); // Sesuaikan dengan durasi animasi (0.3s)
+    };
+
+    // Find matches (3 or more in a row or column)
+    const findMatches = () => {
+        const matches = [];
+
+        // Check rows
+        for (let i = 0; i < minigameState.gridSize; i++) {
+            let count = 1;
+            let startCol = 0;
+            for (let j = 1; j <= minigameState.gridSize; j++) {
+                if (j < minigameState.gridSize && minigameState.grid[i][j]?.emoji === minigameState.grid[i][j - 1]?.emoji) {
+                    count++;
+                } else {
+                    if (count >= 3) {
+                        for (let k = startCol; k < startCol + count; k++) {
+                            matches.push({ row: i, col: k });
+                        }
+                    }
+                    count = 1;
+                    startCol = j;
+                }
+            }
+        }
+
+        // Check columns
+        for (let j = 0; j < minigameState.gridSize; j++) {
+            let count = 1;
+            let startRow = 0;
+            for (let i = 1; i <= minigameState.gridSize; i++) {
+                if (i < minigameState.gridSize && minigameState.grid[i][j]?.emoji === minigameState.grid[i - 1][j]?.emoji) {
+                    count++;
+                } else {
+                    if (count >= 3) {
+                        for (let k = startRow; k < startRow + count; k++) {
+                            matches.push({ row: k, col: j });
+                        }
+                    }
+                    count = 1;
+                    startRow = i;
+                }
+            }
+        }
+
+        return matches;
+    };
+
+    // Process matches
+    // Process matches with sound and inventory reward
+    const processMatches = async (matches) => {
+        // Tandai cell yang cocok
+        matches.forEach(({ row, col }) => {
+            minigameState.grid[row][col].matched = true;
+        });
+        updateMinigameUI();
+
+        // Hitung skor dan tentukan tanaman yang cocok
+        const matchCount = matches.length;
+        let points = 0;
+        if (matchCount === 3) points = 10;
+        else if (matchCount === 4) points = 20;
+        else if (matchCount >= 5) points = 30;
+        minigameState.score += points;
+
+        // Tambahkan tanaman ke inventaris jika kecocokan 4 atau lebih
+        if (matchCount >= 4) {
+            // Ambil emoji dari salah satu sel yang cocok (semua sel dalam matches memiliki emoji yang sama)
+            const matchedEmoji = minigameState.grid[matches[0].row][matches[0].col].emoji;
+            // Tambahkan ke inventaris
+            gameState.inventory[matchedEmoji] = (gameState.inventory[matchedEmoji] || 0) + 1;
+            // Tampilkan notifikasi
+            const plantName = getPlantName(matchedEmoji);
+            showNotification(`Got 1 ${plantName} ${matchedEmoji}!`);
+            // Perbarui UI dan simpan game
+            updateUI();
+            saveGame();
+        }
+
+        // Putar efek suara kecocokan
+        playSound('match.wav');
+
+        // Tunggu animasi selesai
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Hapus cell yang cocok dan isi ulang grid
+        dropCells();
+        fillGrid();
+        updateMinigameUI();
+
+        // Periksa apakah ada match baru
+        const newMatches = findMatches();
+        if (newMatches.length > 0) {
+            await processMatches(newMatches);
+        } else {
+            minigameState.isProcessing = false;
+            checkMinigameEnd();
+        }
+    };
+
+    // Drop cells to fill gaps
+    const dropCells = () => {
+        for (let j = 0; j < minigameState.gridSize; j++) {
+            let emptyRow = minigameState.gridSize - 1;
+            for (let i = minigameState.gridSize - 1; i >= 0; i--) {
+                if (!minigameState.grid[i][j].matched) {
+                    minigameState.grid[emptyRow][j] = minigameState.grid[i][j];
+                    emptyRow--;
+                }
+            }
+            // Tandai slot kosong
+            for (let i = emptyRow; i >= 0; i--) {
+                minigameState.grid[i][j] = { emoji: '', matched: true };
+            }
+        }
+    };
+
+    // Fill empty slots with new plants
+    const fillGrid = () => {
+        const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const plantPool = availablePlants.slice(0, Math.min(minigameState.maxPlants, availablePlants.length));
+        for (let i = 0; i < minigameState.gridSize; i++) {
+            for (let j = 0; j < minigameState.gridSize; j++) {
+                if (minigameState.grid[i][j].matched) {
+                    minigameState.grid[i][j] = {
+                        emoji: plantPool[Math.floor(Math.random() * plantPool.length)].emoji,
+                        matched: false
+                    };
+                }
+            }
+        }
+    };
+
+    // Check if minigame is over
+    const checkMinigameEnd = async () => {
+        if (minigameState.moves <= 0 || minigameState.score >= minigameState.targetScore) {
+            let message = '';
+            let reward = 0;
+
+            if (minigameState.score >= minigameState.targetScore) {
+                message = `Great job! You scored ${minigameState.score} points!`;
+                reward = Math.floor(minigameState.score / 8);
+            } else {
+                message = `Game over! You scored ${minigameState.score} points.`;
+                reward = Math.floor(minigameState.score / 15);
+            }
+
+            gameState.money += reward;
+            gameState.money = Math.min(gameState.money, 999999);
+            updateUI();
+            saveGame();
+
+            const rewardMessage = `${message}<br>Reward: 🪙${reward}!`;
+
+            await showPopup(rewardMessage, 'Minigame Result');
+            _('#minigame-popup-overlay').classList.remove('show');
+        }
+    };
+
+    // Open minigame
+    const openMinigame = async () => {
+        const entryCost = 50;
+        const confirmed = await showPopup(`Play Plant Match minigame for 🪙${entryCost}?`);
+        if (confirmed) {
+            if (gameState.money >= entryCost) {
+                if (gameState.money - entryCost >= 50) {
+                    gameState.money -= entryCost;
+                    // updateUI();
+                    // saveGame();
+                    initMinigame();
+                    _('#minigame-popup-overlay').classList.add('show');
+                } else {
+                    showNotification(`Can't play, not good for your 🪙 health`);
+                }
+            } else {
+                showNotification(`Not enough 🪙 to play minigame!`);
+            }
+        }
+    };
+
+    // Event listeners for minigame
+    _('#play-minigame').addEventListener('click', openMinigame);
+    _('#minigame-close').addEventListener('click', () => {
+        _('#minigame-popup-overlay').classList.remove('show');
+    });
+    // ==========================================================================
+    // ==========================================================================
 
     // Initialize the game
     initGame();
