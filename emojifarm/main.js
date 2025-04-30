@@ -102,6 +102,7 @@
         checksum: '',
         music: true
     };
+    const maxmoney = 999999;
 
     const _ = (id) => {
         let el = {};
@@ -632,7 +633,7 @@
                             const quantity = parseInt(quantityInput.value);
                             if (quantity > 0 && quantity <= count) {
                                 gameState.money += quantity * (getPlantCost(emoji) + 2) || 0;
-                                gameState.money = gameState.money > 999999 ? 999999 : gameState.money;
+                                gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
                                 gameState.inventory[emoji] -= quantity;
                                 if (gameState.inventory[emoji] <= 0) {
                                     delete gameState.inventory[emoji];
@@ -808,7 +809,7 @@
                     }
                 });
 
-                parsed.money = parsed.money > 999999 ? 999999 : parsed.money;
+                parsed.money = parsed.money > maxmoney ? maxmoney : parsed.money;
 
                 // Migrate plantTypes
                 const plantTypes = gameState.plantTypes;
@@ -967,7 +968,7 @@
             const plantValue = getPlantValue(plantEmoji);
             const reward = (plantValue * quantity);// + (gameState.level * 10);
             gameState.money += reward;
-            gameState.money = gameState.money > 999999 ? 999999 : gameState.money;
+            gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
             // Tingkatkan questCompletedCount
             gameState.questCompletedCount += 1;
@@ -1216,10 +1217,6 @@
         }
     });
 
-    const numberFormat = (number) => {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
-
     // ==========================================================================
     // ==========================================================================
     // Minigame state
@@ -1247,7 +1244,8 @@
 
     // Generate minigame grid
     const generateMinigameGrid = () => {
-        const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const getavailablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const availablePlants = getavailablePlants.reverse();
         const plantPool = availablePlants.slice(0, Math.min(minigameState.maxPlants, availablePlants.length));
         minigameState.grid = [];
 
@@ -1487,7 +1485,8 @@
 
     // Fill empty slots with new plants
     const fillGrid = () => {
-        const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const getavailablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+        const availablePlants = getavailablePlants.reverse();
         const plantPool = availablePlants.slice(0, Math.min(minigameState.maxPlants, availablePlants.length));
         for (let i = 0; i < minigameState.gridSize; i++) {
             for (let j = 0; j < minigameState.gridSize; j++) {
@@ -1516,13 +1515,13 @@
             }
 
             gameState.money += reward;
-            gameState.money = Math.min(gameState.money, 999999);
+            gameState.money = Math.min(gameState.money, maxmoney);
             updateUI();
             saveGame();
 
             const rewardMessage = `${message}<br>Reward: 🪙${reward}!`;
 
-            await showPopup(rewardMessage, 'Minigame Result');
+            await showPopup(rewardMessage, 'Result');
             _('#minigame-popup-overlay').classList.remove('show');
         }
     };
@@ -1543,15 +1542,18 @@
                     showNotification(`Can't play, not good for your 🪙 health`);
                 }
             } else {
-                showNotification(`Not enough 🪙 to play minigame!`);
+                showNotification(`Not enough 🪙 to play!`);
             }
         }
     };
 
     // Event listeners for minigame
     _('#play-minigame').addEventListener('click', openMinigame);
-    _('#minigame-close').addEventListener('click', () => {
-        _('#minigame-popup-overlay').classList.remove('show');
+    _('#minigame-close').addEventListener('click', async () => {
+        const confirmed = await showPopup(`Close Plant Match without finishing it will not return your 🪙.<br>Are you sure to close it?`);
+        if (confirmed) {
+            _('#minigame-popup-overlay').classList.remove('show');
+        }
     });
     // ==========================================================================
     // ==========================================================================

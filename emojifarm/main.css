@@ -881,8 +881,10 @@ input:checked+.slider:before {
 
 #play-minigame {
     float: right;
+    position: relative;
+    top: -3px;
     cursor: pointer;
-    background-color: #c8f56d;
+    background-color: #e6f6f7;
     color: #000000;
     padding: 5px 9px;
     font-size: 0.9rem;
