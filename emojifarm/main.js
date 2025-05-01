@@ -1687,7 +1687,9 @@
     const openMinigame = async () => {
         const levelrequire = 5;
         if (gameState.level >= levelrequire) {
-            const entryCost = gameState.level * 10;
+            const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+            availablePlants.sort((a, b) => b.cost - a.cost);
+            const entryCost = availablePlants[0].cost * 10;
             const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
             if (confirmed) {
                 if (gameState.money >= entryCost) {
