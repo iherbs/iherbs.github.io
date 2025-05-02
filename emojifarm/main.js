@@ -165,7 +165,7 @@
             <br>
             <h3>1. Manage Your Farm</h3>
             <ul>
-                <li><strong>Plant Crops</strong>: Visit the <em>Market</em> (🌱 Seed tab) to buy seeds. Click a seed to select it, then tap an empty plot in the <em>Farm Grid</em> to plant. Each seed costs coins (🪙).</li>
+                <li><strong>Plant Crops</strong>: Visit the <em>Market</em> (🌱 Seed tab) to buy seeds. Click a seed to select it, then tap an empty plot in the <em>Farm Grid</em> to plant. Each seed costs 🪙.</li>
                 <li><strong>Grow and Harvest</strong>: Crops grow over time, shown by a progress bar. When the bar is full, click the plot to harvest the crop. Harvested crops go to your <em>Inventory</em>.</li>
                 <li><strong>Boost Growth</strong>: Use items from the <em>Growth</em> tab (💧 Water, 🧴 Fertilizer, 🧪 Potion) to speed up crop growth. Select an item and click a growing plot to apply it.</li>
             </ul>
@@ -173,25 +173,25 @@
             <h3>2. Complete Quests</h3>
             <ul>
                 <li>Check the <em>Quest</em> panel (📃) to see tasks from friendly NPCs. Each quest asks for a specific number of crops (e.g., 3 🌾 Wheat).</li>
-                <li>Deliver crops from your <em>Inventory</em> by clicking the checkmark button when you have enough. Completing quests earns coins (🪙), points, and helps you level up!</li>
+                <li>Deliver crops from your <em>Inventory</em> by clicking the checkmark button when you have enough. Completing quests earns (🪙), points, and helps you level up!</li>
             </ul>
             <br>
             <h3>3. Care for Your Pet</h3>
             <ul>
-                <li>Adopt a pet in the <em>Pet</em> panel (🐾) by clicking <em>Buy</em> and choosing a pet (e.g., 🐈 Cat). Pets cost coins.</li>
+                <li>Adopt a pet in the <em>Pet</em> panel (🐾) by clicking <em>Buy</em> and choosing a pet (e.g., 🐈 Cat). Pets cost 🪙.</li>
                 <li>Feed your pet with food (🍭 Lollipop, 🍫 Chocolate) or crops from your <em>Inventory</em> using the <em>Feed</em> button. Keep their hunger bar full!</li>
                 <li>A well-fed pet (hunger ≥ 20) will automatically harvest ripe crops for you.</li>
             </ul>
             <br>
             <h3>4. Play the Plant Match</h3>
             <ul>
-                <li>Access the Plant Match by clicking the <em>Match</em> button (🌿) in the <em>Quest</em> panel. It costs 50 coins to play.</li>
+                <li>Access the Plant Match by clicking the <em>Match</em> button (🌿) in the <em>Quest</em> panel. It costs 🪙 to play.</li>
                 <li><strong>How to Play</strong>:
                     <ul>
                         <li>You’ll see a 6x6 grid filled with crop emojis (e.g., 🌾, 🌽).</li>
                         <li>Swap adjacent crops by clicking one, then clicking a neighboring crop to form rows or columns of 3 or more identical crops.</li>
                         <li>Matching 3 crops earns 10 points, 4 crops earns 20 points, and 5+ crops earns 30 points. Matching 4 or more also adds that crop to your <em>Inventory</em> (e.g., match 4 🌾 to get 1 Wheat).</li>
-                        <li>You have 20 moves to reach 500 points. If you succeed, you’ll earn coins.</li>
+                        <li>You have 20 moves to reach 500 points. If you succeed, you’ll earn 🪙.</li>
                     </ul>
                 </li>
                 <li><strong>Tips</strong>:
@@ -206,7 +206,7 @@
             <ul>
                 <li>Earn points by completing quests to level up. Higher levels unlock new crops in the <em>Market</em>.</li>
                 <li>Buy additional plots (🟫 Land) in the <em>Market</em> to expand your farm.</li>
-                <li>Sell crops in your <em>Inventory</em> by clicking them and choosing a quantity to earn extra coins.</li>
+                <li>Sell crops in your <em>Inventory</em> by clicking them and choosing a quantity to earn extra 🪙.</li>
             </ul>
             <br>
             <h3>6. Save Your Progress</h3>
@@ -218,8 +218,8 @@
             <ul>
                 <li>Keep planting and harvesting to build your <em>Inventory</em> for quests.</li>
                 <li>Feed your pet regularly to ensure automatic harvesting.</li>
-                <li>Play <em>Plant Match</em> to earn extra coins and crops, especially if you need specific crops for quests.</li>
-                <li>Manage your coins wisely—don’t spend all at once, as you’ll need some for seeds</li>
+                <li>Play <em>Plant Match</em> to earn extra 🪙 and crops, especially if you need specific crops for quests.</li>
+                <li>Manage your 🪙 wisely—don’t spend all at once, as you’ll need some for seeds</li>
             </ul>
 
             <p>Ready to start your farming journey? Plant your first crop, adopt a pet, and dive into <em>Plant Match</em> for extra fun! Happy farming! 🌾🐾</p>
