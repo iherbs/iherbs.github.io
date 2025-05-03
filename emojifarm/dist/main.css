@@ -409,15 +409,6 @@ input:checked+.slider:before {
     text-align: center;
 }
 
-.market {
-    margin-bottom: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 15px;
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .market-tab {
     display: inline-block;
     position: relative;
@@ -602,6 +593,7 @@ input:checked+.slider:before {
     transform: translateY(-2px);
 }
 
+.market,
 .quest {
     margin-top: 20px;
     background-color: #fff;
@@ -887,15 +879,26 @@ input:checked+.slider:before {
     }
 }
 
-#play-minigame {
-    float: right;
+.minigame {
+    margin-top: 20px;
+    background-color: transparent;
+    width: 100%;
+    display: grid;
+    grid-template-rows: repeat(1, auto);
+    grid-auto-flow: column;
+    gap: 15px;
+}
+
+.minigame-item {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
     position: relative;
-    top: -3px;
     cursor: pointer;
-    background-color: #e6f6f7;
+    background: #FFFFFF;
     color: #000000;
-    padding: 5px 9px;
-    font-size: 0.9rem;
+    padding: 10px 9px;
+    font-size: 20px;
     border-radius: 5px;
     box-shadow: 0px 1px 2px #ddd;
     -webkit-tap-highlight-color: transparent;
@@ -1011,4 +1014,82 @@ input:checked+.slider:before {
     100% {
         transform: translateY(55px);
     }
+}
+
+/* ===================================== */
+
+#dropcrops-container {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#dropcrops-grid {
+    position: relative;
+    margin: 0px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 100%;
+    max-width: 340px;
+}
+
+#dropcrops-canvas {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 350px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+}
+
+.emoji {
+    position: absolute;
+    font-size: 24px;
+    user-select: none;
+    text-align: center;
+    line-height: 1;
+    z-index: 20;
+}
+
+.emoji-preview {
+    position: absolute;
+    font-size: 24px;
+    user-select: none;
+    text-align: center;
+    line-height: 1;
+    z-index: 25;
+    opacity: 0.7;
+    /* Sedikit transparan untuk membedakan */
+    pointer-events: none;
+    /* Hindari interaksi dengan preview */
+}
+
+.game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    z-index: 100;
+    display: none;
+}
+
+.danger-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    border-bottom: 2px dashed #30c1ff;
+    z-index: 10;
 }

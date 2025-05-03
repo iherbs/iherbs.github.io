@@ -1721,6 +1721,485 @@
     });
     // ==========================================================================
     // ==========================================================================
+    // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // ==========================================================================
+    // ==========================================================================
+
+    const Engine = Matter.Engine,
+        Runner = Matter.Runner,
+        Render = Matter.Render,
+        World = Matter.World,
+        Bodies = Matter.Bodies,
+        Body = Matter.Body,
+        Events = Matter.Events;
+
+    // Game constants
+    let EMOJI_SEQUENCE = [];
+    const EMOJI_SIZES = [35, 45, 55, 65, 75, 85, 95, 105, 115];
+    const WALL_THICKNESS = 15;
+    const DANGER_ZONE_Y = 60;
+    const UPDATE_INTERVAL = 33;
+
+    // Game variables
+    let score = 0;
+    let nextEmojiIndex = 0;
+    let nextEmojiTemp = 0;
+    let gameStarted = false;
+    let merging = false;
+    let isGameOver = false;
+    let canSpawn = true;
+    let previewElement = null;
+    let lastPositionX = 0;
+
+    // DOM elements
+    const scoreElement = document.getElementById('dropcrops-score');
+    const nextEmojiElement = document.getElementById('dropcrops-next');
+    const gameCanvas = document.getElementById('dropcrops-canvas');
+
+    // Danger zone
+    const dangerZone = document.createElement('div');
+    dangerZone.className = 'danger-zone';
+    gameCanvas.appendChild(dangerZone);
+
+    // Create engine
+    const engine = Engine.create({
+        gravity: { x: 0, y: 1, scale: 0.001 },
+        constraintIterations: 2,
+        positionIterations: 4,
+        velocityIterations: 4,
+        enableSleeping: true
+    });
+
+    const canvasWidth = 300;
+    const canvasHeight = 350;
+
+    // Create walls
+    const walls = [
+        // bottom
+        Bodies.rectangle(canvasWidth / 2, canvasHeight + WALL_THICKNESS / 2 - 5, canvasWidth, WALL_THICKNESS, { isStatic: true, friction: 0, render: { visible: false } }),
+        // left
+        Bodies.rectangle(-WALL_THICKNESS / 2, canvasHeight / 2, WALL_THICKNESS - 10, canvasHeight, { isStatic: true, friction: 0, render: { visible: false } }),
+        // right
+        Bodies.rectangle(canvasWidth + WALL_THICKNESS / 2 - 5, canvasHeight / 2, WALL_THICKNESS, canvasHeight, { isStatic: true, friction: 0, render: { visible: false } })
+    ];
+    World.add(engine.world, walls);
+
+    // Hidden renderer
+    const render = Render.create({
+        element: gameCanvas,
+        engine: engine,
+        options: { width: canvasWidth, height: canvasHeight, wireframes: false, background: 'transparent', visible: false }
+    });
+
+    const runner = Runner.create({ delta: 16.67 });
+    Runner.run(runner, engine);
+
+    const emojiBodies = new Map();
+    let lastUpdateTime = performance.now();
+
+    function getRandomEmojiIndex() {
+        const weights = [0.4, 0.3, 0.15, 0.08, 0.05, 0.02];
+        let rand = Math.random(), sum = 0;
+        for (let i = 0; i < weights.length; i++) {
+            sum += weights[i];
+            if (rand <= sum) return i;
+        }
+        return 0;
+    }
+
+    function createEmoji(x, y, emojiIndex) {
+        if (isGameOver) {
+            // console.log('Game over, cannot spawn emoji');
+            return null;
+        }
+
+        const size = EMOJI_SIZES[emojiIndex];
+        const emoji = EMOJI_SEQUENCE[emojiIndex];
+
+        const body = Bodies.circle(x, y, size / 2, {
+            restitution: 0.1,
+            friction: 0.5,
+            density: 0.001 * size,
+            render: { visible: false },
+            label: `emoji-${emojiIndex}`,
+            sleepThreshold: 60
+        });
+
+        emojiBodies.set(body, {
+            emoji,
+            index: emojiIndex,
+            element: null,
+            merged: false
+        });
+
+        World.add(engine.world, body);
+        createEmojiElement(body);
+        // console.log(`Created emoji: ${emoji} at (${x}, ${y}) with size ${size}`);
+        return body;
+    }
+
+    function createEmojiElement(body) {
+        const emojiData = emojiBodies.get(body);
+        if (!emojiData) {
+            console.error('No emoji data for body');
+            return;
+        }
+
+        const element = document.createElement('div');
+        element.className = 'emoji';
+        element.textContent = emojiData.emoji;
+        element.style.fontSize = `${EMOJI_SIZES[emojiData.index]}px`;
+        element.style.zIndex = '20';
+        gameCanvas.appendChild(element);
+        emojiData.element = element;
+        updateEmojiElementPosition(body);
+        // console.log(`Created DOM element for emoji: ${emojiData.emoji}`);
+    }
+
+    function updateEmojiElementPosition(body) {
+        const emojiData = emojiBodies.get(body);
+        if (!emojiData || !emojiData.element) return;
+
+        const element = emojiData.element;
+        const size = EMOJI_SIZES[emojiData.index];
+        element.style.left = `${body.position.x - size / 2}px`;
+        element.style.top = `${body.position.y - size / 2}px`;
+        element.style.transform = `rotate(${body.angle}rad)`;
+    }
+
+    // Create preview element
+    function createPreviewElement() {
+        if (previewElement) return;
+        previewElement = document.createElement('div');
+        previewElement.className = 'emoji-preview';
+        previewElement.style.fontSize = `${EMOJI_SIZES[nextEmojiIndex]}px`;
+        previewElement.style.zIndex = '25';
+        previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
+        gameCanvas.appendChild(previewElement);
+        // console.log('Created preview element');
+    }
+
+    // Update preview position
+    function updatePreviewPosition(x) {
+        if (!previewElement || isGameOver) return;
+        const size = EMOJI_SIZES[nextEmojiIndex];
+        // Batasi posisi x agar tetap di dalam canvas
+        const clampedX = Math.max(size / 2, Math.min(canvasWidth - size / 2, x)) + 5;
+        previewElement.style.left = `${(clampedX - size / 2) - (WALL_THICKNESS)}px`;
+        previewElement.style.top = `30px`; // Tetap di tengah danger zone
+        previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
+        previewElement.style.fontSize = `${EMOJI_SIZES[nextEmojiIndex]}px`;
+    }
+
+    // Remove preview element
+    function removePreviewElement() {
+        if (previewElement) {
+            previewElement.remove();
+            previewElement = null;
+            // console.log('Removed preview element');
+        }
+    }
+
+    Events.on(engine, 'collisionStart', function (event) {
+        if (merging || isGameOver) return;
+
+        const pairs = event.pairs;
+        for (let pair of pairs) {
+            if (pair.bodyA.label.startsWith('emoji-') && pair.bodyB.label.startsWith('emoji-')) {
+                const bodyA = pair.bodyA;
+                const bodyB = pair.bodyB;
+
+                if (bodyA.isSleeping && bodyB.isSleeping) continue;
+
+                const emojiDataA = emojiBodies.get(bodyA);
+                const emojiDataB = emojiBodies.get(bodyB);
+
+                if (emojiDataA && emojiDataB &&
+                    emojiDataA.index === emojiDataB.index &&
+                    !emojiDataA.merged && !emojiDataB.merged &&
+                    emojiDataA.index < EMOJI_SEQUENCE.length - 1) {
+                    merging = true;
+                    mergeEmojis(bodyA, bodyB);
+                    merging = false;
+                }
+            }
+        }
+    });
+
+    function mergeEmojis(bodyA, bodyB) {
+        const emojiDataA = emojiBodies.get(bodyA);
+        const emojiDataB = emojiBodies.get(bodyB);
+
+        if (!emojiDataA || !emojiDataB || emojiDataA.merged || emojiDataB.merged) return;
+
+        const mergeX = (bodyA.position.x + bodyB.position.x) / 2;
+        const mergeY = (bodyA.position.y + bodyB.position.y) / 2;
+
+        removeEmoji(bodyA);
+        removeEmoji(bodyB);
+
+        const newEmojiIndex = emojiDataA.index + 1;
+        const newBody = createEmoji(mergeX, mergeY, newEmojiIndex);
+
+        playSound('match.wav');
+        if (newEmojiIndex === EMOJI_SEQUENCE.length - 1) {
+            gameOver(true);
+            return;
+        }
+
+        score += (newEmojiIndex + 1) * 10;
+        scoreElement.textContent = score;
+
+        if (newBody) {
+            Body.applyForce(newBody, newBody.position, { x: (Math.random() - 0.5) * 0.01, y: -0.02 });
+        }
+    }
+
+    function removeEmoji(body) {
+        const emojiData = emojiBodies.get(body);
+        if (!emojiData) return;
+
+        emojiData.merged = true;
+        if (emojiData.element) {
+            emojiData.element.remove();
+            // console.log(`Removed emoji: ${emojiData.emoji}`);
+        }
+        World.remove(engine.world, body);
+        emojiBodies.delete(body);
+    }
+
+    function updateNextEmoji() {
+        if (!gameStarted) {
+            nextEmojiIndex = getRandomEmojiIndex();
+        } else {
+            nextEmojiIndex = nextEmojiTemp;
+        }
+        nextEmojiTemp = getRandomEmojiIndex();
+        nextEmojiElement.textContent = EMOJI_SEQUENCE[nextEmojiTemp];
+        if (previewElement) {
+            previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
+            previewElement.style.fontSize = `${EMOJI_SIZES[nextEmojiIndex]}px`;
+        }
+        setTimeout(() => {
+            updatePreviewPosition(lastPositionX);
+        }, 300);
+    }
+
+    function spawnEmoji(x) {
+        if (!gameStarted) {
+            return;
+        }
+        if (!canSpawn || isGameOver) {
+            // console.log('Cannot spawn: canSpawn=', canSpawn, 'isGameOver=', isGameOver);
+            return;
+        }
+
+        canSpawn = false;
+        setTimeout(() => canSpawn = true, 500);
+
+        // console.log(`Spawning emoji at x=${x}`);
+        removePreviewElement(); // Hapus preview sebelum spawn
+        createEmoji(x, 50, nextEmojiIndex);
+        updateNextEmoji();
+        createPreviewElement(); // Buat preview baru setelah spawn
+    }
+
+    // Event handlers untuk preview
+    gameCanvas.addEventListener('mousemove', function (e) {
+        if (isGameOver || !canSpawn) return;
+        const rect = gameCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        if (!previewElement) createPreviewElement();
+        lastPositionX = x;
+        updatePreviewPosition(x);
+    });
+
+    gameCanvas.addEventListener('touchmove', function (e) {
+        if (isGameOver || !canSpawn) return;
+        e.preventDefault();
+        const rect = gameCanvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        if (!previewElement) createPreviewElement();
+        lastPositionX = x;
+        updatePreviewPosition(x);
+    });
+
+    gameCanvas.addEventListener('click', function (e) {
+        if (!canSpawn || isGameOver) return;
+        const rect = gameCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        // console.log(`Click at x=${x}`);
+        spawnEmoji(x);
+    });
+
+    gameCanvas.addEventListener('touchstart', function (e) {
+        if (!canSpawn || isGameOver) return;
+        e.preventDefault();
+        const rect = gameCanvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        lastPositionX = x;
+    });
+
+    gameCanvas.addEventListener('touchend', function (e) {
+        if (!canSpawn || isGameOver) return;
+        e.preventDefault();
+        spawnEmoji(lastPositionX);
+    });
+
+
+    function gameLoop(timestamp) {
+        if (isGameOver) return;
+
+        if (timestamp - lastUpdateTime >= UPDATE_INTERVAL) {
+            let dangerZoneActive = false;
+            emojiBodies.forEach((data, body) => {
+                if (body.isSleeping) return;
+
+                updateEmojiElementPosition(body);
+
+                if (body.position.y < (DANGER_ZONE_Y + 15) && body.speed < 0.1) {
+                    // console.log('Game over triggered: emoji in danger zone');
+                    gameOver();
+                    return;
+                }
+                if (body.position.y < DANGER_ZONE_Y) {
+                    dangerZoneActive = true;
+                }
+
+                if (body.position.y > canvasHeight + 100 || body.position.x < -100 || body.position.x > canvasWidth + 100) {
+                    removeEmoji(body);
+                }
+            });
+
+            lastUpdateTime = timestamp;
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+        const dropcropsgrid = document.getElementById('dropcrops-container');
+        const gameOverDiv = document.createElement('div');
+        gameOverDiv.className = 'game-over';
+        gameOverDiv.style.display = 'flex';
+        gameOverDiv.innerHTML = `
+        <button class="restart-btn" id="startgame">Start Game</button>
+    `;
+        dropcropsgrid.appendChild(gameOverDiv);
+
+        gameOverDiv.querySelector('#startgame').addEventListener('click', function () {
+            dropcropsgrid.removeChild(gameOverDiv);
+            if (isGameOver) {
+                updateNextEmoji();
+                isGameOver = false;
+                setTimeout(() => {
+                    gameStarted = true;
+                }, 500);
+                // console.log('Game restarted');
+                createPreviewElement(); // Buat preview baru setelah restart
+                requestAnimationFrame(gameLoop);
+            } else {
+                setTimeout(() => {
+                    gameStarted = true;
+                }, 500);
+            }
+            // console.log('Game started');
+        });
+    }
+
+    function gameOver(finish = false) {
+        if (isGameOver) return;
+        isGameOver = true;
+        gameStarted = false;
+        removePreviewElement(); // Hapus preview saat game over
+
+        const dropcropsgrid = document.getElementById('dropcrops-container');
+        const gameOverDiv = document.createElement('div');
+        gameOverDiv.className = 'game-over';
+        gameOverDiv.style.display = 'flex';
+        if (finish) {
+            gameState.points += 5;
+            if (gameState.pet) {
+                gameState.pet.hunger = Math.min(gameState.pet.hunger + 50, 100);
+                showNotification(`Fed ${gameState.pet.emoji} with ${option.name}! Hunger: ${Math.round(gameState.pet.hunger)}`);
+                updatePetUI();
+            }
+            checkLevelUp();
+            updateUI();
+            saveGame();
+            gameOverDiv.innerHTML = `
+            <h2>Congratulations!</h2>
+            <button class="restart-btn">OK</button>
+        `;
+        } else {
+            gameOverDiv.innerHTML = `
+            <h2>Game Over!</h2>
+            <button class="restart-btn">OK</button>
+        `;
+        }
+        // <p>Your score: ${score}</p>
+        dropcropsgrid.appendChild(gameOverDiv);
+
+        gameOverDiv.querySelector('.restart-btn').addEventListener('click', function () {
+            emojiBodies.forEach((data, body) => removeEmoji(body));
+            emojiBodies.clear();
+            dropcropsgrid.removeChild(gameOverDiv);
+            score = 0;
+            scoreElement.textContent = '0';
+            _('#dropcrops-popup-overlay').classList.remove('show');
+        });
+    }
+
+    const initDropCrop = () => {
+        updateNextEmoji();
+        createPreviewElement(); // Buat preview saat inisialisasi
+        requestAnimationFrame(gameLoop);
+        startGame();
+    }
+
+    const openDropCrops = async () => {
+        const levelrequire = 10, maxlvl = 10;
+        if (gameState.level >= levelrequire) {
+            const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
+            let newsort = [...availablePlants].map(p => p.emoji);
+            newsort.reverse();
+            newsort = newsort.slice(0, Math.min(maxlvl, newsort.length));
+            availablePlants.sort((a, b) => b.cost - a.cost);
+            const entryCost = availablePlants[0].cost * 10;
+            const confirmed = await showPopup(`Play Drop Crops for 🪙${entryCost}?`);
+            if (confirmed) {
+                newsort.reverse();
+                _("#dropcrops-info").innerHTML = newsort.toString().replace(/,/g, ' > ');
+                if (gameState.money >= entryCost) {
+                    if (gameState.money - entryCost >= 50) {
+                        EMOJI_SEQUENCE = newsort;
+                        gameState.money -= entryCost;
+                        updateUI();
+                        saveGame();
+                        initDropCrop();
+                        _('#dropcrops-popup-overlay').classList.add('show');
+                    } else {
+                        showNotification(`Can't play, not good for your 🪙 health`);
+                    }
+                } else {
+                    showNotification(`Not enough 🪙 to play!`);
+                }
+            }
+        } else {
+            showPopup(`Plant Match can be played at level ${levelrequire}`, 'Level Requirement', false);
+        }
+    }
+
+    // Event listeners for dropcrops
+    _('#play-dropcrops').addEventListener('click', openDropCrops);
+    _('#dropcrops-close').addEventListener('click', async () => {
+        const confirmed = await showPopup(`Close Drop Crops without finishing it will not return your 🪙.<br>Are you sure to close it?`);
+        if (confirmed) {
+            _('#dropcrops-popup-overlay').classList.remove('show');
+        }
+    });
+    // ==========================================================================
+    // ==========================================================================
 
     // Initialize the game
     initGame();
