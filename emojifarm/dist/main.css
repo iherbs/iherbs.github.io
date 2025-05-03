@@ -10,19 +10,19 @@
 @font-face {
     font-family: "Delius";
     font-style: "normal";
-    src: url("Delius.ttf") format("truetype");
+    src: url("../font/Delius.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "notoemoji";
     font-style: "normal";
-    src: url("NotoColorEmoji.ttf") format("truetype");
+    src: url("../font/NotoColorEmoji.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "twemoji";
     font-style: "normal";
-    src: url("twemoji.ttf") format("truetype");
+    src: url("../font/twemoji.ttf") format("truetype");
 }
 
 * {
