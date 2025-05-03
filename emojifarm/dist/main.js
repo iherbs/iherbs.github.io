@@ -2158,7 +2158,7 @@
     }
 
     const openDropCrops = async () => {
-        const levelrequire = 10, maxlvl = 10;
+        const levelrequire = 10, maxlvl = 9;
         if (gameState.level >= levelrequire) {
             const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
             let newsort = [...availablePlants].map(p => p.emoji);
