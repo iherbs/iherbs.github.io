@@ -504,6 +504,8 @@
                     // gameState.selectedSeed = null;
                     // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 }
+            } else {
+                toggleMarket();
             }
         } else if (plot.plant && isReadyToHarvest(index)) {
             // Harvest if ready
@@ -610,7 +612,7 @@
 
             // Kurangi hunger setiap hari (10 per hari, 60 detik)
             if (gameState.pet) {
-                gameState.pet.hunger = Math.max(gameState.pet.hunger - (10 / (gameState.dayDuration / 0.1)), 0);
+                gameState.pet.hunger = Math.max(gameState.pet.hunger - (3 / (gameState.dayDuration / 0.1)), 0);
                 updatePetUI();
                 if (gameState.pet.hunger < 20 && gameState.pet.hunger >= 19.9) {
                     showNotification(`${gameState.pet.emoji} is hungry! Feed your pet.`);
@@ -1307,6 +1309,10 @@
             if (option.type === 'buy') {
                 if ((gameState.money - option.cost) >= 50) {
                     gameState.money -= option.cost;
+                    _('#love-animation').classList.add('love-heart');
+                    setTimeout(() => {
+                        _('#love-animation').classList.remove('love-heart');
+                    }, 1500);
                 } else {
                     showNotification(`can't buy, not good for your 🪙 health`);
                     return;
@@ -1337,6 +1343,7 @@
         const petEmoji = document.getElementById('pet-emoji');
         const hungerProgress = document.getElementById('hunger-progress');
         if (gameState.pet) {
+            _('#pet-emoji-container').style.display = 'block';
             petEmoji.textContent = gameState.pet.emoji;
             hungerProgress.style.width = `${gameState.pet.hunger}%`;
             hungerProgress.style.backgroundColor = gameState.pet.hunger >= 20 ? '#1b83f2' : '#999';
