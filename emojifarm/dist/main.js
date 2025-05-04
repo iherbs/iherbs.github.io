@@ -131,6 +131,7 @@
     const pointsText = _('#points-text');
     const questContent = _('#quest-content');
     const setting = _('#setting');
+    const marketbtn = _('#market-button');
 
     const popupOverlay = _('#popup-overlay');
     const popupTitle = _('#popup-title');
@@ -228,9 +229,6 @@
         showPopup(tutorialContent, 'How to Play', false);
     };
 
-    // Add event listener for help button
-    _('#help').addEventListener('click', showTutorial);
-
     const music = _("#background-audio");
     music.volume = 0.9;
     document.addEventListener("click", () => {
@@ -249,6 +247,22 @@
             audio.play();
         }
     };
+
+    const toggleMarket = () => {
+        if (_('#market').style.transform == 'translateY(0px)') {
+            _('#market').style.transform = 'translateY(170px)';
+        } else {
+            _('#market').style.transform = 'translateY(0px)';
+        }
+    }
+
+    _("#market-button").addEventListener('click', () => {
+        toggleMarket();
+    });
+
+    _("#market-close").addEventListener('click', () => {
+        toggleMarket();
+    });
 
     const setupMarketTabs = () => {
         document.querySelectorAll('.market-tab').forEach(tab => {
@@ -281,10 +295,11 @@
             marketItem.addEventListener('click', () => {
                 // Hapus class selected dari semua item
                 document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
-                _('#pet-items').style.display = 'none';
                 // Tambahkan class selected ke item yang diklik
                 marketItem.classList.add('selected');
                 gameState.selectedSeed = item.emoji;
+                marketbtn.innerHTML = item.emoji;
+                toggleMarket();
             });
             growthItemsContainer.appendChild(marketItem);
         });
@@ -297,7 +312,7 @@
         // Tambah 1 tanaman per level setelah Level 1
         const additionalPlants = level > 1 ? gameState.plantTypes.slice(2, 2 + (level - 1)) : [];
         // Selalu sertakan Land
-        const landPlant = gameState.plotCount < 14 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
+        const landPlant = gameState.plotCount < 16 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
         if (landPlant.length == 0) {
             if (additionalPlants.length == 0) {
                 return [...basePlants];
@@ -332,7 +347,6 @@
             `;
             item.addEventListener('click', async () => {
                 // Remove selected class from all items
-                _('#pet-items').style.display = 'none';
                 document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 if (plant.emoji == "🟫") {
                     let confirmed = await showPopup('<span style="font-size:20px;">Buy Land 🟫?</span>');
@@ -346,6 +360,7 @@
                                 updateUI();
                                 createFarmPlots();
                                 populateMarket();
+                                toggleMarket();
                                 showNotification(`New Land 🟫 Added!`);
                             } else {
                                 showNotification(`can't buy, not good for your 🪙 health`);
@@ -358,6 +373,8 @@
                     // Add selected class to clicked item
                     item.classList.add('selected');
                     gameState.selectedSeed = plant.emoji;
+                    marketbtn.innerHTML = plant.emoji;
+                    toggleMarket();
                     // showNotification(`Selected ${plant.name} for planting!`);
                 }
             });
@@ -444,12 +461,20 @@
             plot.addEventListener('click', () => handlePlotClick(i));
             farmGrid.appendChild(plot);
         }
+
+        for (let j = gameState.plotCount; j < 16; j++) {
+            const plot = document.createElement('div');
+            plot.className = 'plot';
+            plot.innerHTML = '<div class="plant"></div>';
+            farmGrid.appendChild(plot);
+        }
     }
 
     // Handle plot click
     const handlePlotClick = async (index) => {
         const plot = gameState.plots[index];
 
+        // console.log(gameState.selectedSeed);
         playSound('tap.wav');
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
@@ -466,18 +491,18 @@
                         updatePlotUI(index);
                         updateUI();
                         // showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for 🪙${seedCost}!`);
-                        gameState.selectedSeed = null;
+                        // gameState.selectedSeed = null;
                         // Reset selected item in market
-                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                         saveGame();
                     } else {
                         showNotification(`Not enough 🪙 to buy ${gameState.selectedSeed}!`);
                         // Reset selected item in market
-                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                     }
                 } else {
-                    gameState.selectedSeed = null;
-                    document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                    // gameState.selectedSeed = null;
+                    // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 }
             }
         } else if (plot.plant && isReadyToHarvest(index)) {
@@ -507,7 +532,7 @@
                                 progressWrap.classList.remove('power-growth-animation');
                             }, 500);
                         }
-                        document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+                        // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                         saveGame();
                     } else {
                         showNotification(`can't buy, not good for your 🪙 health`);
@@ -516,8 +541,8 @@
                     showNotification(`Not enough 🪙 to use ${item.emoji}!`);
                 }
             }
-            gameState.selectedSeed = null;
-            document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
+            // gameState.selectedSeed = null;
+            // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
     }
 
@@ -876,8 +901,8 @@
                     parsed.points = 0;
                 }
 
-                if (parsed.plotCount > 14) {
-                    parsed.plotCount = 14;
+                if (parsed.plotCount > 16) {
+                    parsed.plotCount = 16;
                 }
 
                 if (!parsed.pet) {
@@ -955,11 +980,44 @@
 
     window.onclick = (event) => {
         // console.log(event.target);
-        if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost')) {
+        if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.progress-wrap') && !event.target.matches('.progress-icon') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost') && !event.target.matches('#pet-emoji-container') && !event.target.matches('#pet-emoji')) {
             gameState.selectedSeed = null;
+            marketbtn.innerHTML = '🌱';
             document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
     };
+
+    // Menu ==================================================
+    _('#menu-inventory').addEventListener('click', async () => {
+        _('#wrappets').style.display = 'none';
+        if (_('#wrapinventory').style.display == 'block') {
+            _('#wrapinventory').style.display = 'none';
+        } else {
+            _('#wrapinventory').style.display = 'block'
+        }
+    });
+
+    _('#inventory-close').addEventListener('click', () => {
+        _('#wrapinventory').style.display = 'none';
+    });
+    _('#menu-pet').addEventListener('click', async () => {
+        _('#wrapinventory').style.display = 'none';
+        if (_('#wrappets').style.display == 'block') {
+            _('#wrappets').style.display = 'none';
+        } else {
+            _('#wrappets').style.display = 'block'
+            buyPet();
+        }
+    });
+
+    _('#pet-close').addEventListener('click', () => {
+        _('#wrappets').style.display = 'none';
+    });
+    // End Menu ==================================================
+
+    _('#inventory-close').addEventListener('click', () => {
+        _('#wrapinventory').style.display = 'none';
+    });
 
     let reset = false;
     setting.addEventListener('click', async () => {
@@ -981,7 +1039,12 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+            <div style="margin-top:15px">
+                <span id="help" class="buttonaddition">❓</span>
+            </div>
         `, 'Setting', false);
+
+        _('#help').addEventListener('click', showTutorial);
 
         _('#btnmusic').addEventListener('click', () => {
             gameState.music = _('#btnmusic').checked;
@@ -1088,7 +1151,7 @@
 
             updateUI();
         } else {
-            showNotification(`Not enough ${getPlantName(plantEmoji)}! Need ${quantity}, have ${inventoryCount}.`);
+            showNotification(`Not enough ${plantEmoji}! Need ${quantity}, have ${inventoryCount}.`);
         }
     }
 
@@ -1104,15 +1167,15 @@
             const questItem = document.createElement('div');
             questItem.className = 'quest-item';
             questItem.innerHTML = `
-                <div class="quest-npc">${npc}</div>
                 <div class="quest-details">
-                    ${quantity} ${plantEmoji} ${getPlantName(plantEmoji)}
+                    ${quantity} ${plantEmoji}
                 </div>
-                <button class="quest-button" ${isCompletable ? '' : 'disabled'}><span class="check-icon"></span></button>
+                <span class="quest-button" ${isCompletable ? '' : 'style="display:none;"'}><span class="check-icon"></span></span>
+                <div class="quest-npc">${npc}</div>
             `;
+            // <br>${getPlantName(plantEmoji)}
 
-            const completeButton = questItem.querySelector('.quest-button');
-            completeButton.addEventListener('click', () => completeQuest(index));
+            questItem.addEventListener('click', () => completeQuest(index));
 
             questContent.appendChild(questItem);
         });
@@ -1148,49 +1211,42 @@
     // Fungsi untuk membeli atau mengganti hewan
     const buyPet = async () => {
         const petItems = document.getElementById('pet-items');
-        if (petItems.style.display == 'none') {
-            petItems.style.display = 'flex';
-            petItems.innerHTML = '';
-            gameState.petTypes.forEach(pet => {
-                const item = document.createElement('div');
-                item.className = 'pet-item';
-                item.innerHTML = `
+        petItems.style.display = 'flex';
+        petItems.innerHTML = '';
+        gameState.petTypes.forEach(pet => {
+            const item = document.createElement('div');
+            item.className = 'pet-item';
+            item.innerHTML = `
                     <div class="market-item-emoji">${pet.emoji}</div>
                     <div class="market-item-name">${pet.name}</div>
                     <div class="market-item-cost">🪙${pet.cost}</div>
                 `;
-                item.addEventListener('click', async () => {
-                    const action = gameState.pet ? 'replace' : 'buy';
-                    const confirmed = await showPopup(`${action === 'buy' ? 'Buy' : 'Replace pet with'} ${pet.name} ${pet.emoji} for 🪙${pet.cost}?`);
-                    if (confirmed) {
-                        if (gameState.money >= pet.cost) {
-                            if ((gameState.money - pet.cost) >= 50) {
-                                gameState.money -= pet.cost;
-                                gameState.pet = { id: pet.id, emoji: pet.emoji, hunger: 100 };
-                                petItems.style.display = 'none';
-                                updatePetUI();
-                                updateUI();
-                                showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
-                                saveGame();
-                            } else {
-                                showNotification(`can't buy, not good for your 🪙 health`);
-                            }
+            item.addEventListener('click', async () => {
+                const action = gameState.pet ? 'replace' : 'buy';
+                const confirmed = await showPopup(`${action === 'buy' ? 'Buy' : 'Replace pet with'} ${pet.name} ${pet.emoji} for 🪙${pet.cost}?`);
+                if (confirmed) {
+                    if (gameState.money >= pet.cost) {
+                        if ((gameState.money - pet.cost) >= 50) {
+                            gameState.money -= pet.cost;
+                            gameState.pet = { id: pet.id, emoji: pet.emoji, hunger: 100 };
+                            updatePetUI();
+                            updateUI();
+                            showNotification(`${action === 'buy' ? 'Adopted' : 'Replaced with'} ${pet.name} ${pet.emoji}!`);
+                            saveGame();
                         } else {
-                            showNotification(`Not enough 🪙 to ${action} ${pet.emoji}!`);
+                            showNotification(`can't buy, not good for your 🪙 health`);
                         }
+                    } else {
+                        showNotification(`Not enough 🪙 to ${action} ${pet.emoji}!`);
                     }
-                });
-                petItems.appendChild(item);
+                }
             });
-        } else {
-            petItems.innerHTML = '';
-            petItems.style.display = 'none';
-        }
+            petItems.appendChild(item);
+        });
     };
 
     // Fungsi untuk memberi makan hewan
     const feedPet = async () => {
-        _('#pet-items').style.display = 'none';
         if (!gameState.pet) {
             showNotification('No pet to feed!');
             return;
@@ -1285,7 +1341,7 @@
             hungerProgress.style.width = `${gameState.pet.hunger}%`;
             hungerProgress.style.backgroundColor = gameState.pet.hunger >= 20 ? '#1b83f2' : '#999';
         } else {
-            petEmoji.innerHTML = '<div style="height:12px;"></div><span style="font-size:2rem;position:absolute;top:-14px;transform: rotate(-90deg);">🐾</span>';
+            _('#pet-emoji-container').style.display = 'none';
             hungerProgress.style.width = '0%';
         }
     };
@@ -1301,10 +1357,8 @@
         }
     };
 
-    _('#buy-pet').addEventListener('click', buyPet);
     _('#feed-pet').addEventListener('click', feedPet);
     _('#pet-emoji').addEventListener('click', () => {
-        _('#pet-items').style.display = 'none';
         if (gameState.pet) {
             _('#love-animation').classList.add('love-heart');
             setTimeout(() => {

@@ -1,0 +1,16 @@
+{
+    "name": "Emoji Farm",
+    "short_name": "🌱Farm",
+    "description": "Cozy Emoji Farm Game",
+    "icons": [
+        {
+            "src": "../img/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "/",
+    "display": "fullscreen",
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff"
+}

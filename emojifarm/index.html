@@ -3,10 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>Cozy Emoji Farm</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#ffffff" />
-    <title>Cozy Emoji Farm</title>
+    <link rel="manifest" href="assets/js/web.webmanifest">
     <link rel="shortcut icon" type="image/png" href="icon.png" />
     <link rel="apple-touch-icon" sizes="57x57" href="icon.png" />
     <link rel="apple-touch-icon" sizes="72x72" href="icon.png" />
@@ -18,7 +19,7 @@
 </head>
 
 <body class="twemoji">
-    <div class=" game-container">
+    <div id="container">
         <div class="time-display">
             <span>🕒</span>
             <div class="time-progress">
@@ -34,18 +35,49 @@
                     <span class="points-text" id="points-text">0/5</span>
                 </div>
                 <span style="float:right;">🪙 <span id="money" style="padding-top: 5px;">50</span></span>
+                <br>
+                <span id="feed-pet" style="font-size:1rem;margin-left:5px;">
+                    🐾
+                    <div class="hunger-bar">
+                        <div class="hunger-progress" id="hunger-progress"></div>
+                    </div>
+                </span>
             </div>
-
+        </div>
+        <div id="menu">
+            <span id="menu-inventory">📦</span>
+            <span id="menu-pet">🐾</span>
+            <span id="play-minigame">🌿</span>
+            <span id="play-dropcrops">🥗</span>
         </div>
 
-        <div class="farm-grid" id="farm-grid">
-            <!-- Farm plots will be added here by JavaScript -->
+        <div id="wrapinventory">
+            <div class="inventory">
+                <div class="panel-title">
+                    📦 Inventory
+                    <span id="inventory-close">❌</span>
+                </div>
+                <div class="inventory-items" id="inventory">
+                    <!-- Inventory items will be added here by JavaScript -->
+                </div>
+            </div>
         </div>
 
-        <div class="market">
+        <div id="wrappets">
+            <div id="pets">
+                <div class="panel-title">
+                    🐾 Buy Pet
+                    <span id="pet-close">❌</span>
+                </div>
+                <div class="pet-items" id="pet-items"></div>
+            </div>
+        </div>
+
+        <div id="market">
             <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
                 <span class="market-tab active" id="market-title" data-tab="seed">🌱 Seed</span>
                 <span class="market-tab" data-tab="growth">💧 Growth</span>
+                <span id="market-close">❌</span>
             </div>
             <div class="market-items" id="market-items">
                 <!-- Market items will be added here by JavaScript -->
@@ -55,54 +87,27 @@
             </div>
         </div>
 
-        <div class="quest">
-            <div class="panel-title">
-                📃 Quest
+        <div id="field">
+            <div id="street">
+                <div class="quest-content" id="quest-content"></div>
             </div>
-            <div class="quest-content" id="quest-content">
-                <!-- Quest details will be added here by JavaScript -->
-            </div>
+            <div id="farm-grid"></div>
         </div>
 
-        <div class="inventory">
-            <div class="panel-title">📦 Inventory</div>
-            <div class="inventory-items" id="inventory">
-                <!-- Inventory items will be added here by JavaScript -->
-            </div>
-        </div>
+        <div id="market-button">🌱</div>
 
-        <div class="minigame">
-            <span id="play-minigame" class="minigame-item">🌿 Match</span>
-            <span id="play-dropcrops" class="minigame-item">🥗 Drop</span>
-        </div>
-
-        <div class="pets">
-            <div class="panel-title">
-                🐾 Pet
-                <div class="hunger-bar">
-                    <div class="hunger-progress" id="hunger-progress"></div>
-                </div>
-                <div class="pet-actions">
-                    <button id="feed-pet">Feed</button>
-                    <button id="buy-pet">Buy</button>
-                </div>
-            </div>
-            <div class="pet-display" id="pet-display">
-                <div class="pet-emoji-container">
-                    <span id="pet-emoji"></span>
-                    <div class="love-animation" id="love-animation">🩷</div>
-                </div>
-            </div>
-            <div class="pet-items" id="pet-items" style="display: none;"></div>
-        </div>
-
-        <div class="last-played" id="last-played"></div>
-
-        <div style="position:relative;text-align:center;margin-top:20px;font-size:17px;">
+        <span style="position:absolute;text-align:center;font-size:17px;bottom:6px;right:6px;z-index:1;">
             <span id="setting" class="buttonaddition">⚙️</span>
-            <span id="help" class="buttonaddition">❓</span>
-        </div>
+        </span>
     </div>
+
+
+    <div id="pet-emoji-container">
+        <span id="pet-emoji"></span>
+        <div class="love-animation" id="love-animation">🩷</div>
+    </div>
+
+    <div class="last-played" id="last-played" style="display:none;"></div>
 
     <div class="popup-overlay" id="minigame-popup-overlay">
         <div class="popup" style="max-width: 600px;">
@@ -138,7 +143,6 @@
     </div>
 
     <div class="notification" id="notification"></div>
-
     <div class="popup-overlay" id="popup-overlay">
         <div class="popup">
             <div class="panel-title" id="popup-title">Confirm</div>
@@ -154,6 +158,7 @@
         <source src="music/CozyGardenSerenity.mp3" type="audio/mpeg">
     </audio>
     <audio id="sfx" controlsList="nodownload" hidden></audio>
+    <script src="assets/js/register.js"></script>
     <script src="dist/matter.min.js"></script>
     <script src="dist/main.js"></script>
 </body>
