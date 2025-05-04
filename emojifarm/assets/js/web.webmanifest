@@ -9,7 +9,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": "/",
+    "start_url": "/emojifarm/",
     "display": "fullscreen",
     "theme_color": "#ffffff",
     "background_color": "#ffffff"
