@@ -94,6 +94,58 @@ button {
     z-index: 0;
 }
 
+
+.grass {
+    position: absolute;
+    width: 5px;
+    height: 25px;
+    background: linear-gradient(to top, #e6f7e6 0%, #4caf50 50%, #66bb6a 100%);
+    border-radius: 5px 5px 0 0;
+    box-shadow: 2px 2px 5px rgba(230, 247, 230, 0.2);
+    transform-origin: bottom center;
+    animation: sway 2s ease-in-out infinite;
+    z-index: 0;
+}
+
+.grass::before,
+.grass::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    width: 5px;
+    height: 20px;
+    background: linear-gradient(to top, #e6f7e6 0%, #388e3c 50%, #4caf50 100%);
+    border-radius: 5px 5px 0 0;
+    box-shadow: 2px 2px 5px rgba(230, 247, 230, 0.2);
+    transform-origin: bottom center;
+}
+
+.grass::before {
+    left: -5px;
+    height: 20px;
+    animation: sway 2.2s ease-in-out infinite;
+}
+
+.grass::after {
+    left: 5px;
+    height: 20px;
+    animation: sway 1.8s ease-in-out infinite;
+}
+
+@keyframes sway {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(10deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
 #field {
     position: absolute;
     bottom: 50px;
