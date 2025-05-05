@@ -6,6 +6,7 @@
         dayDuration: 60, // seconds per in-game day
         realTimeScale: 60, // 1 real second = 60 game seconds (1:60 ratio)
         lastPlayed: null,
+        emoji: 'twemoji',
         level: 1,
         points: 0,
         quests: [],
@@ -899,6 +900,9 @@
                 if (!parsed.level) {
                     parsed.level = 1;
                 }
+                if (!parsed.emoji) {
+                    parsed.emoji = 'twemoji';
+                }
                 if (!parsed.points) {
                     parsed.points = 0;
                 }
@@ -935,6 +939,7 @@
                 Object.assign(gameState, parsed);
                 gameState.plantTypes = plantTypes;
 
+                document.body.className = gameState.emoji;
                 calculateOfflineProgress();
             } catch (e) {
                 console.error('Failed to load save:', e);
@@ -1023,6 +1028,7 @@
 
     let reset = false;
     setting.addEventListener('click', async () => {
+        let emofont = document.body.className;
         const set = showPopup(`
             <button type="button" id="resetgame">
                 Reset Game
@@ -1041,10 +1047,44 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+            <div style="margin-top:10px">
+                <div class="custom-select">
+                    <div class="selected-option" id="selectedEmoji">
+                        <span id="selected-font" class="${emofont}">🌾🌽🪙</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="options" id="font-options" style="display:none;">
+                        <span class="selectEmoji defemoji" data="defemoji">🌾🌽🪙</span>
+                        <span class="selectEmoji twemoji" data="twemoji">🌾🌽🪙</span>
+                        <span class="selectEmoji notoemoji" data="notoemoji">🌾🌽🪙</span>
+                    </div>
+                </div>
+            </div>
             <div style="margin-top:15px">
                 <span id="help" class="buttonaddition">❓</span>
             </div>
         `, 'Setting', false);
+
+        _('#selectedEmoji').addEventListener('click', () => {
+            if (_("#font-options").style.display == "block") {
+                _("#font-options").style.display = "none";
+            } else {
+                _("#font-options").style.display = "block";
+            }
+        });
+
+        const selectemoji = document.querySelectorAll('.selectEmoji')
+        selectemoji.forEach(element => {
+            element.addEventListener('click', function () {
+                const attr = element.getAttribute('data');
+                _("#font-options").style.display = "none";
+
+                document.getElementById("selected-font").className = attr;
+                document.body.className = attr;
+                gameState.emoji = attr;
+                saveGame();
+            });
+        });
 
         _('#help').addEventListener('click', showTutorial);
 
