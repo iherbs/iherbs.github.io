@@ -1441,6 +1441,13 @@
                             _(`#love-animation-one`).classList.remove('love-heart');
                         }, 1500);
                     });
+
+                    petEmojiContainerOne.addEventListener('touchstart', (e) => {
+                        _(`#love-animation-one`).classList.add('love-heart');
+                        setTimeout(() => {
+                            _(`#love-animation-one`).classList.remove('love-heart');
+                        }, 1500);
+                    });
                 } else {
                     _('#pet-emoji-two').innerHTML = pet.emoji;
                     // hunger bar kedua jika ada hewan kedua
@@ -1448,6 +1455,13 @@
                     // petEmojiContainerTwo.style.animation = 'movewalk 25s ease infinite';
                     // Tambahkan event listener untuk klik hewan
                     petEmojiContainerTwo.addEventListener('click', () => {
+                        _(`#love-animation-two`).classList.add('love-heart');
+                        setTimeout(() => {
+                            _(`#love-animation-two`).classList.remove('love-heart');
+                        }, 1500);
+                    });
+
+                    petEmojiContainerTwo.addEventListener('touchstart', (e) => {
                         _(`#love-animation-two`).classList.add('love-heart');
                         setTimeout(() => {
                             _(`#love-animation-two`).classList.remove('love-heart');
@@ -2425,14 +2439,14 @@
         // Event handler untuk mouse
         mypet.addEventListener('mousedown', (e) => {
             isDragging = true;
-            mypet.classList.add('dragging');
             stopRandomMovement();
             e.preventDefault();
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
-                const x = e.clientX - 25;
+                mypet.classList.add('dragging');
+                const x = e.clientX - 50;
                 const y = e.clientY - 25;
                 mypet.style.left = x + 'px';
                 mypet.style.top = y + 'px';
@@ -2452,15 +2466,15 @@
         // Event handler untuk touch
         mypet.addEventListener('touchstart', (e) => {
             isDragging = true;
-            mypet.classList.add('dragging');
             stopRandomMovement();
             e.preventDefault();
         });
 
         document.addEventListener('touchmove', (e) => {
             if (isDragging) {
+                mypet.classList.add('dragging');
                 const touch = e.touches[0];
-                const x = touch.clientX - 25;
+                const x = touch.clientX - 50;
                 const y = touch.clientY - 25;
                 mypet.style.left = x + 'px';
                 mypet.style.top = y + 'px';
