@@ -410,9 +410,6 @@
     const createFarmPlots = () => {
         farmGrid.innerHTML = '';
 
-        // Adjust plot count based on screen size
-        const screenWidth = window.innerWidth;
-
         // Initialize plots array if needed
         while (gameState.plots.length < gameState.plotCount) {
             gameState.plots.push({ plant: null, growth: 0, plantedAt: null });
@@ -2396,7 +2393,8 @@
     mypets.forEach((mypet, index) => {
         let isDragging = false;
         let randomMovementInterval;
-        let lastX = Math.random() * (window.innerWidth - 50); // Posisi awal acak
+        let containerWidth = document.getElementById('container').offsetWidth;
+        let lastX = Math.random() * (containerWidth - 50);
         let lastY = Math.random() * (window.innerHeight - 50);
 
         // Atur posisi awal
@@ -2406,7 +2404,7 @@
         // Fungsi untuk pergerakan acak
         function movemypetRandomly() {
             if (!isDragging) {
-                const maxX = window.innerWidth - 50;
+                const maxX = containerWidth - 50;
                 const maxY = window.innerHeight - 50;
                 const randomX = Math.floor(Math.random() * maxX);
                 const randomY = Math.floor(Math.random() * maxY);
@@ -2455,8 +2453,9 @@
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 mypet.classList.add('dragging');
-                const x = e.clientX - 50;
+                const x = e.clientX - ((window.innerWidth - containerWidth) / 2);
                 const y = e.clientY - 25;
+                console.log(`Dragging: ${x}, ${y}`);
                 mypet.style.left = x + 'px';
                 mypet.style.top = y + 'px';
                 lastX = x;
@@ -2483,7 +2482,7 @@
             if (isDragging) {
                 mypet.classList.add('dragging');
                 const touch = e.touches[0];
-                const x = touch.clientX - 50;
+                const x = touch.clientX - 25;
                 const y = touch.clientY - 25;
                 mypet.style.left = x + 'px';
                 mypet.style.top = y + 'px';
