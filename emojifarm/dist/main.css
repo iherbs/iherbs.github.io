@@ -27,6 +27,13 @@
     src: url("../font/NotoColorEmoji.ttf") format("truetype");
 }
 
+@media (prefers-color-scheme: dark) {
+    :root {
+        --theme-color: #ffffff;
+    }
+}
+
+
 * {
     box-sizing: border-box;
     margin: 0;
