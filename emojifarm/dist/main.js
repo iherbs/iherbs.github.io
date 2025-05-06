@@ -616,7 +616,7 @@
                 petHungerHandler(gameState.pet[0].hunger - (3 / (gameState.dayDuration / 0.1)), true);
                 updatePetUI();
                 if (gameState.pet[0].hunger < 20 && gameState.pet[0].hunger >= 19.9) {
-                    showNotification(`${gameState.pet.emoji} is hungry! Feed your pet.`);
+                    showNotification(`Your pet is hungry! Feed your pet.`);
                 }
             }
 
@@ -1348,7 +1348,7 @@
         }
 
         const message = `
-        Feed ${gameState.pet.emoji} with:<br>
+        Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options.map(opt => `
                 <div class="feeditem">
