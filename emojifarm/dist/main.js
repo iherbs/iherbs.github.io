@@ -479,7 +479,7 @@
         playSound('tap.wav');
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
-            if (gameState.selectedSeed) {
+            if (gameState.selectedSeed && marketbtn.innerHTML != '🌱') {
                 const item = gameState.plantTypes.find(i => i.emoji === gameState.selectedSeed);
                 if (item != undefined) {
                     const seedCost = getPlantCost(gameState.selectedSeed);
@@ -1201,6 +1201,15 @@
             updateUI();
         } else {
             showNotification(`Not enough ${plantEmoji}! Need ${quantity}, have ${inventoryCount}.`);
+            // if (_('#market').style.transform == 'translateY(170px)' || _('#market').style.transform == '') {
+            //     _('#market').style.transform = 'translateY(0px)';
+            // }
+            const marketitem = document.querySelectorAll('.market-item');
+            var indxe = 0;
+            marketitem.forEach((el, i) => {
+                if (el.getAttribute('data-emoji') == plantEmoji) { indxe = i; }
+            });
+            marketitem[indxe].scrollIntoView({ block: 'start', behavior: 'smooth' });
         }
     }
 
@@ -1416,7 +1425,7 @@
             if (equal) {
                 gameState.pet[index].hunger = num;
             } else {
-                gameState.pet[index].hunger = Math.min(gameState.pet[index].hunger + num, 100);
+                gameState.pet[index].hunger = Math.min(Math.max(gameState.pet[index].hunger, 0) + num, 100);
             }
         });
     }
