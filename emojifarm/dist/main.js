@@ -952,6 +952,7 @@
 
         // Pastikan ada hingga 3 quest saat memuat
         generateQuests();
+        initgarden();
     }
 
     // Show popup with message and return a Promise
@@ -1486,7 +1487,9 @@
 
     // Fungsi untuk panen otomatis
     const autoHarvest = () => {
-        if (gameState.pet.length > 0 && gameState.pet[0].hunger < 20) return;
+        if ((gameState.pet.length > 0 && gameState.pet[0].hunger < 20) || gameState.pet.length <= 0) {
+            return;
+        }
 
         const readyPlotIndex = gameState.plots.findIndex((plot, index) => plot.plant && isReadyToHarvest(index));
         if (readyPlotIndex !== -1) {
@@ -1981,7 +1984,7 @@
     const emojiBodies = new Map();
     let lastUpdateTime = performance.now();
 
-    function getRandomEmojiIndex() {
+    const getRandomEmojiIndex = () => {
         const weights = [0.4, 0.3, 0.15, 0.08, 0.05, 0.02];
         let rand = Math.random(), sum = 0;
         for (let i = 0; i < weights.length; i++) {
@@ -1991,7 +1994,7 @@
         return 0;
     }
 
-    function createEmoji(x, y, emojiIndex) {
+    const createEmoji = (x, y, emojiIndex) => {
         if (isGameOver) {
             // console.log('Game over, cannot spawn emoji');
             return null;
@@ -2022,7 +2025,7 @@
         return body;
     }
 
-    function createEmojiElement(body) {
+    const createEmojiElement = (body) => {
         const emojiData = emojiBodies.get(body);
         if (!emojiData) {
             console.error('No emoji data for body');
@@ -2040,7 +2043,7 @@
         // console.log(`Created DOM element for emoji: ${emojiData.emoji}`);
     }
 
-    function updateEmojiElementPosition(body) {
+    const updateEmojiElementPosition = (body) => {
         const emojiData = emojiBodies.get(body);
         if (!emojiData || !emojiData.element) return;
 
@@ -2052,7 +2055,7 @@
     }
 
     // Create preview element
-    function createPreviewElement() {
+    const createPreviewElement = () => {
         if (previewElement) return;
         previewElement = document.createElement('div');
         previewElement.className = 'emoji-preview';
@@ -2064,7 +2067,7 @@
     }
 
     // Update preview position
-    function updatePreviewPosition(x) {
+    const updatePreviewPosition = (x) => {
         if (!previewElement || isGameOver) return;
         const size = EMOJI_SIZES[nextEmojiIndex];
         // Batasi posisi x agar tetap di dalam canvas
@@ -2076,7 +2079,7 @@
     }
 
     // Remove preview element
-    function removePreviewElement() {
+    const removePreviewElement = () => {
         if (previewElement) {
             previewElement.remove();
             previewElement = null;
@@ -2110,7 +2113,7 @@
         }
     });
 
-    function mergeEmojis(bodyA, bodyB) {
+    const mergeEmojis = (bodyA, bodyB) => {
         const emojiDataA = emojiBodies.get(bodyA);
         const emojiDataB = emojiBodies.get(bodyB);
 
@@ -2139,7 +2142,7 @@
         }
     }
 
-    function removeEmoji(body) {
+    const removeEmoji = (body) => {
         const emojiData = emojiBodies.get(body);
         if (!emojiData) return;
 
@@ -2152,7 +2155,7 @@
         emojiBodies.delete(body);
     }
 
-    function updateNextEmoji() {
+    const updateNextEmoji = () => {
         if (!gameStarted) {
             nextEmojiIndex = getRandomEmojiIndex();
         } else {
@@ -2169,7 +2172,7 @@
         }, 300);
     }
 
-    function spawnEmoji(x) {
+    const spawnEmoji = (x) => {
         if (!gameStarted) {
             return;
         }
@@ -2231,7 +2234,7 @@
     });
 
 
-    function gameLoop(timestamp) {
+    const gameLoop = (timestamp) => {
         if (isGameOver) return;
 
         if (timestamp - lastUpdateTime >= UPDATE_INTERVAL) {
@@ -2261,14 +2264,14 @@
         requestAnimationFrame(gameLoop);
     }
 
-    function startGame() {
+    const startGame = () => {
         const dropcropsgrid = document.getElementById('dropcrops-container');
         const gameOverDiv = document.createElement('div');
         gameOverDiv.className = 'game-over';
         gameOverDiv.style.display = 'flex';
         gameOverDiv.innerHTML = `
-        <button class="restart-btn" id="startgame">Start Game</button>
-    `;
+            <button class="restart-btn" id="startgame">Start Game</button>
+        `;
         dropcropsgrid.appendChild(gameOverDiv);
 
         gameOverDiv.querySelector('#startgame').addEventListener('click', function () {
@@ -2291,7 +2294,7 @@
         });
     }
 
-    function gameOver(finish = false) {
+    const gameOver = (finish = false) => {
         if (isGameOver) return;
         isGameOver = true;
         gameStarted = false;
@@ -2502,6 +2505,378 @@
         // Memulai animasi untuk bola ini
         startRandomMovement();
     });
+
+
+    // ======================================================================================
+    // ================================== GARDEN GRID =======================================
+    // ======================================================================================
+    _("#garden").addEventListener("click", function () {
+        _("#garden-container").style.display = "flex";
+        loadinventory();
+    });
+    const rows = 15; // Jumlah baris
+    const cols = 11; // 11 kolom
+    const gardenGrid = document.getElementById('gardenGrid');
+    const inventoryGrid = document.getElementById('grid-inventory');
+    let selectedEmoji = null;
+    let draggedElement = null;
+    let ghostElement = null;
+    let touchTimeout = null;
+    const gardenState = {
+        checksum: null,
+        inventory: {},
+        garden: []
+    };
+
+    const initgarden = () => {
+        // Buat grid
+        for (let i = 0; i < rows * cols; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            cell.setAttribute('draggable', 'true');
+            cell.addEventListener('dragover', (e) => e.preventDefault());
+            cell.addEventListener('dragenter', () => cell.classList.add('dragging-over'));
+            cell.addEventListener('dragleave', () => cell.classList.remove('dragging-over'));
+            cell.addEventListener('drop', (e) => dropItem(e, cell));
+            cell.addEventListener('dragstart', handleGridDragStart);
+            cell.addEventListener('dragend', handleGridDragEnd);
+            cell.addEventListener('touchstart', (e) => handleGridTouchStart(e, cell));
+            cell.addEventListener('touchmove', (e) => handleGridTouchMove(e, cell));
+            cell.addEventListener('touchend', (e) => handleGridTouchEnd(e, cell));
+            cell.addEventListener('click', (e) => {
+                addEmojiToGrid(selectedEmoji, cell);
+            });
+            gardenGrid.appendChild(cell);
+        }
+
+        loadGridState();
+        loadinventory();
+    }
+
+    _("#clearselected").addEventListener("click", function () {
+        clearSelectedEmoji();
+    });
+
+    const clearSelectedEmoji = () => {
+        selectedEmoji = null;
+        document.querySelectorAll('.inventorygrid-item').forEach(i => i.classList.remove('itemselected'));
+        _("#clearselected").style.display = "none";
+    }
+
+
+    const loadinventory = () => {
+        inventoryGrid.innerHTML = '';
+        Object.entries(gameState.inventory).forEach(([emoji, count]) => {
+            if (count > 0) {
+                const item = document.createElement('div');
+                item.className = 'inventorygrid-item';
+                // item.setAttribute("draggable", "true");
+                item.setAttribute("data-item", emoji);
+                item.innerHTML = `${emoji}<br><span style="font-size:15px;">${count}</span>`;
+                inventoryGrid.appendChild(item);
+            }
+        });
+
+        // Inisialisasi item inventaris
+        document.querySelectorAll('.inventorygrid-item').forEach(item => {
+            // item.addEventListener('dragstart', handleGridDragStart);
+            // item.addEventListener('dragend', handleGridDragEnd);
+            // item.addEventListener('touchstart', (e) => handleGridTouchStart(e, item));
+            // item.addEventListener('touchmove', (e) => handleGridTouchMove(e, item));
+            // item.addEventListener('touchend', (e) => handleGridTouchEnd(e, item));
+            item.addEventListener('click', () => {
+                selectedEmoji = item.dataset.item;
+                document.querySelectorAll('.inventorygrid-item').forEach(i => i.classList.remove('itemselected'));
+                item.classList.add('itemselected');
+                _("#clearselected").style.display = "block";
+            });
+        });
+    }
+
+    // Fungsi untuk menangani drag start
+    const handleGridDragStart = (e) => {
+        draggedElement = e.target.closest('.grid-cell') || e.target.closest('.inventorygrid-item');
+        if (draggedElement) {
+            const item = draggedElement.dataset.item || draggedElement.textContent;
+            if (item) {
+                e.dataTransfer.setData('text/plain', item);
+                if (draggedElement.classList.contains('grid-cell')) {
+                    e.dataTransfer.setData('remove', 'true');
+                }
+                draggedElement.classList.add('dragging');
+
+                // Buat elemen ghost
+                ghostElement = document.createElement('div');
+                ghostElement.classList.add('drag-ghost');
+                ghostElement.textContent = item;
+                ghostElement.style.top = '-300px';
+                document.body.appendChild(ghostElement);
+
+                // Nonaktifkan drag image bawaan browser
+                const emptyImage = new Image();
+                emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAACwAAAAAAQABAAACAkQBADs';
+                e.dataTransfer.setDragImage(emptyImage, 0, 0);
+            } else {
+                e.preventDefault();
+            }
+        }
+    }
+
+    // Fungsi untuk menangani drag end
+    const handleGridDragEnd = () => {
+        if (draggedElement) {
+            draggedElement.classList.remove('dragging');
+            draggedElement = null;
+        }
+        if (ghostElement) {
+            ghostElement.remove();
+            ghostElement = null;
+        }
+        document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('dragging-over'));
+    }
+
+    // Fungsi untuk menangani drop
+    const dropItem = (e, cell) => {
+        e.preventDefault();
+        const item = e.dataTransfer.getData('text/plain');
+        const isRemove = e.dataTransfer.getData('remove') === 'true';
+        cell.classList.remove('dragging-over');
+
+        if (isRemove && draggedElement !== cell) {
+            if (draggedElement.textContent != '') {
+                draggedElement.textContent = cell.textContent;
+            } else {
+                draggedElement.textContent = '';
+            }
+            cell.textContent = item;
+        } else if (item) {
+            cell.textContent = item;
+        }
+        saveGridState();
+        handleGridDragEnd();
+    }
+
+    // Fungsi untuk touch event
+    const handleGridTouchStart = (e, element) => {
+        e.preventDefault();
+        if (element.textContent != "") {
+            draggedElement = element;
+            element.classList.add('dragging');
+            if (element.classList.contains('grid-cell') && element.textContent) {
+                element.dataset.item = element.textContent;
+                element.dataset.remove = 'true';
+            }
+            touchTimeout = setTimeout(() => {
+                ghostElement = document.createElement('div');
+                ghostElement.classList.add('drag-ghost');
+                ghostElement.style.display = 'none';
+                ghostElement.textContent = element.dataset.item || element.textContent;
+                document.body.appendChild(ghostElement);
+            }, 100);
+        }
+        if (selectedEmoji != null) {
+            addEmojiToGrid(selectedEmoji, element);
+        }
+    }
+
+    const addEmojiToGrid = (emoji, element) => {
+        // kalau inventory kurangi
+        if (gameState.inventory[emoji] > 0) {
+            if (element.textContent == '') {
+                element.textContent = emoji;
+                gameState.inventory[emoji] = gameState.inventory[emoji] - 1;
+                saveGame();
+                loadinventory();
+            }
+        } else {
+            clearSelectedEmoji();
+            if (emoji != null) {
+                showNotification(`Not enough ${emoji} in inventory!`);
+            }
+        }
+        saveGridState();
+    }
+
+    const returnEmojiFromGrid = (emoji) => {
+        // kalau inventory kembalikan ke inventory
+        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        if (plant != undefined) {
+            if (!gameState.inventory[emoji]) {
+                gameState.inventory[emoji] = 0;
+            }
+            gameState.inventory[emoji] = gameState.inventory[emoji] + 1;
+            saveGame();
+            loadinventory();
+        } else {
+            // kalau garden item kembalikan ke garden inventory
+            if (!gardenState.inventory[emoji]) {
+                gardenState.inventory[emoji] = 0;
+            }
+            gardenState.inventory[emoji]++;
+        }
+        saveGridState();
+    }
+
+    const handleGridTouchMove = (e, element) => {
+        e.preventDefault();
+        if (draggedElement && ghostElement) {
+            const touch = e.touches[0];
+            const offset = window.innerWidth <= 600 ? 14 : 30; // Offset disesuaikan untuk mobile
+            ghostElement.style.display = 'block';
+            ghostElement.style.left = `${touch.clientX - offset}px`;
+            ghostElement.style.top = `${touch.clientY - offset + window.scrollY}px`; // Kompensasi scroll
+
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('dragging-over'));
+            if (target && target.classList.contains('grid-cell')) {
+                target.classList.add('dragging-over');
+            }
+        }
+    }
+
+    const handleGridTouchEnd = (e, element) => {
+        e.preventDefault();
+        clearTimeout(touchTimeout);
+        if (draggedElement && ghostElement) {
+            ghostElement.remove();
+            ghostElement = null;
+            draggedElement.classList.remove('dragging');
+
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            if (target && target.classList.contains('grid-cell')) {
+                const item = draggedElement.dataset.item || draggedElement.textContent;
+                const isRemove = draggedElement.dataset.remove === 'true';
+
+                if (isRemove && draggedElement !== target) {
+                    if (target.textContent != '') {
+                        draggedElement.textContent = target.textContent;
+                    } else {
+                        draggedElement.textContent = '';
+                    }
+                    target.textContent = item;
+                } else if (item) {
+                    target.textContent = item;
+                }
+            } else if (draggedElement.classList.contains('grid-cell') && draggedElement.textContent) {
+                // kembalikan inventory
+                returnEmojiFromGrid(draggedElement.textContent);
+                draggedElement.textContent = ''; // Hapus jika diseret ke luar
+            }
+
+            saveGridState(); // Simpan status grid setelah perubahan
+            document.querySelectorAll('.grid-cell').forEach(cell => cell.classList.remove('dragging-over'));
+            draggedElement = null;
+        }
+    }
+
+    // Menghapus item jika diseret keluar grid (desktop)
+    document.addEventListener('dragover', (e) => e.preventDefault());
+    document.addEventListener('drop', (e) => {
+        if (!e.target.closest('.grid-cell') && !e.target.closest('.inventorygrid-item') && draggedElement) {
+            const isRemove = e.dataTransfer.getData('remove') === 'true';
+            if (isRemove && draggedElement.textContent) {
+                // kembalikan inventory
+                returnEmojiFromGrid(draggedElement.textContent);
+                draggedElement.textContent = '';
+                saveGridState(); // Simpan status grid setelah penghapusan
+            }
+            handleGridDragEnd();
+        }
+    });
+
+    // Update posisi ghost element saat drag di desktop
+    document.addEventListener('drag', (e) => {
+        if (ghostElement && e.clientX && e.clientY) {
+            ghostElement.style.left = `${e.clientX - 30}px`; // Offset setengah ukuran elemen
+            ghostElement.style.top = `${e.clientY - 30 + window.scrollY}px`; // Kompensasi scroll
+        }
+    });
+
+    // Fungsi untuk menyalin grid ke clipboard sebagai teks
+    const copyGrid = () => {
+        const cells = document.querySelectorAll('.grid-cell');
+        let gridText = '';
+        for (let row = 0; row < rows; row++) {
+            let rowText = '';
+            for (let col = 0; col < cols; col++) {
+                const cellIndex = row * cols + col;
+                const cellContent = cells[cellIndex].textContent || '🟩';
+                rowText += `${cellContent}`;
+            }
+            gridText += rowText + '\n';
+        }
+
+        // Salin ke clipboard
+        navigator.clipboard.writeText(gridText).then(() => {
+            alert('Copied.');
+        }).catch(err => {
+            console.error('Gagal menyalin ke clipboard:', err);
+            alert('Gagal menyalin grid. Silakan coba lagi.');
+        });
+    }
+
+
+    const gardenChecksum = (data) => {
+        const str = JSON.stringify({ garden: data.garden, inventory: data.inventory });
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+        }
+        return hash;
+    };
+
+    // Fungsi untuk menyimpan status grid ke localStorage
+    const saveGridState = () => {
+        const cells = document.querySelectorAll('.grid-cell');
+        const gridState = Array.from(cells).map(cell => cell.textContent || '');
+        gardenState['garden'] = gridState;
+        gardenState.checksum = gardenChecksum(gardenState);
+        localStorage.setItem('gardenState', JSON.stringify(gardenState));
+    }
+
+    // Fungsi untuk memuat status grid dari localStorage
+    const loadGridState = () => {
+        const savedState = localStorage.getItem('gardenState');
+        if (savedState) {
+            const parsed = JSON.parse(savedState);
+
+            if (gardenChecksum(parsed) !== parsed['checksum']) {
+                console.error('Checksum mismatch, loading default state.');
+                return;
+            }
+
+            if (!parsed.hasOwnProperty('garden')) {
+                parsed['garden'] = parsed;
+            }
+
+            if (!parsed.hasOwnProperty('inventory')) {
+                parsed['inventory'] = {};
+            }
+
+
+            Object.assign(gardenState, parsed);
+
+            const gridState = parsed['garden'];
+            const cells = document.querySelectorAll('.grid-cell');
+            cells.forEach((cell, index) => {
+                if (gridState[index]) {
+                    cell.textContent = gridState[index];
+                }
+            });
+        } else {
+            const cells = document.querySelectorAll('.grid-cell');
+            cells.forEach((cell, index) => {
+                if (gardenState.garden.length == 0) {
+                    cell.textContent = '🌳';
+                }
+            });
+        }
+    }
+    // ======================================================================================
+    // ================================= GARDEN GRID ========================================
+    // ======================================================================================
 
     // Initialize the game
     initGame();

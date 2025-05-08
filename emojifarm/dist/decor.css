@@ -1,0 +1,154 @@
+.grid-container {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #f0f8ff;
+    z-index: 5;
+}
+
+.itemselected {
+    background: #f0f8ff;
+    box-shadow: 0 0px 2px rgba(0, 0, 0, 0.2);
+}
+
+#clearselected {
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    border-radius: 20px;
+    background: #ffffff;
+    text-align: center;
+    padding: 7px 15px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+#wrapgrid-inventory {
+    position: fixed;
+    background: #ffffff;
+    width: 100%;
+    bottom: 0px;
+    height: 210px;
+    padding-top: 30px;
+    border-top: 2px dashed var(--soil-color);
+    z-index: 1;
+}
+
+#grid-inventory {
+    display: grid;
+    height: 100%;
+    width: 100%;
+    grid-template-columns: repeat(6, auto);
+    grid-auto-flow: row;
+    font-size: 1.5rem;
+    gap: 10px;
+    overflow-x: auto;
+    padding-top: 15px;
+    padding-bottom: 45px;
+    overflow: auto;
+}
+
+.inventorygrid-item {
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 7px;
+    padding-left: 5px;
+    padding-right: 5px;
+    line-height: 1;
+    width: 78px;
+    max-height: 65px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.garden-grid {
+    position: relative;
+    margin-top: 90px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(11, 60px);
+    gap: 0;
+    row-gap: 0;
+    column-gap: 0;
+    background: #e6f7e6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    width: fit-content;
+    justify-content: center;
+    justify-items: center;
+}
+
+.grid-cell {
+    width: 60px;
+    height: 60px;
+    background-color: #e6f7e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+    margin: 0;
+    padding: 0;
+}
+
+.grid-cell:hover,
+.grid-cell.dragging-over {
+    background-color: rgba(165, 214, 167, 0.9);
+}
+
+.grid-cell.dragging-over {
+    background-color: rgba(255, 245, 157, 0.9);
+}
+
+.grid-cell.dragging {
+    opacity: 0.2;
+}
+
+.drag-ghost {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+    .garden-grid {
+        grid-template-columns: repeat(11, 33px);
+        gap: 0;
+        row-gap: 0;
+        column-gap: 0;
+        width: 100%;
+    }
+
+    .grid-cell,
+    .inventory-item,
+    .drag-ghost {
+        width: 33px;
+        height: 33px;
+        font-size: 18px;
+    }
+
+    .drag-ghost {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+}

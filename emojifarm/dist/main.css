@@ -352,7 +352,7 @@ button {
     color: #2E8B57;
     margin-bottom: 15px;
     align-items: center;
-    z-index: 2;
+    z-index: 6;
 }
 
 .points-progress-container {

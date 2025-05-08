@@ -16,6 +16,7 @@
     <link rel="shortcut icon" type="image/png" href="icon.png" />
 
     <link rel="stylesheet" href="dist/main.css">
+    <link rel="stylesheet" href="dist/decor.css">
 </head>
 
 <body class="twemoji">
@@ -61,6 +62,7 @@
             <span id="menu-pet">🐾</span>
             <span id="play-minigame">🌿</span>
             <span id="play-dropcrops">🥗</span>
+            <span id="garden" style="display: none">⛲</span>
         </div>
 
         <div id="wrapinventory">
@@ -168,6 +170,15 @@
                 <button class="popup-button popup-cancel" id="popup-cancel">❌</button>
             </div>
         </div>
+    </div>
+
+    <div class="grid-container" id="garden-container">
+        <div class="garden-grid" id="gardenGrid"></div>
+        <div id="wrapgrid-inventory">
+            <span id="clearselected">Clear</span>
+            <div class="inventory" id="grid-inventory"></div>
+        </div>
+    </div>
     </div>
 
     <audio id="background-audio" loop controls hidden>
