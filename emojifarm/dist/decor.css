@@ -83,7 +83,7 @@
 #clearselected {
     display: none;
     position: absolute;
-    bottom: 0px;
+    bottom: -33px;
     right: 10px;
     border-radius: 20px;
     background: #ffffff;
@@ -96,7 +96,7 @@
 #sellselected {
     display: none;
     position: absolute;
-    bottom: 0px;
+    bottom: -33px;
     left: 10px;
     border-radius: 20px;
     background: #ffffff;
@@ -111,7 +111,7 @@
     background: #ffffff;
     width: 100%;
     bottom: 0px;
-    height: 210px;
+    height: 200px;
     padding-top: 30px;
     transform: translateY(220px);
     transition: all 0.3s ease;
@@ -208,9 +208,11 @@
     height: 60px;
     background-color: rgba(255, 255, 255, 0.9);
     display: flex;
+    text-align: center;
     justify-content: center;
     align-items: center;
     font-size: 28px;
+    line-height: 1.9;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     opacity: 0.9;
@@ -230,12 +232,6 @@
     .drag-ghost {
         width: 33px;
         height: 33px;
-        font-size: 18px;
-    }
-
-    .drag-ghost {
-        width: 28px;
-        height: 28px;
         font-size: 18px;
     }
 }

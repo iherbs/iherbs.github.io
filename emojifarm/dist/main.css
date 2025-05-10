@@ -624,7 +624,7 @@ button {
     left: 2px;
     width: 40%;
     background-color: transparent;
-    padding: 8px 15px;
+    padding: 8px 8px;
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
     cursor: pointer;
