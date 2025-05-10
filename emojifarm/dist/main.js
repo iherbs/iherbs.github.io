@@ -2670,10 +2670,10 @@
     });
 
     const toggleGardenInventory = () => {
-        if (_('#wrapgrid-inventory').style.transform == 'translateY(-15px)') {
+        if (_('#wrapgrid-inventory').style.transform == 'translateY(-45px)') {
             _('#wrapgrid-inventory').style.transform = 'translateY(220px)';
         } else {
-            _('#wrapgrid-inventory').style.transform = 'translateY(-15px)';
+            _('#wrapgrid-inventory').style.transform = 'translateY(-45px)';
         }
     }
 
@@ -2724,7 +2724,6 @@
                 inventoryGrid.appendChild(item);
             }
         });
-        inventoryGrid.innerHTML += '<br>';
 
         // Inisialisasi item inventaris
         // document.querySelectorAll('.inventorygrid-item').forEach(item => {
@@ -2746,7 +2745,6 @@
                 objectGrid.appendChild(item);
             }
         });
-        objectGrid.innerHTML += '<br>';
 
         marketGrid.innerHTML = '';
         Object.entries(gardenItem).forEach(([emoji, count]) => {
@@ -2759,7 +2757,6 @@
                 marketGrid.appendChild(item);
             }
         });
-        marketGrid.innerHTML += '<br>';
 
         initinventorygrid();
     }
@@ -2942,7 +2939,6 @@
         e.preventDefault();
         if (element.textContent != "") {
             draggedElement = element;
-            element.classList.add('dragging');
             if (element.classList.contains('grid-cell') && element.textContent) {
                 element.dataset.item = element.textContent;
                 element.dataset.remove = 'true';
@@ -2963,6 +2959,7 @@
     const handleGridTouchMove = (e, element) => {
         e.preventDefault();
         if (draggedElement && ghostElement) {
+            element.classList.add('dragging');
             const touch = e.touches[0];
             const offset = window.innerWidth <= 600 ? 14 : 30; // Offset disesuaikan untuk mobile
             ghostElement.style.display = 'block';
