@@ -13,98 +13,99 @@
         plotCount: 4,
         plots: [],
         inventory: {},
-        selectedSeed: null,
-        plantTypes: [
-            { emoji: '🌾', name: 'Wheat', growthTime: 6, value: 10, cost: 5 },
-            { emoji: '🌽', name: 'Corn', growthTime: 8, value: 15, cost: 8 },
-            { emoji: '🥕', name: 'Carrot', growthTime: 11, value: 15, cost: 10 },
-            { emoji: '🥜', name: 'Peanuts', growthTime: 11, value: 16, cost: 11 },
-            { emoji: '🫘', name: 'Beans', growthTime: 13, value: 16, cost: 12 },
-            { emoji: '🥒', name: 'Cucumber', growthTime: 13, value: 17, cost: 14 },
-            { emoji: '🌶️', name: 'Pepper', growthTime: 17, value: 20, cost: 15 },
-            { emoji: '🫑', name: 'Bell Pepper', growthTime: 18, value: 22, cost: 16 },
-            { emoji: '🥔', name: 'Potato', growthTime: 27, value: 30, cost: 20 },
-            { emoji: '🍆', name: 'Eggplant', growthTime: 25, value: 20, cost: 15 },
-            { emoji: '🍅', name: 'Tomato', growthTime: 30, value: 25, cost: 20 },
-            { emoji: '🫛', name: 'Peas', growthTime: 25, value: 20, cost: 15 },
-            { emoji: '🥬', name: 'Lettuce', growthTime: 28, value: 20, cost: 16 },
-            { emoji: '🥦', name: 'Broccoli', growthTime: 30, value: 25, cost: 18 },
-            { emoji: '🍎', name: 'Apple', growthTime: 30, value: 25, cost: 20 },
-            { emoji: '🍓', name: 'Strawberry', growthTime: 26, value: 25, cost: 18 },
-            { emoji: '🍐', name: 'Pear', growthTime: 30, value: 25, cost: 20 },
-            { emoji: '🍊', name: 'Orange', growthTime: 30, value: 28, cost: 22 },
-            { emoji: '🍋', name: 'Lemon', growthTime: 35, value: 32, cost: 25 },
-            { emoji: '🍋‍🟩', name: 'Lime', growthTime: 33, value: 30, cost: 24 },
-            { emoji: '🍌', name: 'Banana', growthTime: 40, value: 38, cost: 30 },
-            { emoji: '🍉', name: 'Watermelon', growthTime: 40, value: 38, cost: 32 },
-            { emoji: '🍇', name: 'Grapes', growthTime: 45, value: 45, cost: 35 },
-            { emoji: '🫐', name: 'Blueberries', growthTime: 44, value: 44, cost: 37 },
-            { emoji: '🍈', name: 'Melon', growthTime: 50, value: 48, cost: 40 },
-            { emoji: '🍒', name: 'Cherry', growthTime: 50, value: 45, cost: 38 },
-            { emoji: '🍑', name: 'Peach', growthTime: 60, value: 55, cost: 44 },
-            { emoji: '🥭', name: 'Mango', growthTime: 55, value: 50, cost: 42 },
-            { emoji: '🍍', name: 'Pineapple', growthTime: 55, value: 50, cost: 45 },
-            { emoji: '🥥', name: 'Coconut', growthTime: 57, value: 52, cost: 46 },
-            { emoji: '🥝', name: 'Kiwi', growthTime: 62, value: 58, cost: 48 },
-            { emoji: '🥑', name: 'Avocado', growthTime: 60, value: 55, cost: 50 },
-            { emoji: '🍄', name: 'Mushroom', growthTime: 68, value: 62, cost: 55 },
-            { emoji: '🌹', name: 'Rose', growthTime: 66, value: 58, cost: 50 },
-            { emoji: '🌷', name: 'Tulip', growthTime: 67, value: 61, cost: 55 },
-            { emoji: '🪻', name: 'Hyacinth', growthTime: 68, value: 63, cost: 58 },
-            { emoji: '🪷', name: 'Lotus', growthTime: 70, value: 66, cost: 60 },
-            { emoji: '🌺', name: 'Hibiscus', growthTime: 72, value: 68, cost: 62 },
-            { emoji: '🌼', name: 'Daisy', growthTime: 75, value: 70, cost: 65 },
-            { emoji: '🌻', name: 'Sunflower', growthTime: 80, value: 80, cost: 70 },
-            { emoji: '🌸', name: 'Sakura', growthTime: 110, value: 100, cost: 80 },
-            { emoji: '🟫', name: 'Land', growthTime: 0, value: 0, cost: 300 }
-        ],
-        growthItems: [
-            { emoji: '💧', name: 'Water', growthBoost: 2, cost: 20 },
-            { emoji: '🧴', name: 'Fertilizer', growthBoost: 5, cost: 50 },
-            { emoji: '🧪', name: 'Potion', growthBoost: 10, cost: 100 }
-        ],
-        gameInterval: null,
-        npcs: [
-            '🧔🏻‍♂️', '🧔🏻', '🤡', '👻', '🤖', '👽', '🧜🏻‍♂️', '🧚🏻‍♂️',
-            '🧞‍♂️', '🧝🏻‍♂️', '🧙🏻‍♂️', '🧛🏻‍♂️', '🧟‍♂️', '🥷🏻', '🎅🏻',
-            '💂🏻‍♂️', '🤴🏻', '👷🏻‍♂️', '👮🏻‍♂️', '🕵🏻‍♂️', '👨🏻‍✈️', '👨🏻‍🔬',
-            '👨🏻‍⚕️', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍🚒', '👨🏻‍🌾', '👨🏻‍💼',
-            '👨🏻‍⚖️', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍🍳', '🧕🏻', '👳🏻‍♂️',
-            '👲🏻', '👨🏻‍🦳', '👨🏻‍🦱', '👨🏻‍🦲', '🕴🏻', '💃🏻', '🕺🏻'
-        ],
         pet: [],
-        petTypes: [
-            { id: 'dog', name: 'Dog', emoji: '🐕', cost: 500 },
-            { id: 'cat', name: 'Cat', emoji: '🐈', cost: 500 },
-            { id: 'rabbit', name: 'Rabbit', emoji: '🐇', cost: 700 },
-            { id: 'butterfly', name: 'Butterfly', emoji: '🦋', cost: 1100 },
-            { id: 'swan', name: 'Swan', emoji: '🦢', cost: 1300 },
-            { id: 'snail', name: 'Snail', emoji: '🐌', cost: 1500 },
-            { id: 'poodle', name: 'Poodle', emoji: '🐩', cost: 1800 },
-            { id: 'black_cat', name: 'Black Cat', emoji: '🐈‍⬛', cost: 2100 },
-            { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', cost: 2500 },
-            { id: 'crab', name: 'Crab', emoji: '🦀', cost: 2900 },
-            { id: 'pufferfish', name: 'Pufferfish', emoji: '🐡', cost: 3300 },
-            { id: 'tropical_fish', name: 'Tropicfish', emoji: '🐠', cost: 3700 },
-            { id: 'dodo', name: 'Dodo', emoji: '🦤', cost: 4100 },
-            { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', cost: 4500 },
-            { id: 'dinosaur', name: 'Dinosaur', emoji: '🦖', cost: 5000 }
-        ],
-        petFoods: [
-            { id: 'lollipop', name: 'Lollipop', emoji: '🍭', cost: 50, hungerValue: 20 },
-            { id: 'chocolate', name: 'Chocolate', emoji: '🍫', cost: 100, hungerValue: 40 }
-        ],
-        petFeedItems: [
-            { emoji: '🌾', hungerValue: 2 },
-            { emoji: '🌽', hungerValue: 3 },
-            { emoji: '🥕', hungerValue: 4 }
-        ], // Tanaman yang bisa digunakan untuk memberi makan
-        autoHarvestInterval: 1,
         checksum: '',
         music: true,
         sfx: true
     };
+    const plantTypes = [
+        { emoji: '🌾', name: 'Wheat', growthTime: 6, value: 10, cost: 5 },
+        { emoji: '🌽', name: 'Corn', growthTime: 8, value: 15, cost: 8 },
+        { emoji: '🥕', name: 'Carrot', growthTime: 11, value: 15, cost: 10 },
+        { emoji: '🥜', name: 'Peanuts', growthTime: 11, value: 16, cost: 11 },
+        { emoji: '🫘', name: 'Beans', growthTime: 13, value: 16, cost: 12 },
+        { emoji: '🥒', name: 'Cucumber', growthTime: 13, value: 17, cost: 14 },
+        { emoji: '🌶️', name: 'Pepper', growthTime: 17, value: 20, cost: 15 },
+        { emoji: '🫑', name: 'Bell Pepper', growthTime: 18, value: 22, cost: 16 },
+        { emoji: '🥔', name: 'Potato', growthTime: 27, value: 30, cost: 20 },
+        { emoji: '🍆', name: 'Eggplant', growthTime: 25, value: 20, cost: 15 },
+        { emoji: '🍅', name: 'Tomato', growthTime: 30, value: 25, cost: 20 },
+        { emoji: '🫛', name: 'Peas', growthTime: 25, value: 20, cost: 15 },
+        { emoji: '🥬', name: 'Lettuce', growthTime: 28, value: 20, cost: 16 },
+        { emoji: '🥦', name: 'Broccoli', growthTime: 30, value: 25, cost: 18 },
+        { emoji: '🌹', name: 'Rose', growthTime: 30, value: 25, cost: 20 },
+        { emoji: '🍎', name: 'Apple', growthTime: 30, value: 25, cost: 20 },
+        { emoji: '🍓', name: 'Strawberry', growthTime: 26, value: 25, cost: 18 },
+        { emoji: '🍐', name: 'Pear', growthTime: 30, value: 25, cost: 20 },
+        { emoji: '🍊', name: 'Orange', growthTime: 30, value: 28, cost: 22 },
+        { emoji: '🍋', name: 'Lemon', growthTime: 35, value: 32, cost: 25 },
+        { emoji: '🍋‍🟩', name: 'Lime', growthTime: 33, value: 30, cost: 24 },
+        { emoji: '🍌', name: 'Banana', growthTime: 40, value: 38, cost: 30 },
+        { emoji: '🍉', name: 'Watermelon', growthTime: 40, value: 38, cost: 32 },
+        { emoji: '🍇', name: 'Grapes', growthTime: 45, value: 45, cost: 35 },
+        { emoji: '🫐', name: 'Blueberries', growthTime: 44, value: 44, cost: 37 },
+        { emoji: '🍈', name: 'Melon', growthTime: 50, value: 48, cost: 40 },
+        { emoji: '🍒', name: 'Cherry', growthTime: 50, value: 45, cost: 38 },
+        { emoji: '🍑', name: 'Peach', growthTime: 60, value: 55, cost: 44 },
+        { emoji: '🥭', name: 'Mango', growthTime: 55, value: 50, cost: 42 },
+        { emoji: '🍍', name: 'Pineapple', growthTime: 55, value: 50, cost: 45 },
+        { emoji: '🥥', name: 'Coconut', growthTime: 57, value: 52, cost: 46 },
+        { emoji: '🥝', name: 'Kiwi', growthTime: 62, value: 58, cost: 48 },
+        { emoji: '🥑', name: 'Avocado', growthTime: 60, value: 55, cost: 50 },
+        { emoji: '🍄', name: 'Mushroom', growthTime: 68, value: 62, cost: 55 },
+        { emoji: '🌷', name: 'Tulip', growthTime: 67, value: 61, cost: 55 },
+        { emoji: '🪻', name: 'Hyacinth', growthTime: 68, value: 63, cost: 58 },
+        { emoji: '🪷', name: 'Lotus', growthTime: 70, value: 66, cost: 60 },
+        { emoji: '🌺', name: 'Hibiscus', growthTime: 72, value: 68, cost: 62 },
+        { emoji: '🌼', name: 'Daisy', growthTime: 75, value: 70, cost: 65 },
+        { emoji: '🌻', name: 'Sunflower', growthTime: 80, value: 80, cost: 70 },
+        { emoji: '🌸', name: 'Sakura', growthTime: 110, value: 100, cost: 80 },
+        { emoji: '🟫', name: 'Land', growthTime: 0, value: 0, cost: 300 }
+    ];
+    const growthItems = [
+        { emoji: '💧', name: 'Water', growthBoost: 2, cost: 20 },
+        { emoji: '🧴', name: 'Fertilizer', growthBoost: 5, cost: 50 },
+        { emoji: '🧪', name: 'Potion', growthBoost: 10, cost: 100 }
+    ];
+    const npcs = [
+        '🧔🏻‍♂️', '🧔🏻', '🤡', '👻', '🤖', '👽', '🧜🏻‍♂️', '🧚🏻‍♂️',
+        '🧞‍♂️', '🧝🏻‍♂️', '🧙🏻‍♂️', '🧛🏻‍♂️', '🧟‍♂️', '🥷🏻', '🎅🏻',
+        '💂🏻‍♂️', '🤴🏻', '👷🏻‍♂️', '👮🏻‍♂️', '🕵🏻‍♂️', '👨🏻‍✈️', '👨🏻‍🔬',
+        '👨🏻‍⚕️', '👨🏻‍🔧', '👨🏻‍🏭', '👨🏻‍🚒', '👨🏻‍🌾', '👨🏻‍💼',
+        '👨🏻‍⚖️', '👨🏻‍🎤', '👨🏻‍🎨', '👨🏻‍🍳', '🧕🏻', '👳🏻‍♂️',
+        '👲🏻', '👨🏻‍🦳', '👨🏻‍🦱', '👨🏻‍🦲', '🕴🏻', '💃🏻', '🕺🏻'
+    ];
+    const petTypes = [
+        { id: 'dog', name: 'Dog', emoji: '🐕', cost: 500 },
+        { id: 'cat', name: 'Cat', emoji: '🐈', cost: 500 },
+        { id: 'rabbit', name: 'Rabbit', emoji: '🐇', cost: 700 },
+        { id: 'butterfly', name: 'Butterfly', emoji: '🦋', cost: 1100 },
+        { id: 'swan', name: 'Swan', emoji: '🦢', cost: 1300 },
+        { id: 'snail', name: 'Snail', emoji: '🐌', cost: 1500 },
+        { id: 'poodle', name: 'Poodle', emoji: '🐩', cost: 1800 },
+        { id: 'blackcat', name: 'Black Cat', emoji: '🐈‍⬛', cost: 2100 },
+        { id: 'jellyfish', name: 'Jellyfish', emoji: '🪼', cost: 2500 },
+        { id: 'crab', name: 'Crab', emoji: '🦀', cost: 2900 },
+        { id: 'pufferfish', name: 'Pufferfish', emoji: '🐡', cost: 3300 },
+        { id: 'fish', name: 'Fish', emoji: '🐟', cost: 3500 },
+        { id: 'tropicfish', name: 'Tropicfish', emoji: '🐠', cost: 3700 },
+        { id: 'dodo', name: 'Dodo', emoji: '🦤', cost: 4100 },
+        { id: 'hedgehog', name: 'Hedgehog', emoji: '🦔', cost: 4500 },
+        { id: 'dinosaur', name: 'Dinosaur', emoji: '🦖', cost: 5000 }
+    ];
+    const petFoods = [
+        { id: 'lollipop', name: 'Lollipop', emoji: '🍭', cost: 50, hungerValue: 20 },
+        { id: 'chocolate', name: 'Chocolate', emoji: '🍫', cost: 100, hungerValue: 40 }
+    ];
+    const petFeedItems = [
+        { emoji: '🌾', hungerValue: 2 },
+        { emoji: '🌽', hungerValue: 3 },
+        { emoji: '🥕', hungerValue: 4 }
+    ];
     const maxmoney = 999999;
+    let selectedSeed = null;
+    let gameInterval = null;
+    let autoHarvestInterval = 1;
 
     const _ = (id) => {
         let el = {};
@@ -284,7 +285,7 @@
         const growthItemsContainer = _('#growth-items');
         growthItemsContainer.innerHTML = '';
 
-        gameState.growthItems.forEach(item => {
+        growthItems.forEach(item => {
             const marketItem = document.createElement('div');
             marketItem.className = 'market-item';
             marketItem.dataset.emoji = item.emoji;
@@ -298,7 +299,7 @@
                 document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 // Tambahkan class selected ke item yang diklik
                 marketItem.classList.add('selected');
-                gameState.selectedSeed = item.emoji;
+                selectedSeed = item.emoji;
                 marketbtn.innerHTML = item.emoji;
                 toggleMarket();
             });
@@ -309,11 +310,11 @@
     // Dapatkan tanaman yang tersedia di market berdasarkan level
     const getAvailablePlants = (level) => {
         // Pada Level 1, hanya Wheat dan Corn
-        const basePlants = gameState.plantTypes.slice(0, 2); // 🌾, 🌽
+        const basePlants = plantTypes.slice(0, 2); // 🌾, 🌽
         // Tambah 1 tanaman per level setelah Level 1
-        const additionalPlants = level > 1 ? gameState.plantTypes.slice(2, 2 + (level - 1)) : [];
+        const additionalPlants = level > 1 ? plantTypes.slice(2, 2 + (level - 1)) : [];
         // Selalu sertakan Land
-        const landPlant = gameState.plotCount < 16 ? gameState.plantTypes.find(p => p.emoji === '🟫') : [];
+        const landPlant = gameState.plotCount < 16 ? plantTypes.find(p => p.emoji === '🟫') : [];
         if (landPlant.length == 0) {
             if (additionalPlants.length == 0) {
                 return [...basePlants];
@@ -357,7 +358,7 @@
                             if ((gameState.money - seedCost) >= 50) {
                                 gameState.money -= seedCost;
                                 gameState.plotCount++;
-                                gameState.plantTypes.find(p => p.emoji === '🟫').cost = gameState.plantTypes.find(p => p.emoji === '🟫').cost + 300;
+                                plantTypes.find(p => p.emoji === '🟫').cost = plantTypes.find(p => p.emoji === '🟫').cost + 300;
                                 updateUI();
                                 createFarmPlots();
                                 populateMarket();
@@ -373,7 +374,7 @@
                 } else {
                     // Add selected class to clicked item
                     item.classList.add('selected');
-                    gameState.selectedSeed = plant.emoji;
+                    selectedSeed = plant.emoji;
                     marketbtn.innerHTML = plant.emoji;
                     toggleMarket();
                     // showNotification(`Selected ${plant.name} for planting!`);
@@ -472,34 +473,34 @@
     const handlePlotClick = async (index) => {
         const plot = gameState.plots[index];
 
-        // console.log(gameState.selectedSeed);
+        // console.log(selectedSeed);
         playSound('tap.wav');
         if (!plot.plant) {
             // Plant a seed if empty and seed is selected
-            if (gameState.selectedSeed && marketbtn.innerHTML != '🌱') {
-                const item = gameState.plantTypes.find(i => i.emoji === gameState.selectedSeed);
+            if (selectedSeed && marketbtn.innerHTML != '🌱') {
+                const item = plantTypes.find(i => i.emoji === selectedSeed);
                 if (item != undefined) {
-                    const seedCost = getPlantCost(gameState.selectedSeed);
+                    const seedCost = getPlantCost(selectedSeed);
 
                     if (gameState.money >= seedCost) {
-                        plot.plant = gameState.selectedSeed;
+                        plot.plant = selectedSeed;
                         plot.growth = 0;
                         plot.plantedAt = new Date().toISOString();
                         gameState.money -= seedCost;
                         updatePlotUI(index);
                         updateUI();
-                        // showNotification(`Planted ${getPlantName(gameState.selectedSeed)} for 🪙${seedCost}!`);
-                        // gameState.selectedSeed = null;
+                        // showNotification(`Planted ${getPlantName(selectedSeed)} for 🪙${seedCost}!`);
+                        // selectedSeed = null;
                         // Reset selected item in market
                         // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                         saveGame();
                     } else {
-                        showNotification(`Not enough 🪙 to buy ${gameState.selectedSeed}!`);
+                        showNotification(`Not enough 🪙 to buy ${selectedSeed}!`);
                         // Reset selected item in market
                         // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                     }
                 } else {
-                    // gameState.selectedSeed = null;
+                    // selectedSeed = null;
                     // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
                 }
             } else {
@@ -508,9 +509,9 @@
         } else if (plot.plant && isReadyToHarvest(index)) {
             // Harvest if ready
             harvestPlant(index);
-        } else if (plot.plant && gameState.selectedSeed) {
+        } else if (plot.plant && selectedSeed) {
             // Gunakan item percepatan jika tanaman ada dan item dipilih
-            const item = gameState.growthItems.find(i => i.emoji === gameState.selectedSeed);
+            const item = growthItems.find(i => i.emoji === selectedSeed);
             if (item != undefined) {
                 if (gameState.money >= item.cost) {
                     if (gameState.money - item.cost >= 50) {
@@ -541,7 +542,7 @@
                     showNotification(`Not enough 🪙 to use ${item.emoji}!`);
                 }
             }
-            // gameState.selectedSeed = null;
+            // selectedSeed = null;
             // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
     }
@@ -603,9 +604,9 @@
 
     // Start the game loop for automatic day progression
     const startGameLoop = () => {
-        if (gameState.gameInterval) { clearInterval(gameState.gameInterval); }
+        if (gameInterval) { clearInterval(gameInterval); }
         let lastAutoHarvest = 0;
-        gameState.gameInterval = setInterval(() => {
+        gameInterval = setInterval(() => {
             gameState.time += 0.1;
 
             // Kurangi hunger setiap hari (10 per hari, 60 detik)
@@ -619,7 +620,7 @@
 
             // Panen otomatis setiap 2 detik
             lastAutoHarvest += 0.1;
-            if (lastAutoHarvest >= gameState.autoHarvestInterval) {
+            if (lastAutoHarvest >= autoHarvestInterval) {
                 autoHarvest();
                 lastAutoHarvest = 0;
             }
@@ -817,22 +818,22 @@
 
     // Helper functions to get plant info
     const getGrowthTime = (emoji) => {
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        const plant = plantTypes.find(p => p.emoji === emoji);
         return plant ? plant.growthTime : 0;
     }
 
     const getPlantValue = (emoji) => {
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        const plant = plantTypes.find(p => p.emoji === emoji);
         return plant ? plant.value : 0;
     }
 
     const getPlantCost = (emoji) => {
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        const plant = plantTypes.find(p => p.emoji === emoji);
         return plant ? plant.cost : 0;
     }
 
     const getPlantName = (emoji) => {
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        const plant = plantTypes.find(p => p.emoji === emoji);
         return plant ? plant.name : 'Unknown Plant';
     }
     const calculateChecksum = (data) => {
@@ -843,7 +844,6 @@
             inventory: data.inventory,
             plots: data.plots,
             plotCount: data.plotCount,
-            plantTypes: data.plantTypes,
             pet: data.pet
         });
 
@@ -889,11 +889,6 @@
                     parsed.pet = [];
                 }
 
-                // Migrate growth if not present        
-                if (!parsed.growthItems) {
-                    parsed.growthItems = gameState.growthItems;
-                }
-
                 // Migrate quests if not present or old format (single quest)
                 if (!parsed.quests) {
                     parsed.quests = parsed.quest ? [parsed.quest] : [];
@@ -937,12 +932,7 @@
 
                 parsed.money = parsed.money > maxmoney ? maxmoney : parsed.money;
 
-                // Migrate plantTypes
-                const plantTypes = gameState.plantTypes;
-                plantTypes.find(p => p.emoji === '🟫').cost = parsed.plantTypes.find(p => p.emoji === '🟫').cost;
-
                 Object.assign(gameState, parsed);
-                gameState.plantTypes = plantTypes;
 
                 document.body.className = gameState.emoji;
                 calculateOfflineProgress();
@@ -994,7 +984,7 @@
     window.onclick = (event) => {
         // console.log(event.target);
         if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.progress-wrap') && !event.target.matches('.progress-icon') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost') && !event.target.matches('#pet-emoji-container') && !event.target.matches('#pet-emoji')) {
-            gameState.selectedSeed = null;
+            selectedSeed = null;
             marketbtn.innerHTML = '🌱';
             document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
         }
@@ -1115,7 +1105,7 @@
             if (confirmed) {
                 const resetinput = _('#reset-input').value;
                 if (resetinput == "reset") {
-                    clearInterval(gameState.gameInterval);
+                    clearInterval(gameInterval);
                     localStorage.removeItem('emojiFarm');
                     reset = true;
                     window.scrollTo(0, 0);
@@ -1146,7 +1136,7 @@
         const baseQuantity = gameState.questCompletedCount > 10 ? Math.floor(Math.random() * 10) + 1 : Math.floor(Math.random() * 3) + 1;
         const quantity = gameState.level > 6 ? baseQuantity + 2 : baseQuantity;
         const usedNPCs = gameState.quests.map(q => q.npc);
-        const availableNPCs = gameState.npcs.filter(npc => !usedNPCs.includes(npc));
+        const availableNPCs = npcs.filter(npc => !usedNPCs.includes(npc));
         if (availableNPCs.length === 0) return null; // Cegah quest jika tidak ada NPC
         const npc = availableNPCs[Math.floor(Math.random() * availableNPCs.length)];
         return { npc, plantEmoji: plant.emoji, quantity };
@@ -1154,7 +1144,7 @@
 
     // Generate quests up to 3
     const generateQuests = () => {
-        while (gameState.quests.length < 3 && gameState.npcs.length > gameState.quests.length) {
+        while (gameState.quests.length < 3 && npcs.length > gameState.quests.length) {
             const quest = generateSingleQuest();
             if (quest) gameState.quests.push(quest);
         }
@@ -1273,7 +1263,7 @@
 
         // Tambahkan tombol untuk membeli atau mengganti hewan
         const actionText = gameState.pet.length < 2 ? 'Buy' : 'Replace';
-        gameState.petTypes.forEach(pet => {
+        petTypes.forEach(pet => {
             const item = document.createElement('div');
             item.className = 'pet-item';
             item.innerHTML = `
@@ -1333,14 +1323,14 @@
         }
 
         const options = [
-            ...gameState.petFoods.map(food => ({
+            ...petFoods.map(food => ({
                 type: 'buy',
                 name: food.name,
                 emoji: food.emoji,
                 cost: food.cost,
                 hungerValue: food.hungerValue
             })),
-            ...gameState.petFeedItems.map(item => ({
+            ...petFeedItems.map(item => ({
                 type: 'inventory',
                 name: getPlantName(item.emoji),
                 emoji: item.emoji,
@@ -2534,9 +2524,16 @@
         '🪨': 10, '🪵': 10, '🚧': 10, '🌳': 10, '🗿': 10, '🪴': 10,
         '🪸': 10, '🎍': 10, '🍀': 10, '⚱️': 10, '🎁': 10,
         '🏺': 10, '🎈': 10, '🎏': 10, '🚪': 10, '🪟': 10,
-        '🩷': 10, '❤️': 10, '🧡': 10, '💛': 10, '💚': 10,
-        '🩵': 10, '💙': 10, '💜': 10, '🖤': 10, '🩶': 10,
-        '🤍': 10, '🤎': 10, '💎': 10, '🎀': 10, '🏮': 10,
+        '💎': 10, '🎀': 10, '🏮': 10, '☁️': 10,
+        '🌧️': 10, '🌨️': 10, '☀️': 10, '⭐': 10, '🌕': 10,
+        '🌙': 10, '🌫️': 10, '❄️': 10, '🫧': 10, '⚡': 10,
+        '🔥': 10, '🌈': 10, '🕸️': 10, '🌱': 10, '🌿': 10,
+        '🌴': 10, '🌲': 10, '🎄': 10, '🌵': 10, '⛄': 10,
+        '🕯️': 10, '📺': 10, '📻': 10, '📡': 10, '🪜': 10,
+        '🧱': 10, '🪑': 10, '🛋️': 10, '🛝': 10, '🥅': 10,
+        '🗑️': 10, '🪙': 10, '🕰️': 10, '⏰': 10, '⚽': 10,
+        '🏀': 10, '🏐': 10, '🏈': 10, '♟️': 10, '🎰': 10,
+        '🐚': 10, '🎵': 10, '🎶': 10,
         '🎐': 10, '🪩': 10, '🎎': 10, '🪅': 10, '📫': 10,
         '📮': 10, '🪞': 10, '⛲': 10, '🪦': 10, '💈': 10,
         '🪺': 10, '⛩️': 10, '🕋': 10, '🛕': 10, '🕍': 10,
@@ -2550,7 +2547,21 @@
         '🛴': 10, '🚜': 10, '🚛': 10, '🚚': 10, '🛻': 10,
         '🚐': 10, '🚒': 10, '🚑': 10, '🚓': 10, '🏎️': 10,
         '🚎': 10, '🚌': 10, '🚙': 10, '🚕': 10, '🚗': 10,
-        '⛽': 10, '🚁': 10, '🛸': 10, '🕳️': 10
+        '⛽': 10, '🚁': 10, '🛸': 10, '🕳️': 10,
+        '🩷': 10, '❤️': 10, '🧡': 10, '💛': 10, '💚': 10,
+        '🩵': 10, '💙': 10, '💜': 10, '🖤': 10, '🩶': 10,
+        '🤍': 10, '🤎': 10, '🟥': 10, '🟧': 10,
+        '🟨': 10, '🟩': 10, '🟦': 10, '🟪': 10, '⬛': 10,
+        '⬜': 10, '🟫': 10, '🏳️': 10, '🏴': 10, '🚩': 10,
+        '🏁': 10, '🔰': 10, '♻️': 10, '⚠️': 10, '🚸': 10,
+        '❌': 10, '✖️': 10, '🟰': 10, '➕': 10, '➖': 10,
+        '❗': 10, '❕': 10, '💠': 10, '🆗': 10, '🆓': 10,
+        '🆙': 10, '🆒': 10, '🆕': 10, '0️⃣': 10, '1️⃣': 10,
+        '2️⃣': 10, '3️⃣': 10, '4️⃣': 10, '5️⃣': 10, '6️⃣': 10,
+        '7️⃣': 10, '8️⃣': 10, '9️⃣': 10, '🔟': 10, '➡️': 10,
+        '⬅️': 10, '⬆️': 10, '⬇️': 10, '↗️': 10, '↘️': 10,
+        '↙️': 10, '↖️': 10, '↪️': 10, '↩️': 10, '⤴️': 10,
+        '⤵️': 10
     }
 
     const initgarden = () => {
@@ -2848,7 +2859,7 @@
 
     const returnEmojiFromGrid = (emoji) => {
         // kalau inventory kembalikan ke inventory
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        const plant = plantTypes.find(p => p.emoji === emoji);
         if (plant != undefined) {
             if (!gameState.inventory[emoji]) {
                 gameState.inventory[emoji] = 0;

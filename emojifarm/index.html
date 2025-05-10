@@ -125,6 +125,30 @@
         </span>
     </div>
 
+    <div class="grid-container" id="garden-container">
+        <span id="copy-button">
+            <span style="position:relative;margin-left:-1px;margin-top:1px;">🟩</span>
+            <span style="position:absolute;margin-left:-18px;margin-top:-4px;">🟩</span>
+        </span>
+        <span id="garden-button">⛲</span>
+        <div class="garden-grid" id="gardenGrid"></div>
+        <div id="wrapgrid-inventory">
+            <span id="closegardeninventory">❌</span>
+            <span id="clearselected">Clear</span>
+            <span id="sellselected">Sell</span>
+
+            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
+                <span class="market-garden active" data-tab="inventory">📦
+                    Inventory</span>
+                <span class="market-garden" data-tab="object">⛲ Item</span>
+                <span class="market-garden" data-tab="market">🛍️ Market</span>
+            </div>
+            <div class="grid-inventory" id="grid-inventory"></div>
+            <div class="grid-inventory" id="grid-object"></div>
+            <div class="grid-inventory" id="grid-market"></div>
+        </div>
+    </div>
+
 
     <div class="last-played" id="last-played" style="display:none;"></div>
 
@@ -171,31 +195,6 @@
                 <button class="popup-button popup-cancel" id="popup-cancel">❌</button>
             </div>
         </div>
-    </div>
-
-    <div class="grid-container" id="garden-container">
-        <span id="copy-button">
-            <span style="position:relative;margin-left:-1px;margin-top:1px;">🟩</span>
-            <span style="position:absolute;margin-left:-18px;margin-top:-4px;">🟩</span>
-        </span>
-        <span id="garden-button">⛲</span>
-        <div class="garden-grid" id="gardenGrid"></div>
-        <div id="wrapgrid-inventory">
-            <span id="closegardeninventory">❌</span>
-            <span id="clearselected">Clear</span>
-            <span id="sellselected">Sell</span>
-
-            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
-                <span class="market-garden active" data-tab="inventory">📦
-                    Inventory</span>
-                <span class="market-garden" data-tab="object">⛲ Item</span>
-                <span class="market-garden" data-tab="market">🛍️ Market</span>
-            </div>
-            <div class="grid-inventory" id="grid-inventory"></div>
-            <div class="grid-inventory" id="grid-object"></div>
-            <div class="grid-inventory" id="grid-market"></div>
-        </div>
-    </div>
     </div>
 
     <audio id="background-audio" loop controls hidden>
