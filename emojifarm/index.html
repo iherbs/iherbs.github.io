@@ -62,8 +62,9 @@
             <span id="menu-pet">🐾</span>
             <span id="play-minigame">🌿</span>
             <span id="play-dropcrops">🥗</span>
-            <span id="garden" style="display: none">⛲</span>
+            <span id="garden">⛲</span>
         </div>
+        <span id="farm-button">🌱</span>
 
         <div id="wrapinventory">
             <div class="inventory">
@@ -173,10 +174,26 @@
     </div>
 
     <div class="grid-container" id="garden-container">
+        <span id="copy-button">
+            <span style="position:relative;margin-left:-1px;margin-top:1px;">🟩</span>
+            <span style="position:absolute;margin-left:-18px;margin-top:-4px;">🟩</span>
+        </span>
+        <span id="garden-button">⛲</span>
         <div class="garden-grid" id="gardenGrid"></div>
         <div id="wrapgrid-inventory">
+            <span id="closegardeninventory">❌</span>
             <span id="clearselected">Clear</span>
-            <div class="inventory" id="grid-inventory"></div>
+            <span id="sellselected">Sell</span>
+
+            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
+                <span class="market-garden active" data-tab="inventory">📦
+                    Inventory</span>
+                <span class="market-garden" data-tab="object">⛲ Item</span>
+                <span class="market-garden" data-tab="market">🛍️ Market</span>
+            </div>
+            <div class="grid-inventory" id="grid-inventory"></div>
+            <div class="grid-inventory" id="grid-object"></div>
+            <div class="grid-inventory" id="grid-market"></div>
         </div>
     </div>
     </div>

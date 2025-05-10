@@ -16,16 +16,93 @@
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.2);
 }
 
+#farm-button {
+    position: absolute;
+    top: 52px;
+    right: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 12px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 1px 3px #ddd;
+    z-index: 6;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#garden-button {
+    cursor: pointer;
+    position: fixed;
+    bottom: -29px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 75px;
+    height: 70px;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 50%;
+    font-size: 1.7rem;
+    text-align: center;
+    box-shadow: 0px 0px 3px #a6a6a6;
+    z-index: 2;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#copy-button {
+    cursor: pointer;
+    position: fixed;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-left: 60px;
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 50%;
+    font-size: 1rem;
+    text-align: center;
+    box-shadow: 0px 0px 3px #a6a6a6;
+    z-index: 2;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.market-garden {
+    width: 32% !important;
+}
+
+#closegardeninventory {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 7px;
+    -webkit-tap-highlight-color: transparent;
+}
+
 #clearselected {
     display: none;
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     right: 10px;
     border-radius: 20px;
     background: #ffffff;
     text-align: center;
     padding: 7px 15px;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    -webkit-tap-highlight-color: transparent;
+}
+
+#sellselected {
+    display: none;
+    position: absolute;
+    bottom: 0px;
+    left: 10px;
+    border-radius: 20px;
+    background: #ffffff;
+    text-align: center;
+    padding: 7px 15px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    -webkit-tap-highlight-color: transparent;
 }
 
 #wrapgrid-inventory {
@@ -35,22 +112,29 @@
     bottom: 0px;
     height: 210px;
     padding-top: 30px;
-    border-top: 2px dashed var(--soil-color);
-    z-index: 1;
+    transform: translateY(220px);
+    transition: all 0.3s ease;
+    box-shadow: 0 -3px 5px rgba(50, 50, 50, 0.1);
+    z-index: 2;
 }
 
-#grid-inventory {
+.grid-inventory {
+    margin-bottom: 0px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;
     display: grid;
     height: 100%;
     width: 100%;
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(4, auto);
+    justify-content: center;
     grid-auto-flow: row;
     font-size: 1.5rem;
     gap: 10px;
-    overflow-x: auto;
     padding-top: 15px;
     padding-bottom: 45px;
     overflow: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .inventorygrid-item {
@@ -64,6 +148,7 @@
     max-height: 65px;
     border-radius: 5px;
     border: 1px solid #ddd;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .garden-grid {
@@ -98,6 +183,7 @@
     transition: background-color 0.3s ease;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .grid-cell:hover,

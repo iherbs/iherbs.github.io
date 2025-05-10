@@ -739,7 +739,8 @@
                             const quantityInput = _('#sell-quantity');
                             const quantity = parseInt(quantityInput.value);
                             if (quantity > 0 && quantity <= count) {
-                                gameState.money += quantity * (getPlantCost(emoji) + 2) || 0;
+                                const sell = quantity * (getPlantCost(emoji) + 2) || 0;
+                                gameState.money += sell;
                                 gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
                                 gameState.inventory[emoji] -= quantity;
                                 if (gameState.inventory[emoji] <= 0) {
@@ -747,7 +748,7 @@
                                 }
                                 updateUI();
                                 saveGame();
-                                showNotification(`Sold ${quantity} ${plantName} for 🪙${quantity * getPlantValue(emoji)}!`);
+                                showNotification(`Sold ${quantity} ${plantName} for 🪙${sell}!`);
                             }
                         }
                     });
@@ -2458,7 +2459,6 @@
                 mypet.classList.add('dragging');
                 const x = e.clientX - ((window.innerWidth - containerWidth) / 2);
                 const y = e.clientY - 25;
-                console.log(`Dragging: ${x}, ${y}`);
                 mypet.style.left = x + 'px';
                 mypet.style.top = y + 'px';
                 lastX = x;
@@ -2512,12 +2512,15 @@
     // ======================================================================================
     _("#garden").addEventListener("click", function () {
         _("#garden-container").style.display = "flex";
+        _("#farm-button").style.display = "block";
         loadinventory();
     });
     const rows = 15; // Jumlah baris
     const cols = 11; // 11 kolom
     const gardenGrid = document.getElementById('gardenGrid');
     const inventoryGrid = document.getElementById('grid-inventory');
+    const objectGrid = document.getElementById('grid-object');
+    const marketGrid = document.getElementById('grid-market');
     let selectedEmoji = null;
     let draggedElement = null;
     let ghostElement = null;
@@ -2527,6 +2530,28 @@
         inventory: {},
         garden: []
     };
+    const gardenItem = {
+        '🪨': 10, '🪵': 10, '🚧': 10, '🌳': 10, '🗿': 10, '🪴': 10,
+        '🪸': 10, '🎍': 10, '🍀': 10, '⚱️': 10, '🎁': 10,
+        '🏺': 10, '🎈': 10, '🎏': 10, '🚪': 10, '🪟': 10,
+        '🩷': 10, '❤️': 10, '🧡': 10, '💛': 10, '💚': 10,
+        '🩵': 10, '💙': 10, '💜': 10, '🖤': 10, '🩶': 10,
+        '🤍': 10, '🤎': 10, '💎': 10, '🎀': 10, '🏮': 10,
+        '🎐': 10, '🪩': 10, '🎎': 10, '🪅': 10, '📫': 10,
+        '📮': 10, '🪞': 10, '⛲': 10, '🪦': 10, '💈': 10,
+        '🪺': 10, '⛩️': 10, '🕋': 10, '🛕': 10, '🕍': 10,
+        '🕌': 10, '⛪': 10, '🏛️': 10, '💒': 10, '🏩': 10,
+        '🏫': 10, '🏪': 10, '🏨': 10, '🏦': 10, '🏥': 10,
+        '🏤': 10, '🏣': 10, '🏬': 10, '🏢': 10, '🏭': 10,
+        '🏗️': 10, '🏚️': 10, '🏡': 10, '🏠': 10, '🛖': 10,
+        '⛺': 10, '🗻': 10, '🏔️': 10, '⛰️': 10, '🌋': 10,
+        '🎡': 10, '🏯': 10, '🏰': 10, '🚋': 10, '🚃': 10,
+        '🚟': 10, '🛺': 10, '🏍️': 10, '🛵': 10, '🚲': 10,
+        '🛴': 10, '🚜': 10, '🚛': 10, '🚚': 10, '🛻': 10,
+        '🚐': 10, '🚒': 10, '🚑': 10, '🚓': 10, '🏎️': 10,
+        '🚎': 10, '🚌': 10, '🚙': 10, '🚕': 10, '🚗': 10,
+        '⛽': 10, '🚁': 10, '🛸': 10, '🕳️': 10
+    }
 
     const initgarden = () => {
         // Buat grid
@@ -2544,23 +2569,146 @@
             cell.addEventListener('touchmove', (e) => handleGridTouchMove(e, cell));
             cell.addEventListener('touchend', (e) => handleGridTouchEnd(e, cell));
             cell.addEventListener('click', (e) => {
-                addEmojiToGrid(selectedEmoji, cell);
+                addEmojiToGrid(cell);
             });
             gardenGrid.appendChild(cell);
         }
 
         loadGridState();
         loadinventory();
+        gardenMarketTabs();
     }
+
+    _("#farm-button").addEventListener("click", function () {
+        _("#garden-container").style.display = "none";
+        _("#farm-button").style.display = "none";
+    });
+
+    _("#closegardeninventory").addEventListener("click", function () {
+        // clearSelectedEmoji();
+        toggleGardenInventory();
+    });
+
+    _("#garden-button").addEventListener("click", function () {
+        toggleGardenInventory();
+    });
+
+    _("#copy-button").addEventListener("click", function () {
+        copyGrid();
+    });
 
     _("#clearselected").addEventListener("click", function () {
         clearSelectedEmoji();
     });
 
+    _("#sellselected").addEventListener("click", function () {
+        if (gardenState.inventory[selectedEmoji.emoji] != undefined) {
+            const emoji = selectedEmoji.emoji;
+            const cost = gardenItem[emoji];
+            const count = gardenState.inventory[emoji];
+            showPopup(`
+                Sell ${emoji} for 🪙${(cost)} each?<br>
+                <button type="button" id="qtysellmin" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➖</button>
+                <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:right;outline:none;">
+                <button type="button" id="qtyselladd" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➕</button>
+                <div>Total: 🪙<span id="sell-total">${count * (cost)}</span></div>
+            `).then(confirmed => {
+                if (confirmed) {
+                    const quantityInput = _('#sell-quantity');
+                    const quantity = parseInt(quantityInput.value);
+                    if (quantity > 0 && quantity <= count) {
+                        const sell = quantity * cost || 0;
+                        gameState.money += sell;
+                        gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
+                        gardenState.inventory[emoji] -= quantity;
+                        if (gardenState.inventory[emoji] <= 0) {
+                            delete gardenState.inventory[emoji];
+                        }
+                        updateUI();
+                        saveGame();
+                        loadinventory();
+                        saveGridState();
+                        showNotification(`Sold ${quantity} ${emoji} for 🪙${sell}!`);
+                    }
+                }
+            });
+
+            _('#sell-quantity').addEventListener('input', (e) => {
+                let quantity = parseInt(e.target.value);
+                if (quantity < 1) { quantity = 1; }
+                if (quantity > count) { quantity = count; }
+                if (isNaN(quantity)) {
+                    quantity = 0;
+                } else {
+                    e.target.value = quantity;
+                }
+                _('#sell-total').textContent = quantity * (cost);
+            });
+
+            _('#qtysellmin').addEventListener('click', () => {
+                let qty = parseInt(_('#sell-quantity').value) - 1;
+                if (qty < 1) {
+                    qty = 1;
+                    _('#sell-quantity').value = 1;
+                } else {
+                    _('#sell-quantity').value = qty;
+                }
+                _('#sell-total').textContent = qty * (cost);
+            });
+
+            _('#qtyselladd').addEventListener('click', () => {
+                let qty = parseInt(_('#sell-quantity').value) + 1;
+                if (qty > count) {
+                    qty = count
+                    _('#sell-quantity').value = count;
+                } else {
+                    _('#sell-quantity').value = qty;
+                }
+                _('#sell-total').textContent = qty * (cost);
+            });
+        }
+    });
+
+    const toggleGardenInventory = () => {
+        if (_('#wrapgrid-inventory').style.transform == 'translateY(-15px)') {
+            _('#wrapgrid-inventory').style.transform = 'translateY(220px)';
+        } else {
+            _('#wrapgrid-inventory').style.transform = 'translateY(-15px)';
+        }
+    }
+
     const clearSelectedEmoji = () => {
         selectedEmoji = null;
         document.querySelectorAll('.inventorygrid-item').forEach(i => i.classList.remove('itemselected'));
         _("#clearselected").style.display = "none";
+        _("#sellselected").style.display = "none";
+    }
+
+    const initinventorygrid = () => {
+        // Inisialisasi item inventaris
+        document.querySelectorAll('.inventorygrid-item').forEach(item => {
+            item.addEventListener('click', () => {
+                let activetab = '';
+                document.querySelectorAll('.market-garden').forEach(tab => {
+                    if (tab.classList.length == 2) {
+                        activetab = tab.dataset.tab;
+                    }
+                });
+
+                let cost = 0;
+                if (activetab == 'market') {
+                    cost = gardenItem[item.dataset.item] != undefined ? gardenItem[item.dataset.item] : 0;
+                }
+                selectedEmoji = { emoji: item.dataset.item, cost: cost };
+
+                document.querySelectorAll('.inventorygrid-item').forEach(i => i.classList.remove('itemselected'));
+                item.classList.add('itemselected');
+                _("#clearselected").style.display = "block";
+                if (activetab == 'object') {
+                    _("#sellselected").style.display = "block";
+                }
+            });
+        });
     }
 
 
@@ -2576,22 +2724,153 @@
                 inventoryGrid.appendChild(item);
             }
         });
+        inventoryGrid.innerHTML += '<br>';
 
         // Inisialisasi item inventaris
-        document.querySelectorAll('.inventorygrid-item').forEach(item => {
-            // item.addEventListener('dragstart', handleGridDragStart);
-            // item.addEventListener('dragend', handleGridDragEnd);
-            // item.addEventListener('touchstart', (e) => handleGridTouchStart(e, item));
-            // item.addEventListener('touchmove', (e) => handleGridTouchMove(e, item));
-            // item.addEventListener('touchend', (e) => handleGridTouchEnd(e, item));
-            item.addEventListener('click', () => {
-                selectedEmoji = item.dataset.item;
-                document.querySelectorAll('.inventorygrid-item').forEach(i => i.classList.remove('itemselected'));
-                item.classList.add('itemselected');
-                _("#clearselected").style.display = "block";
+        // document.querySelectorAll('.inventorygrid-item').forEach(item => {
+        // item.addEventListener('dragstart', handleGridDragStart);
+        // item.addEventListener('dragend', handleGridDragEnd);
+        // item.addEventListener('touchstart', (e) => handleGridTouchStart(e, item));
+        // item.addEventListener('touchmove', (e) => handleGridTouchMove(e, item));
+        // item.addEventListener('touchend', (e) => handleGridTouchEnd(e, item));
+        // });
+
+        objectGrid.innerHTML = '';
+        Object.entries(gardenState.inventory).forEach(([emoji, count]) => {
+            if (count > 0) {
+                const item = document.createElement('div');
+                item.className = 'inventorygrid-item';
+                // item.setAttribute("draggable", "true");
+                item.setAttribute("data-item", emoji);
+                item.innerHTML = `${emoji}<br><span style="font-size:15px;">${count}</span>`;
+                objectGrid.appendChild(item);
+            }
+        });
+        objectGrid.innerHTML += '<br>';
+
+        marketGrid.innerHTML = '';
+        Object.entries(gardenItem).forEach(([emoji, count]) => {
+            if (count > 0) {
+                const item = document.createElement('div');
+                item.className = 'inventorygrid-item';
+                // item.setAttribute("draggable", "true");
+                item.setAttribute("data-item", emoji);
+                item.innerHTML = `${emoji}<br><span style="font-size:15px;">🪙${count}</span>`;
+                marketGrid.appendChild(item);
+            }
+        });
+        marketGrid.innerHTML += '<br>';
+
+        initinventorygrid();
+    }
+
+
+    const gardenMarketTabs = () => {
+        document.querySelectorAll('.market-garden').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Hapus class active dari semua tab
+                document.querySelectorAll('.market-garden').forEach(t => t.classList.remove('active'));
+                // Tambahkan class active ke tab yang diklik
+                tab.classList.add('active');
+                // Tampilkan konten yang sesuai
+                const tabType = tab.dataset.tab;
+                _('#grid-inventory').style.display = tabType === 'inventory' ? 'grid' : 'none';
+                _('#grid-object').style.display = tabType === 'object' ? 'grid' : 'none';
+                _('#grid-market').style.display = tabType === 'market' ? 'grid' : 'none';
+                clearSelectedEmoji();
             });
         });
+    };
+
+    const addEmojiToGrid = (element) => {
+        // kalau inventory kurangi
+        // console.log(selectedEmoji);
+        if (selectedEmoji != null) {
+            const emoji = selectedEmoji.emoji;
+            const cost = selectedEmoji.cost;
+            if (gameState.inventory[emoji] != undefined) {
+                if (gameState.inventory[emoji] > 0) {
+                    if (element.textContent == '') {
+                        element.textContent = emoji;
+                        element.setAttribute("data-item", emoji);
+                        gameState.inventory[emoji]--;
+                        if (gameState.inventory[emoji] == 0) {
+                            clearSelectedEmoji();
+                        }
+                        saveGame();
+                        updateUI();
+                        loadinventory();
+                    }
+                } else {
+                    clearSelectedEmoji();
+                    if (emoji != null) {
+                        showNotification(`Not enough ${emoji} in inventory!`);
+                    }
+                }
+            } else {
+                // get from object
+                if (cost == 0) {
+                    if (gardenState.inventory[emoji] != undefined) {
+                        if (gardenState.inventory[emoji] > 0 && element.textContent == '') {
+                            element.textContent = emoji;
+                            element.setAttribute("data-item", emoji);
+                            gardenState.inventory[emoji]--;
+                            if (gardenState.inventory[emoji] == 0) {
+                                clearSelectedEmoji();
+                            }
+                            loadinventory();
+                        }
+                    } else {
+                        clearSelectedEmoji();
+                        if (emoji != null) {
+                            showNotification(`Not enough ${emoji} in inventory!`);
+                        }
+                    }
+                } else {
+                    if (gardenItem[emoji] != undefined) {
+                        if ((gameState.money - parseInt(cost)) >= 50) {
+                            if (element.textContent == '') {
+                                gameState.money -= parseInt(cost);
+                                element.textContent = emoji;
+                                element.setAttribute("data-item", emoji);
+                                loadinventory();
+                                updateUI();
+                            }
+                        } else {
+                            clearSelectedEmoji();
+                            showNotification(`can't buy, not good for your 🪙 health`);
+                        }
+                    } else {
+                        clearSelectedEmoji();
+                    }
+                }
+            }
+            saveGridState();
+        }
     }
+
+    const returnEmojiFromGrid = (emoji) => {
+        // kalau inventory kembalikan ke inventory
+        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
+        if (plant != undefined) {
+            if (!gameState.inventory[emoji]) {
+                gameState.inventory[emoji] = 0;
+            }
+            gameState.inventory[emoji]++;
+            saveGame();
+            updateUI();
+            loadinventory();
+        } else {
+            // kalau garden item kembalikan ke garden inventory
+            if (!gardenState.inventory[emoji]) {
+                gardenState.inventory[emoji] = 0;
+            }
+            gardenState.inventory[emoji]++;
+            loadinventory();
+        }
+        saveGridState();
+    }
+
 
     // Fungsi untuk menangani drag start
     const handleGridDragStart = (e) => {
@@ -2616,6 +2895,7 @@
                 const emptyImage = new Image();
                 emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAACwAAAAAAQABAAACAkQBADs';
                 e.dataTransfer.setDragImage(emptyImage, 0, 0);
+                selectedEmoji = null;
             } else {
                 e.preventDefault();
             }
@@ -2645,6 +2925,7 @@
         if (isRemove && draggedElement !== cell) {
             if (draggedElement.textContent != '') {
                 draggedElement.textContent = cell.textContent;
+                draggedElement.removeAttribute('data-item');
             } else {
                 draggedElement.textContent = '';
             }
@@ -2675,46 +2956,8 @@
             }, 100);
         }
         if (selectedEmoji != null) {
-            addEmojiToGrid(selectedEmoji, element);
+            addEmojiToGrid(element);
         }
-    }
-
-    const addEmojiToGrid = (emoji, element) => {
-        // kalau inventory kurangi
-        if (gameState.inventory[emoji] > 0) {
-            if (element.textContent == '') {
-                element.textContent = emoji;
-                gameState.inventory[emoji] = gameState.inventory[emoji] - 1;
-                saveGame();
-                loadinventory();
-            }
-        } else {
-            clearSelectedEmoji();
-            if (emoji != null) {
-                showNotification(`Not enough ${emoji} in inventory!`);
-            }
-        }
-        saveGridState();
-    }
-
-    const returnEmojiFromGrid = (emoji) => {
-        // kalau inventory kembalikan ke inventory
-        const plant = gameState.plantTypes.find(p => p.emoji === emoji);
-        if (plant != undefined) {
-            if (!gameState.inventory[emoji]) {
-                gameState.inventory[emoji] = 0;
-            }
-            gameState.inventory[emoji] = gameState.inventory[emoji] + 1;
-            saveGame();
-            loadinventory();
-        } else {
-            // kalau garden item kembalikan ke garden inventory
-            if (!gardenState.inventory[emoji]) {
-                gardenState.inventory[emoji] = 0;
-            }
-            gardenState.inventory[emoji]++;
-        }
-        saveGridState();
     }
 
     const handleGridTouchMove = (e, element) => {
@@ -2752,6 +2995,7 @@
                 if (isRemove && draggedElement !== target) {
                     if (target.textContent != '') {
                         draggedElement.textContent = target.textContent;
+                        draggedElement.removeAttribute('data-item');
                     } else {
                         draggedElement.textContent = '';
                     }
@@ -2762,6 +3006,7 @@
             } else if (draggedElement.classList.contains('grid-cell') && draggedElement.textContent) {
                 // kembalikan inventory
                 returnEmojiFromGrid(draggedElement.textContent);
+                draggedElement.setAttribute("data-item", "");
                 draggedElement.textContent = ''; // Hapus jika diseret ke luar
             }
 
@@ -2779,6 +3024,7 @@
             if (isRemove && draggedElement.textContent) {
                 // kembalikan inventory
                 returnEmojiFromGrid(draggedElement.textContent);
+                draggedElement.setAttribute("data-item", "");
                 draggedElement.textContent = '';
                 saveGridState(); // Simpan status grid setelah penghapusan
             }
@@ -2802,7 +3048,7 @@
             let rowText = '';
             for (let col = 0; col < cols; col++) {
                 const cellIndex = row * cols + col;
-                const cellContent = cells[cellIndex].textContent || '🟩';
+                const cellContent = cells[cellIndex].textContent || '▫️';
                 rowText += `${cellContent}`;
             }
             gridText += rowText + '\n';
@@ -2810,10 +3056,10 @@
 
         // Salin ke clipboard
         navigator.clipboard.writeText(gridText).then(() => {
-            alert('Copied.');
+            showNotification('Copied');
         }).catch(err => {
-            console.error('Gagal menyalin ke clipboard:', err);
-            alert('Gagal menyalin grid. Silakan coba lagi.');
+            console.error('Failed to copy to clipboard: ', err);
+            showNotification('Failed to copy to clipboard');
         });
     }
 
@@ -2833,12 +3079,12 @@
         const gridState = Array.from(cells).map(cell => cell.textContent || '');
         gardenState['garden'] = gridState;
         gardenState.checksum = gardenChecksum(gardenState);
-        localStorage.setItem('gardenState', JSON.stringify(gardenState));
+        localStorage.setItem('gardenGrid', JSON.stringify(gardenState));
     }
 
     // Fungsi untuk memuat status grid dari localStorage
     const loadGridState = () => {
-        const savedState = localStorage.getItem('gardenState');
+        const savedState = localStorage.getItem('gardenGrid');
         if (savedState) {
             const parsed = JSON.parse(savedState);
 

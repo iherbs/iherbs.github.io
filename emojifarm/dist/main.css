@@ -616,7 +616,8 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-.market-tab {
+.market-tab,
+.market-garden {
     display: inline-block;
     position: relative;
     top: 0.9px;
@@ -631,7 +632,8 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-.market-tab.active {
+.market-tab.active,
+.market-garden.active {
     border-top: 1px solid #dddddd;
     border-left: 1px solid #dddddd;
     border-right: 1px solid #dddddd;
