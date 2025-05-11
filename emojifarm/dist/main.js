@@ -342,10 +342,11 @@
             const item = document.createElement('div');
             item.className = 'market-item';
             item.dataset.emoji = plant.emoji;
+
             item.innerHTML = `
                 <div class="market-item-emoji">${plant.emoji}</div>
                 <div class="market-item-name">${plant.name}</div>
-                <div class="market-item-cost">🪙${plant.cost}</div>
+                <div class="market-item-cost">🪙${getPlantCost(plant.emoji)}</div>
             `;
             item.addEventListener('click', async () => {
                 // Remove selected class from all items
@@ -358,7 +359,6 @@
                             if ((gameState.money - seedCost) >= 50) {
                                 gameState.money -= seedCost;
                                 gameState.plotCount++;
-                                plantTypes.find(p => p.emoji === '🟫').cost = plantTypes.find(p => p.emoji === '🟫').cost + 300;
                                 updateUI();
                                 createFarmPlots();
                                 populateMarket();
@@ -829,7 +829,8 @@
 
     const getPlantCost = (emoji) => {
         const plant = plantTypes.find(p => p.emoji === emoji);
-        return plant ? plant.cost : 0;
+        const landprice = (gameState.plotCount - 3) * 300;
+        return plant ? (plant.emoji == "🟫" ? landprice : plant.cost) : 0;
     }
 
     const getPlantName = (emoji) => {
@@ -2521,14 +2522,14 @@
         garden: []
     };
     const gardenItem = {
-        '🪨': 10, '🪵': 10, '🚧': 10, '🌳': 10, '🗿': 10, '🪴': 10,
-        '🪸': 10, '🎍': 10, '🍀': 10, '⚱️': 10, '🎁': 10,
+        '🪨': 10, '🪵': 10, '🚧': 10, '🌱': 10, '🌿': 10,
+        '🌳': 10, '🌴': 10, '🌲': 10, '🎄': 10, '🌵': 10,
+        '🪴': 10, '🪸': 10, '🎍': 10, '🍀': 10, '⚱️': 10,
         '🏺': 10, '🎈': 10, '🎏': 10, '🚪': 10, '🪟': 10,
-        '💎': 10, '🎀': 10, '🏮': 10, '☁️': 10,
+        '💎': 10, '🎀': 10, '🏮': 10, '☁️': 10, '🗿': 10,
         '🌧️': 10, '🌨️': 10, '☀️': 10, '⭐': 10, '🌕': 10,
         '🌙': 10, '🌫️': 10, '❄️': 10, '🫧': 10, '⚡': 10,
-        '🔥': 10, '🌈': 10, '🕸️': 10, '🌱': 10, '🌿': 10,
-        '🌴': 10, '🌲': 10, '🎄': 10, '🌵': 10, '⛄': 10,
+        '🔥': 10, '🌈': 10, '🕸️': 10, '⛄': 10, '🎁': 10,
         '🕯️': 10, '📺': 10, '📻': 10, '📡': 10, '🪜': 10,
         '🧱': 10, '🪑': 10, '🛋️': 10, '🛝': 10, '🥅': 10,
         '🗑️': 10, '💰': 10, '🕰️': 10, '⏰': 10, '⚽': 10,
@@ -3123,7 +3124,9 @@
             const cells = document.querySelectorAll('.grid-cell');
             cells.forEach((cell, index) => {
                 if (gardenState.garden.length == 0) {
-                    cell.textContent = '🌳';
+                    if (index == 82) {
+                        cell.textContent = '⛲';
+                    }
                 }
             });
         }
