@@ -2594,10 +2594,10 @@
     _("#farm-button").addEventListener("click", function () {
         _("#garden-container").style.display = "none";
         _("#farm-button").style.display = "none";
+        clearSelectedEmoji();
     });
 
     _("#closegardeninventory").addEventListener("click", function () {
-        // clearSelectedEmoji();
         toggleGardenInventory();
     });
 
