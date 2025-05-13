@@ -984,7 +984,7 @@
 
     window.onclick = (event) => {
         // console.log(event.target);
-        if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.progress-wrap') && !event.target.matches('.progress-icon') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost') && !event.target.matches('#pet-emoji-container') && !event.target.matches('#pet-emoji')) {
+        if (!event.target.matches('.plot') && !event.target.matches('.plant') && !event.target.matches('.progress-container') && !event.target.matches('.progress-wrap') && !event.target.matches('.progress-icon') && !event.target.matches('.progress-bar') && !event.target.matches('.farm-grid') && !event.target.matches('.market') && !event.target.matches('.market-items') && !event.target.matches('.market-item') && !event.target.matches('.market-item-emoji') && !event.target.matches('.market-item-name') && !event.target.matches('.market-item-cost') && !event.target.matches('#pet-emoji-container') && !event.target.matches('#pet-emoji')) {
             selectedSeed = null;
             marketbtn.innerHTML = '🌱';
             document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
