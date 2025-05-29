@@ -2299,12 +2299,14 @@
         if (finish) {
             const availablePlants = getAvailablePlants(gameState.level).filter(p => p.emoji !== '🟫');
             availablePlants.sort((a, b) => b.cost - a.cost);
-            const reward = (availablePlants[0].cost * 10) * 0.8;
+            const reward = (availablePlants[0].cost * 15);
             gameState.money += reward;
             if (gameState.pet.length > 0) {
-                petHungerHandler(50);
+                petHungerHandler(70);
                 showNotification(`Got 🪙 ${reward} & Pet Hunger: ${Math.round(gameState.pet[0].hunger)}`);
                 updatePetUI();
+            } else {
+                showNotification(`Got 🪙 ${reward}`);
             }
             checkLevelUp();
             updateUI();
