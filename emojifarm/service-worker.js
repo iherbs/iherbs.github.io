@@ -1,9 +1,27 @@
 const CACHE_NAME = 'EF-EMOJIFARM';
 const toCache = [
     '/',
-    'assets/js/web.webmanifest',
-    'assets/js/register.js',
-    'assets/img/icon.png',
+    '/emojifarm/',
+    '/emojifarm/icon.png',
+    '/emojifarm/music/',
+    '/emojifarm/font/',
+    '/emojifarm/assets/js/web.webmanifest',
+    '/emojifarm/assets/js/register.js',
+    '/emojifarm/assets/img/icon.png',
+    '/emojifarm/index.html',
+    '/emojifarm/dist/main.js',
+    '/emojifarm/dist/main.css',
+    '/emojifarm/dist/decor.css',
+    '/emojifarm/dist/matter.min.js',
+    '/emojifarm/font/Delius.ttf',
+    '/emojifarm/font/twemoji.ttf',
+    '/emojifarm/font/NotoColorEmoji.ttf',
+    '/emojifarm/music/tap.wav',
+    '/emojifarm/music/levelup.wav',
+    '/emojifarm/music/match.wav',
+    '/emojifarm/music/done.wav',
+    '/emojifarm/music/growth.wav',
+    '/emojifarm/music/CozyGardenSerenity.mp3',
 ];
 
 self.addEventListener('install', function (event) {
