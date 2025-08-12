@@ -2370,7 +2370,7 @@
                 }
             }
         } else {
-            showPopup(`Plant Match can be played at level ${levelrequire}`, 'Level Requirement', false);
+            showPopup(`Drop Crops can be played at level ${levelrequire}`, 'Level Requirement', false);
         }
     }
 
