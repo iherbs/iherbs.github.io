@@ -129,6 +129,20 @@ function setTheme() {
   }
 }
 
+function setIsyarat() {
+  if (_("#btnisyarat").checked == true) {
+    localStorage.setItem("isyarat", "true");
+    _(".isyarat").forEach(function (el) {
+      el.style.display = "block";
+    });
+  } else {
+    localStorage.setItem("isyarat", "false");
+    _(".isyarat").forEach(function (el) {
+      el.style.display = "none";
+    });
+  }
+}
+
 function setTransliteration() {
   if (_("#btntransliteration").checked == true) {
     localStorage.setItem("transliteration", "true");
@@ -363,6 +377,7 @@ async function getsurah(surat = 1, nayah = "") {
   // console.log(re);
 
   let ayah = "", page = 0;
+  let isyarat = localStorage.getItem("isyarat");
   let transliteration = localStorage.getItem("transliteration");
   let translate = localStorage.getItem("translate");
   let tajweed = localStorage.getItem("tajweed");
@@ -386,6 +401,9 @@ async function getsurah(surat = 1, nayah = "") {
                   <div class="star8" style="cursor:pointer;position:relative;" data-label="${re[i]["no_ayah"]}" onclick="showtafsir(${re[i]["id"]})"></div>
                   <div class="arabic" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;">
                       ${parseArabic(re[i]["text_ayah"], tajweed)}
+                  </div>
+                  <div class="isyarat" style="width:100%;text-align:right;font-size:27px;line-height:2.3;margin-top:12px;margin-bottom:10px;direction:rtl;display:${isyarat == "true" ? 'block' : 'none'}">
+                      ${re[i]["text_ayah"]}
                   </div>
                   <span class="artr" style="display:${transliteration == "true" ? 'block' : 'none'}"><i>${re[i]["transliteration"]}</i></span>
                   <span class="arid" style="display:${translate == "true" ? 'block' : 'none'}">${re[i]["text_id"].replaceAll("<sup>", `<sup class="fnote" onclick="showfnote(${i})">`)}</span>
@@ -2014,6 +2032,9 @@ if (theme == "auto") {
   }
 }
 
+if (localStorage.getItem("isyarat") == "true") {
+  _("#btnisyarat").checked = true;
+}
 if (localStorage.getItem("transliteration") == "true") {
   _("#btntransliteration").checked = true;
 }

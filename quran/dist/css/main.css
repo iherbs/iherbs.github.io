@@ -47,6 +47,12 @@
 }
 
 @font-face {
+  font-family: "Isyarat";
+  font-style: "normal";
+  src: url("../../dist/font/Isyarat.woff2") format("woff2");
+}
+
+@font-face {
   font-family: "Poppins";
   font-style: "normal";
   src: url("../../dist/font/Poppins-Regular.ttf") format("truetype");
@@ -106,6 +112,12 @@ a {
 
 .arabic {
   font-family: "Arabic";
+  color: var(--color-arabic);
+  word-break: break-word;
+}
+
+.isyarat {
+  font-family: "Isyarat";
   color: var(--color-arabic);
   word-break: break-word;
 }
