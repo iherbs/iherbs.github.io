@@ -1667,42 +1667,44 @@ function newBookmark() {
   let ttladdbook = _("#ttladdbook").innerHTML;
   let name = _("#grupbookmark").value;
   let book = JSON.parse(localStorage.getItem("bookmark"));
-  if (ttladdbook.includes("Rename Bookmark")) {
-    let bmid = _("#bookmarkid").innerHTML;
-    let bookidold = book[bmid];
-    let bookold = localStorage.getItem(bookidold);
+  if (name != "") {
+    if (ttladdbook.includes("Rename Bookmark")) {
+      let bmid = _("#bookmarkid").innerHTML;
+      let bookidold = book[bmid];
+      let bookold = localStorage.getItem(bookidold);
 
-    book[bmid] = name;
-    localStorage.setItem("bookmark", JSON.stringify(book));
-
-    localStorage.setItem(name, bookold);
-    localStorage.removeItem(bookidold);
-    bataladdBookmark();
-    dataBookmark();
-  } else {
-    if (localStorage.getItem(name) == null) {
-      book.unshift(name);
+      book[bmid] = name;
       localStorage.setItem("bookmark", JSON.stringify(book));
-      if (markno != "") {
-        localStorage.setItem(name, '["' + markno + '"]');
-        markno = "";
-        _("#bookmarkpage").modal("hide");
-      } else {
-        localStorage.setItem(name, "[]");
-        bataladdBookmark();
-        dataBookmark();
-      }
+
+      localStorage.setItem(name, bookold);
+      localStorage.removeItem(bookidold);
+      bataladdBookmark();
+      dataBookmark();
     } else {
-      // bookmark sudah ada
-      if (markno != "") {
-        addmdlBookmark(markno);
+      if (localStorage.getItem(name) == null) {
+        book.unshift(name);
+        localStorage.setItem("bookmark", JSON.stringify(book));
+        if (markno != "") {
+          localStorage.setItem(name, '["' + markno + '"]');
+          markno = "";
+          _("#bookmarkpage").modal("hide");
+        } else {
+          localStorage.setItem(name, "[]");
+          bataladdBookmark();
+          dataBookmark();
+        }
       } else {
-        bataladdBookmark();
-        dataBookmark();
+        // bookmark sudah ada
+        if (markno != "") {
+          addmdlBookmark(markno);
+        } else {
+          bataladdBookmark();
+          dataBookmark();
+        }
       }
     }
+    _("#grupbookmark").value = "";
   }
-  _("#grupbookmark").value = "";
 }
 
 function addBookmark(book = "", mark = "") {
