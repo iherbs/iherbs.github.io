@@ -68,11 +68,21 @@ function parseArabic(text, show = "true") {
         // text = text.replace(madda, '<tajweed class="madda">$&</tajweed>');
         text = text.replace(madda, function (match, capture) {
             if (match.includes('\u064F')) {
-                match = match.replace('\u064F', '');
-                return '\u064F <tajweed class="madda">' + match + '</tajweed>';
+                if (text.includes('\u064F\u0648')) {
+                    match = match.replace('\u064F', '');
+                    return '\u064F<tajweed class="madda">' + match + '</tajweed>';
+                } else {
+                    match = match.replace('\u064F', '');
+                    return '\u064F <tajweed class="madda">' + match + '</tajweed>';
+                }
             } else if (match.includes('\u0650')) {
-                match = match.replace('\u0650', '');
-                return '\u0650 <tajweed class="madda">' + match + '</tajweed>';
+                if (text.includes('\u0655\u0650') || text.includes('\u0641\u0650')) {
+                    match = match.replace('\u0650', '');
+                    return '\u0650<tajweed class="madda">' + match + '</tajweed>';
+                } else {
+                    match = match.replace('\u0650', '');
+                    return '\u0650 <tajweed class="madda">' + match + '</tajweed>';
+                }
             } else {
                 return '<tajweed class="madda">' + match + '</tajweed>';
             }
