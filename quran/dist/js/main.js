@@ -307,9 +307,11 @@ async function carikata(qry = "") {
         let n = parseInt(r) + parseInt(1);
         // console.log(stem(arr[r]['text_id']));
         let ayat = arr[r]["text_id"].toLowerCase();
+        let arbc = arr[r]["text_ayah"].toLowerCase();
+        let trnslt = arr[r]["transliteration"].toLowerCase().replaceAll('ā', 'a').replaceAll('ī', 'i').replaceAll('ṣ', 's').replaceAll('ṭ', 't').replaceAll('ṭ', 't').replaceAll('ḍ', 'd').replaceAll('ụ', 'u').replaceAll('ū', 'u').replaceAll('ż', 'z').replaceAll('ḥ', 'h');
         let ada = 0;
         for (w in kw) {
-          if (ayat.includes(kw[w])) {
+          if (ayat.includes(kw[w]) || trnslt.includes(kw[w]) || arbc.includes(kw[w])) {
             ada = ada + 1;
           }
         }
