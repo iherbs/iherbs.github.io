@@ -52,8 +52,13 @@ function parseArabic(text, show = "true") {
                 match = match.replace('\u0627 \u0643', '\u0627\u0643');
                 return '<tajweed class="ikhfa">' + match + '</tajweed>';
             } else if (match.includes('\u064B')) {
-                match = match.replace('\u064B', '');
-                return '\u064B <tajweed class="ikhfa">' + match + '</tajweed>';
+                if (text.includes('\u0643\u064E')) {
+                    match = match.replace('\u0643\u064E', '\u0643');
+                    return '<tajweed class="ikhfa">' + match + '\u064E</tajweed>';
+                } else {
+                    match = match.replace('\u064B', '');
+                    return '\u064B <tajweed class="ikhfa">' + match + '</tajweed>';
+                }
             } else if (match.includes('\u0643')) {
                 match = match.replace('\u0643', '');
                 return '<tajweed class="ikhfa">' + match + '</tajweed> \u0643';
