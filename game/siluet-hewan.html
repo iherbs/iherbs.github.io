@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tebak Hewan! 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fff9f0;
+    --panel: #ffffff;
+    --panel2: #fffbf5;
+    --gold: #ff9800;
+    --mint: #00bcd4;
+    --coral: #ff5252;
+    --lime: #66bb6a;
+    --lavender: #9c27b0;
+    --white: #ffffff;
+    --card-border: rgba(0,0,0,0.10);
+    --text-dark: #333;
+    --text-mid: #666;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Colorful polka dot background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle 6px at 8%  12%, #ffcdd2 0%, transparent 100%),
+      radial-gradient(circle 5px at 22% 75%, #b3e5fc 0%, transparent 100%),
+      radial-gradient(circle 7px at 42% 30%, #f8bbd0 0%, transparent 100%),
+      radial-gradient(circle 5px at 68% 18%, #dcedc8 0%, transparent 100%),
+      radial-gradient(circle 6px at 85% 65%, #ffe0b2 0%, transparent 100%),
+      radial-gradient(circle 4px at 55% 88%, #e1bee7 0%, transparent 100%),
+      radial-gradient(circle 6px at 15% 50%, #fff9c4 0%, transparent 100%),
+      radial-gradient(circle 5px at 92% 30%, #b2dfdb 0%, transparent 100%),
+      radial-gradient(circle 4px at 75% 90%, #fce4ec 0%, transparent 100%),
+      radial-gradient(circle 6px at 35% 55%, #e3f2fd 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 12px 30px;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 22px 0 16px;
+  }
+
+  .logo {
+    font-family: 'Lilita One', cursive;
+    font-size: clamp(2rem, 7vw, 3rem);
+    color: #ff6f00;
+    text-shadow: 3px 3px 0 #ffcc80, 6px 6px 0 rgba(255,111,0,0.15);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .tagline {
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* SCORE BAR */
+  .scorebar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background: white;
+    border: 2px solid #ffe082;
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 3px 0 #ffe082;
+  }
+
+  .chip .val { color: #ff6f00; font-size: 1.1rem; }
+
+  /* LEVEL PILLS */
+  .level-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .lpill {
+    width: 28px; height: 8px;
+    border-radius: 100px;
+    background: #e0e0e0;
+    transition: background 0.3s;
+  }
+  .lpill.done    { background: #26c6da; }
+  .lpill.current { background: #ff9800; box-shadow: 0 0 8px #ffcc02; }
+
+  /* INSTRUCTION */
+  .hint-bar {
+    text-align: center;
+    background: #e0f7fa;
+    border: 2px solid #80deea;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #00838f;
+    margin-bottom: 14px;
+    letter-spacing: 0.3px;
+  }
+
+  /* GAME BOARD */
+  .board {
+    position: relative;
+    background: #ffffff;
+    border-radius: 28px;
+    border: 3px solid #ffe082;
+    box-shadow: 0 8px 0 #ffcc02, 0 12px 30px rgba(255,152,0,0.15);
+    overflow: hidden;
+    padding: 18px 12px;
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* SVG overlay for lines */
+  #svg-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 20;
+    overflow: visible;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 44px 1fr;
+    gap: 0;
+    align-items: stretch;
+    position: relative;
+    z-index: 10;
+  }
+
+  .col { display: flex; flex-direction: column; gap: 10px; }
+
+  /* CENTER DIVIDER */
+  .center-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .vline {
+    width: 2px;
+    height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      #ffcc80 0px,
+      #ffcc80 6px,
+      transparent 6px,
+      transparent 13px
+    );
+    border-radius: 2px;
+  }
+
+  /* CARDS */
+  .card {
+    background: #fff8f0;
+    border-radius: 18px;
+    border: 2.5px solid #ffe0b2;
+    box-shadow: 0 4px 0 #ffcc80;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .card:hover   { transform: scale(1.04) translateY(-2px); box-shadow: 0 7px 0 #ffcc80; }
+  .card.active  { border-color: #ff9800; box-shadow: 0 4px 0 #e65100, 0 0 0 4px rgba(255,152,0,0.2); transform: scale(1.06) translateY(-2px); }
+  .card.matched { border-color: #26c6da; box-shadow: 0 4px 0 #00838f; cursor: default; pointer-events: none; background: #e0fdf4; }
+  .card.matched .card-label { color: #00838f; }
+
+  .card.wrong-shake { animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%  { transform: translateX(-7px); }
+    75%  { transform: translateX(7px); }
+  }
+
+  /* Silhouette: dark emoji on light background */
+  .sil-emoji {
+    font-size: clamp(2.2rem, 7vw, 3rem);
+    filter: brightness(0) saturate(100%);
+    line-height: 1;
+  }
+
+  .sil-q {
+    width: clamp(44px, 12vw, 60px);
+    height: clamp(44px, 12vw, 60px);
+    background: #fce4ec;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2rem, 6vw, 2.7rem);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+    border: 2px dashed #f48fb1;
+  }
+
+  /* Colorful animal */
+  .animal-emoji {
+    font-size: clamp(2.2rem, 7vw, 3rem);
+    line-height: 1;
+  }
+
+  .card-label {
+    font-size: clamp(0.68rem, 2.3vw, 0.85rem);
+    font-weight: 800;
+    color: #aaa;
+    text-align: center;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* Connection dots on cards */
+  .conn-dot {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 3px solid #ffcc80;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+    z-index: 30;
+  }
+
+  .col-left .card .conn-dot  { right: -8px; }
+  .col-right .card .conn-dot { left: -8px; }
+
+  .card.active .conn-dot     { background: #ff9800; border-color: #ff9800; box-shadow: 0 0 10px #ff9800; }
+  .card.matched .conn-dot    { background: #26c6da; border-color: #26c6da; box-shadow: 0 0 10px #26c6da; }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Lilita One', cursive;
+    font-size: 1rem;
+    padding: 11px 26px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .btn:active { transform: translateY(3px) !important; box-shadow: none !important; }
+
+  .btn-reset {
+    background: #f5f5f5;
+    color: #888;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 4px 0 #e0e0e0;
+  }
+  .btn-reset:hover { background: #eeeeee; transform: translateY(-2px); box-shadow: 0 6px 0 #e0e0e0; }
+
+  .btn-next {
+    background: linear-gradient(135deg, #ff9800, #ff6f00);
+    color: white;
+    box-shadow: 0 5px 0 #e65100;
+    display: none;
+  }
+  .btn-next.show { display: inline-block; }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #e65100; }
+
+  /* WIN OVERLAY */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,200,50,0.35);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .win-box {
+    background: white;
+    border: 4px solid #ffe082;
+    border-radius: 32px;
+    padding: 40px 46px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 10px 0 #ffcc02, 0 20px 60px rgba(255,152,0,0.25);
+    transform: scale(0.6) rotate(3deg);
+    transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .overlay.show .win-box { transform: scale(1) rotate(0deg); }
+
+  .win-trophy { font-size: 5rem; display: block; animation: float 2s ease-in-out infinite; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%  { transform: translateY(-8px); }
+  }
+
+  .win-title {
+    font-family: 'Lilita One', cursive;
+    font-size: 2.4rem;
+    color: #ff6f00;
+    text-shadow: 3px 3px 0 #ffe082;
+    margin: 10px 0 4px;
+  }
+
+  .win-stars { font-size: 2rem; letter-spacing: 5px; margin-bottom: 10px; }
+
+  .win-stats {
+    color: #888;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 22px;
+    line-height: 1.8;
+  }
+  .win-stats b { color: #00838f; }
+
+  /* CONFETTI */
+  .cf {
+    position: fixed;
+    top: -15px;
+    pointer-events: none;
+    z-index: 300;
+    border-radius: 3px;
+    animation: cf-fall linear forwards;
+  }
+  @keyframes cf-fall {
+    0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg) scale(0.5); opacity: 0; }
+  }
+
+  /* DRAG LINE preview */
+  #drag-line {
+    stroke: #ff9800;
+    stroke-width: 5;
+    stroke-dasharray: 9 5;
+    stroke-linecap: round;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo">🐾 Tebak Hewan!</div>
+    <p class="tagline">Cocokkan siluet dengan hewannya</p>
+  </header>
+
+  <div class="scorebar">
+    <div class="chip">✅ Benar <span class="val" id="sc-correct">0</span></div>
+    <div class="chip">❌ Salah <span class="val" id="sc-wrong">0</span></div>
+    <div class="chip">🎮 Level <span class="val" id="sc-level">1</span></div>
+  </div>
+
+  <div class="level-row" id="level-row"></div>
+
+  <div class="hint-bar" id="hint-bar">
+    👆 Klik siluet di kiri, lalu klik hewan yang sesuai di kanan!
+  </div>
+
+  <div class="board" id="board">
+    <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg">
+      <line id="drag-line" x1="0" y1="0" x2="0" y2="0" display="none"/>
+    </svg>
+    <div class="columns" id="columns">
+      <div class="col col-left"  id="col-left"></div>
+      <div class="center-col"><div class="vline"></div></div>
+      <div class="col col-right" id="col-right"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-reset" onclick="resetLevel()">🔄 Ulang</button>
+    <button class="btn btn-next show" id="btn-next" onclick="nextLevel()" style="display:none">▶ Level Berikutnya</button>
+  </div>
+
+</div>
+
+<!-- WIN -->
+<div class="overlay" id="overlay">
+  <div class="win-box">
+    <span class="win-trophy">🏆</span>
+    <div class="win-title">Kamu Hebat!</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-stats" id="win-stats"></div>
+    <button class="btn btn-next show" style="display:inline-block" onclick="restartAll()">🎮 Main Lagi</button>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const LEVELS = [
+  {
+    name: "Hewan Peliharaan",
+    animals: [
+      { sil: '🐶', emoji: '🐶', name: 'Anjing' },
+      { sil: '🐱', emoji: '🐱', name: 'Kucing' },
+      { sil: '🐰', emoji: '🐰', name: 'Kelinci' },
+      { sil: '🐹', emoji: '🐹', name: 'Hamster' },
+    ]
+  },
+  {
+    name: "Hewan Liar",
+    animals: [
+      { sil: '🦁', emoji: '🦁', name: 'Singa' },
+      { sil: '🐘', emoji: '🐘', name: 'Gajah' },
+      { sil: '🦒', emoji: '🦒', name: 'Jerapah' },
+      { sil: '🦓', emoji: '🦓', name: 'Zebra' },
+    ]
+  },
+  {
+    name: "Hewan Air",
+    animals: [
+      { sil: '🐬', emoji: '🐬', name: 'Lumba-lumba' },
+      { sil: '🦈', emoji: '🦈', name: 'Hiu' },
+      { sil: '🐙', emoji: '🐙', name: 'Gurita' },
+      { sil: '🐢', emoji: '🐢', name: 'Kura-kura' },
+    ]
+  },
+  {
+    name: "Hewan Terbang",
+    animals: [
+      { sil: '🦅', emoji: '🦅', name: 'Elang' },
+      { sil: '🦜', emoji: '🦜', name: 'Beo' },
+      { sil: '🦋', emoji: '🦋', name: 'Kupu-kupu' },
+      { sil: '🦚', emoji: '🦚', name: 'Merak' },
+    ]
+  },
+  {
+    name: "Hewan Hutan",
+    animals: [
+      { sil: '🐻', emoji: '🐻', name: 'Beruang' },
+      { sil: '🦊', emoji: '🦊', name: 'Rubah' },
+      { sil: '🐺', emoji: '🐺', name: 'Serigala' },
+      { sil: '🦌', emoji: '🦌', name: 'Rusa' },
+    ]
+  },
+];
+
+const LINE_COLORS = ['#e91e63','#2196f3','#4caf50','#ff9800','#9c27b0','#00bcd4','#ff5722'];
+
+// ==================== STATE ====================
+let currentLevel = 0;
+let totalCorrect = 0, totalWrong = 0;
+let levelCorrect = 0;
+let selectedLeft = null; // { idx, el, pairIdx }
+let connections = [];
+let rightOrder = [];
+let leftOrder  = [];
+
+function shuffle(a) { return [...a].sort(() => Math.random()-0.5); }
+
+// ==================== BUILD ====================
+function buildLevel() {
+  const lvl = LEVELS[currentLevel];
+  levelCorrect = 0;
+  selectedLeft = null;
+  connections = [];
+
+  document.getElementById('sc-level').textContent = currentLevel + 1;
+  document.getElementById('hint-bar').textContent = `👆 Klik siluet di kiri, lalu klik hewan yang sesuai di kanan! — ${lvl.name}`;
+
+  // Level pip row
+  const lr = document.getElementById('level-row');
+  lr.innerHTML = '';
+  LEVELS.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'lpill' + (i < currentLevel ? ' done' : i === currentLevel ? ' current' : '');
+    lr.appendChild(d);
+  });
+
+  // Shuffle both sides
+  leftOrder  = shuffle(lvl.animals.map((a,i) => ({ ...a, origIdx: i })));
+  rightOrder = shuffle(lvl.animals.map((a,i) => ({ ...a, origIdx: i })));
+
+  // Clear SVG lines
+  clearLines();
+
+  const colLeft  = document.getElementById('col-left');
+  const colRight = document.getElementById('col-right');
+  colLeft.innerHTML  = '';
+  colRight.innerHTML = '';
+
+  leftOrder.forEach((a, i) => {
+    colLeft.appendChild(makeCard(a, 'left', i));
+  });
+  rightOrder.forEach((a, i) => {
+    colRight.appendChild(makeCard(a, 'right', i));
+  });
+
+  document.getElementById('btn-next').style.display = 'none';
+
+  // Resize SVG
+  setTimeout(resizeSVG, 80);
+}
+
+function makeCard(data, side, idx) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.dataset.side = side;
+  div.dataset.idx  = idx;
+  div.dataset.origIdx = data.origIdx;
+
+  if (side === 'left') {
+    // Silhouette: dark box + emoji filtered black
+    div.innerHTML = `
+      <div class="sil-q">
+        <span class="sil-emoji">${data.sil}</span>
+      </div>
+      <div class="card-label">???</div>
+    `;
+  } else {
+    // Colorful animal
+    div.innerHTML = `
+      <span class="animal-emoji">${data.emoji}</span>
+      <div class="card-label">${data.name}</div>
+    `;
+  }
+
+  // Connection dot
+  const dot = document.createElement('div');
+  dot.className = 'conn-dot';
+  div.appendChild(dot);
+
+  div.addEventListener('click', () => onCardClick(div, side, idx, data.origIdx));
+
+  return div;
+}
+
+// ==================== INTERACTION ====================
+function onCardClick(el, side, idx, origIdx) {
+  if (el.classList.contains('matched')) return;
+
+  if (side === 'left') {
+    // Deselect if same
+    if (selectedLeft && selectedLeft.idx === idx) {
+      el.classList.remove('active');
+      selectedLeft = null;
+      hideDragLine();
+      return;
+    }
+    if (selectedLeft) selectedLeft.el.classList.remove('active');
+    el.classList.add('active');
+    selectedLeft = { idx, el, origIdx };
+  } else {
+    if (!selectedLeft) {
+      // Hint shake
+      el.classList.add('wrong-shake');
+      el.addEventListener('animationend', () => el.classList.remove('wrong-shake'), { once: true });
+      return;
+    }
+
+    hideDragLine();
+
+    const isCorrect = (selectedLeft.origIdx === origIdx);
+
+    if (isCorrect) {
+      const color = LINE_COLORS[connections.length % LINE_COLORS.length];
+
+      // Animate line
+      const lineEl = drawLine(selectedLeft.idx, idx, color, true);
+
+      selectedLeft.el.classList.remove('active');
+      selectedLeft.el.classList.add('matched');
+      el.classList.add('matched');
+
+      setDotColor(selectedLeft.el, color);
+      setDotColor(el, color);
+
+      // Reveal silhouette name
+      const label = selectedLeft.el.querySelector('.card-label');
+      if (label) {
+        label.textContent = rightOrder.find(r => r.origIdx === origIdx)?.name || '';
+        label.style.color = color;
+      }
+
+      connections.push({ leftIdx: selectedLeft.idx, rightIdx: idx, color, lineEl, origIdx });
+      levelCorrect++;
+      totalCorrect++;
+      document.getElementById('sc-correct').textContent = totalCorrect;
+      selectedLeft = null;
+
+      if (levelCorrect === LEVELS[currentLevel].animals.length) {
+        setTimeout(levelComplete, 600);
+      }
+    } else {
+      totalWrong++;
+      document.getElementById('sc-wrong').textContent = totalWrong;
+
+      // Flash red line then remove
+      const redLine = drawLine(selectedLeft.idx, idx, '#ff6b6b', false);
+      el.classList.add('wrong-shake');
+      el.addEventListener('animationend', () => el.classList.remove('wrong-shake'), { once: true });
+
+      setTimeout(() => {
+        if (redLine && redLine.parentNode) redLine.parentNode.removeChild(redLine);
+      }, 600);
+
+      selectedLeft.el.classList.remove('active');
+      selectedLeft = null;
+    }
+  }
+}
+
+function setDotColor(cardEl, color) {
+  const dot = cardEl.querySelector('.conn-dot');
+  if (dot) {
+    dot.style.background = color;
+    dot.style.borderColor = color;
+    dot.style.boxShadow   = `0 0 8px ${color}`;
+  }
+}
+
+// ==================== SVG LINES ====================
+function resizeSVG() {
+  const board = document.getElementById('board');
+  const svg   = document.getElementById('svg-layer');
+  svg.setAttribute('viewBox', `0 0 ${board.offsetWidth} ${board.offsetHeight}`);
+  svg.setAttribute('width',  board.offsetWidth);
+  svg.setAttribute('height', board.offsetHeight);
+}
+
+function getDotPos(cardEl, side) {
+  const board = document.getElementById('board');
+  const br    = board.getBoundingClientRect();
+  const dot   = cardEl.querySelector('.conn-dot');
+  const dr    = dot.getBoundingClientRect();
+  return {
+    x: dr.left + dr.width / 2 - br.left,
+    y: dr.top  + dr.height / 2 - br.top,
+  };
+}
+
+function drawLine(leftIdx, rightIdx, color, animate) {
+  const leftEl  = document.querySelector(`#col-left .card[data-idx="${leftIdx}"]`);
+  const rightEl = document.querySelector(`#col-right .card[data-idx="${rightIdx}"]`);
+  if (!leftEl || !rightEl) return null;
+
+  const p1 = getDotPos(leftEl,  'left');
+  const p2 = getDotPos(rightEl, 'right');
+
+  const svg = document.getElementById('svg-layer');
+
+  const cpx1 = p1.x + (p2.x - p1.x) * 0.38;
+  const cpx2 = p1.x + (p2.x - p1.x) * 0.62;
+  const d = `M${p1.x},${p1.y} C${cpx1},${p1.y} ${cpx2},${p2.y} ${p2.x},${p2.y}`;
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '5');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke-linecap', 'round');
+
+  if (animate) {
+    const length = 400;
+    path.style.strokeDasharray  = length;
+    path.style.strokeDashoffset = length;
+    path.style.transition = 'stroke-dashoffset 0.5s ease';
+    svg.appendChild(path);
+    requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
+  } else {
+    path.setAttribute('opacity','0.7');
+    svg.appendChild(path);
+  }
+
+  return path;
+}
+
+function clearLines() {
+  const svg = document.getElementById('svg-layer');
+  // Remove all paths
+  const paths = svg.querySelectorAll('path');
+  paths.forEach(p => p.remove());
+  // Keep drag-line element
+}
+
+// ==================== DRAG PREVIEW ====================
+let dragActive = false;
+
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('touchmove', onTouchMove, { passive: true });
+
+function onMouseMove(e) {
+  if (!selectedLeft) return;
+  showDragLineTo(e.clientX, e.clientY);
+}
+function onTouchMove(e) {
+  if (!selectedLeft || !e.touches[0]) return;
+  showDragLineTo(e.touches[0].clientX, e.touches[0].clientY);
+}
+
+function showDragLineTo(cx, cy) {
+  const leftEl = selectedLeft?.el;
+  if (!leftEl) return;
+  const board = document.getElementById('board');
+  const br    = board.getBoundingClientRect();
+  const p1    = getDotPos(leftEl, 'left');
+  const tx    = cx - br.left;
+  const ty    = cy - br.top;
+
+  const dl = document.getElementById('drag-line');
+  dl.setAttribute('x1', p1.x); dl.setAttribute('y1', p1.y);
+  dl.setAttribute('x2', tx);   dl.setAttribute('y2', ty);
+  dl.setAttribute('display', 'block');
+}
+
+function hideDragLine() {
+  const dl = document.getElementById('drag-line');
+  dl.setAttribute('display','none');
+}
+
+// ==================== LEVEL FLOW ====================
+function levelComplete() {
+  if (currentLevel < LEVELS.length - 1) {
+    spawnConfetti(40);
+    document.getElementById('btn-next').style.display = 'inline-block';
+    document.getElementById('hint-bar').textContent = '🎉 Semua cocok! Tekan "Level Berikutnya" untuk lanjut.';
+    document.getElementById('hint-bar').style.color = '#2e7d32';
+    document.getElementById('hint-bar').style.background = '#e8f5e9';
+    document.getElementById('hint-bar').style.borderColor = '#a5d6a7';
+  } else {
+    setTimeout(showWin, 400);
+  }
+}
+
+function nextLevel() {
+  currentLevel++;
+  document.getElementById('hint-bar').style.color = '';
+  document.getElementById('hint-bar').style.borderColor = '';
+  document.getElementById('hint-bar').style.background = '';
+  buildLevel();
+}
+
+function resetLevel() {
+  selectedLeft = null;
+  hideDragLine();
+  buildLevel();
+}
+
+function showWin() {
+  const stars = totalWrong === 0 ? '⭐⭐⭐' : totalWrong <= 4 ? '⭐⭐' : '⭐';
+  document.getElementById('win-stars').textContent = stars;
+  document.getElementById('win-stats').innerHTML =
+    `✅ Benar: <b>${totalCorrect}</b> &nbsp;|&nbsp; ❌ Salah: <b>${totalWrong}</b><br>Semua ${LEVELS.length} level selesai! 🐾`;
+  document.getElementById('overlay').classList.add('show');
+  spawnConfetti(80);
+}
+
+function restartAll() {
+  currentLevel = 0;
+  totalCorrect = 0;
+  totalWrong   = 0;
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('hint-bar').style.color = '';
+  document.getElementById('hint-bar').style.borderColor = '';
+  document.getElementById('hint-bar').style.background = '';
+  buildLevel();
+}
+
+// ==================== CONFETTI ====================
+function spawnConfetti(n) {
+  const colors = ['#ff9800','#e91e63','#2196f3','#4caf50','#9c27b0','#00bcd4','#ff5722','#ffeb3b'];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'cf';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.width  = (7 + Math.random() * 9) + 'px';
+    c.style.height = (7 + Math.random() * 9) + 'px';
+    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    c.style.animationDuration  = (1.4 + Math.random() * 2) + 's';
+    c.style.animationDelay     = (Math.random() * 0.8) + 's';
+    document.body.appendChild(c);
+    c.addEventListener('animationend', () => c.remove());
+  }
+}
+
+// ==================== RESIZE ====================
+window.addEventListener('resize', () => {
+  resizeSVG();
+  clearLines();
+  connections.forEach(conn => {
+    conn.lineEl = drawLine(conn.leftIdx, conn.rightIdx, conn.color, false);
+  });
+});
+
+// ==================== INIT ====================
+buildLevel();
+</script>
+</body>
+</html>
