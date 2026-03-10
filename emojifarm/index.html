@@ -1,13 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Cozy Emoji Farm</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
     <meta name="theme-color" content="#ffffff" />
-    <link rel="manifest" href="assets/js/web.webmanifest">
+    <link rel="manifest" href="assets/js/web.webmanifest" />
     <link rel="shortcut icon" type="image/png" href="icon.png" />
     <link rel="apple-touch-icon" sizes="57x57" href="icon.png" />
     <link rel="apple-touch-icon" sizes="72x72" href="icon.png" />
@@ -15,195 +17,266 @@
     <link rel="apple-touch-icon" sizes="144x144" href="icon.png" />
     <link rel="shortcut icon" type="image/png" href="icon.png" />
 
-    <link rel="stylesheet" href="dist/main.css">
-    <link rel="stylesheet" href="dist/decor.css">
-</head>
+    <link rel="stylesheet" href="dist/main.css" />
+    <link rel="stylesheet" href="dist/decor.css" />
+    <link rel="stylesheet" href="dist/livestock.css" />
+  </head>
 
-<body class="twemoji">
+  <body class="twemoji">
     <div id="container">
+      <div id="wrapgrass">
+        <div class="grass" style="left: 10px; top: 140px"></div>
+        <div class="grass" style="left: 100px; top: 170px"></div>
+        <div class="grass" style="left: 30px; top: 290px"></div>
+        <div class="grass" style="left: 205px; top: 320px"></div>
+        <div class="grass" style="right: 5px; top: 45px"></div>
+        <div class="grass" style="right: 100px; top: 80px"></div>
+        <div class="grass" style="right: 50px; top: 180px"></div>
+        <div class="grass" style="right: 10px; top: 380px"></div>
+      </div>
 
-        <div id="wrapgrass">
-            <div class="grass" style="left:10px;top:140px;"></div>
-            <div class="grass" style="left:100px;top:170px;"></div>
-            <div class="grass" style="left:30px;top:290px;"></div>
-            <div class="grass" style="left:205px;top:320px;"></div>
-            <div class="grass" style="right:5px;top:45px;"></div>
-            <div class="grass" style="right:100px;top:80px;"></div>
-            <div class="grass" style="right:50px;top:180px;"></div>
-            <div class="grass" style="right:10px;top:380px;"></div>
+      <div class="time-display">
+        <span>🕒</span>
+        <div class="time-progress">
+          <div class="time-progress-bar" id="time-progress"></div>
         </div>
+      </div>
 
-        <div class="time-display">
-            <span>🕒</span>
-            <div class="time-progress">
-                <div class="time-progress-bar" id="time-progress"></div>
+      <div class="money-display">
+        <div style="display: block">
+          ⭐ <span id="level" style="position: relative; top: 2px">1</span>
+          <div class="points-progress-container">
+            <div class="points-progress-bar" id="points-progress"></div>
+            <span class="points-text" id="points-text">0/5</span>
+          </div>
+          <span style="float: right"
+            >🪙 <span id="money" style="padding-top: 5px">50</span></span
+          >
+          <br />
+          <span id="feed-pet" style="font-size: 1rem; margin-left: 5px">
+            🐾
+            <div class="hunger-bar">
+              <div class="hunger-progress" id="hunger-progress"></div>
             </div>
+          </span>
         </div>
-
-        <div class="money-display">
-            <div style="display: block;">
-                ⭐ <span id="level" style="position:relative;top:2px;">1</span>
-                <div class="points-progress-container">
-                    <div class="points-progress-bar" id="points-progress"></div>
-                    <span class="points-text" id="points-text">0/5</span>
-                </div>
-                <span style="float:right;">🪙 <span id="money" style="padding-top: 5px;">50</span></span>
-                <br>
-                <span id="feed-pet" style="font-size:1rem;margin-left:5px;">
-                    🐾
-                    <div class="hunger-bar">
-                        <div class="hunger-progress" id="hunger-progress"></div>
-                    </div>
-                </span>
-            </div>
-        </div>
-        <div id="menu">
-            <span id="menu-inventory">📦</span>
-            <span id="menu-pet">🐾</span>
-            <span id="play-minigame">🌿</span>
-            <span id="play-dropcrops">🥗</span>
-            <span id="garden">⛲</span>
-        </div>
-        <span id="farm-button">🌱</span>
-
-        <div id="wrapinventory">
-            <div class="inventory">
-                <div class="panel-title">
-                    📦 Inventory
-                    <span id="inventory-close">❌</span>
-                </div>
-                <div class="inventory-items" id="inventory">
-                    <!-- Inventory items will be added here by JavaScript -->
-                </div>
-            </div>
-        </div>
-
-        <div id="wrappets">
-            <div id="pets">
-                <div class="panel-title">
-                    🐾 Buy Pet
-                    <span id="pet-close">❌</span>
-                </div>
-                <div class="pet-items" id="pet-items"></div>
-            </div>
-        </div>
-
-        <div id="market">
-            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
-                <span class="market-tab active" id="market-title" data-tab="seed">🌱 Seed</span>
-                <span class="market-tab" data-tab="growth">💧 Growth</span>
-                <span id="market-close">❌</span>
-            </div>
-            <div class="market-items" id="market-items">
-                <!-- Market items will be added here by JavaScript -->
-            </div>
-            <div class="market-items" id="growth-items" style="display: none;">
-                <!-- Growth items will be added here by JavaScript -->
-            </div>
-        </div>
-
-        <div id="field">
-            <div id="street">
-                <div class="quest-content" id="quest-content"></div>
-            </div>
-            <div id="farm-grid"></div>
-        </div>
-
-        <div id="pet-emoji-container-one" class="pet-emoji-container">
-            <span id="pet-emoji-one"></span>
-            <div class="love-animation" id="love-animation-one">🩷</div>
-        </div>
-        <div id="pet-emoji-container-two" class="pet-emoji-container">
-            <span id="pet-emoji-two"></span>
-            <div class="love-animation" id="love-animation-two">🩷</div>
-        </div>
-
-        <div id="market-button">🌱</div>
-
-        <span style="position:absolute;text-align:center;font-size:17px;bottom:6px;right:6px;z-index:1;">
-            <span id="setting" class="buttonaddition">⚙️</span>
+      </div>
+      <div id="menu">
+        <span id="menu-inventory">📦</span>
+        <span id="menu-pet">🐾</span>
+        <span id="play-minigame">🌿</span>
+        <span id="play-dropcrops">🥗</span>
+        <span id="garden">⛲</span>
+        <span id="livestock-button">
+          <b>🐔</b>
+          <b>🐮</b>
         </span>
+      </div>
+      <span id="farm-button">🌱</span>
+
+      <div id="wrapinventory">
+        <div class="inventory">
+          <div class="panel-title">
+            📦 Inventory
+            <span id="inventory-close">❌</span>
+          </div>
+          <div class="inventory-items" id="inventory">
+            <!-- Inventory items will be added here by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <div id="wrappets">
+        <div id="pets">
+          <div class="panel-title">
+            🐾 Buy Pet
+            <span id="pet-close">❌</span>
+          </div>
+          <div class="pet-items" id="pet-items"></div>
+        </div>
+      </div>
+
+      <div id="market">
+        <div class="panel-title" style="border-bottom: 1px solid #dddddd">
+          <span class="market-tab active" id="market-title" data-tab="seed"
+            >🌱 Seed</span
+          >
+          <span class="market-tab" data-tab="growth">💧 Growth</span>
+          <span id="market-close">❌</span>
+        </div>
+        <div class="market-items" id="market-items">
+          <!-- Market items will be added here by JavaScript -->
+        </div>
+        <div class="market-items" id="growth-items" style="display: none">
+          <!-- Growth items will be added here by JavaScript -->
+        </div>
+      </div>
+
+      <div id="field">
+        <div id="street">
+          <div class="quest-content" id="quest-content"></div>
+        </div>
+        <div id="farm-grid"></div>
+      </div>
+
+      <div id="pet-emoji-container-one" class="pet-emoji-container">
+        <span id="pet-emoji-one"></span>
+        <div class="love-animation" id="love-animation-one">🩷</div>
+      </div>
+      <div id="pet-emoji-container-two" class="pet-emoji-container">
+        <span id="pet-emoji-two"></span>
+        <div class="love-animation" id="love-animation-two">🩷</div>
+      </div>
+
+      <div id="market-button">🌱</div>
+
+      <span
+        style="
+          position: absolute;
+          text-align: center;
+          font-size: 17px;
+          bottom: 6px;
+          right: 6px;
+          z-index: 1;
+        "
+      >
+        <span id="setting" class="buttonaddition">⚙️</span>
+      </span>
     </div>
 
     <div class="grid-container" id="garden-container">
-        <span id="copy-button">
-            <span style="position:relative;margin-left:-1px;margin-top:1px;">🟩</span>
-            <span style="position:absolute;margin-left:-18px;margin-top:-4px;">🟩</span>
-        </span>
-        <span id="garden-button">⛲</span>
-        <div class="garden-grid" id="gardenGrid"></div>
-        <div id="wrapgrid-inventory">
-            <span id="closegardeninventory">❌</span>
-            <span id="clearselected">Clear</span>
-            <span id="sellselected">Sell</span>
+      <span id="copy-button">
+        <span style="position: relative; margin-left: -1px; margin-top: 1px"
+          >🟩</span
+        >
+        <span style="position: absolute; margin-left: -18px; margin-top: -4px"
+          >🟩</span
+        >
+      </span>
+      <span id="garden-button">⛲</span>
+      <div class="garden-grid" id="gardenGrid"></div>
+      <div id="wrapgrid-inventory">
+        <span id="closegardeninventory">❌</span>
+        <span id="clearselected">Clear</span>
+        <span id="sellselected">Sell</span>
 
-            <div class="panel-title" style="border-bottom: 1px solid #dddddd;">
-                <span class="market-garden active" data-tab="inventory">📦
-                    Inventory</span>
-                <span class="market-garden" data-tab="object">⛲ Item</span>
-                <span class="market-garden" data-tab="market">🛍️ Market</span>
-            </div>
-            <div class="grid-inventory" id="grid-inventory"></div>
-            <div class="grid-inventory" id="grid-object"></div>
-            <div class="grid-inventory" id="grid-market"></div>
+        <div class="panel-title" style="border-bottom: 1px solid #dddddd">
+          <span class="market-garden active" data-tab="inventory"
+            >📦 Inventory</span
+          >
+          <span class="market-garden" data-tab="object">⛲ Item</span>
+          <span class="market-garden" data-tab="market">🛍️ Market</span>
         </div>
+        <div class="grid-inventory" id="grid-inventory"></div>
+        <div class="grid-inventory" id="grid-object"></div>
+        <div class="grid-inventory" id="grid-market"></div>
+      </div>
     </div>
 
+    <div class="grid-container" id="livestock-container">
+      <div id="livestock-content">
+        <div class="grass" style="left: 10px; top: 170px"></div>
+        <div class="grass" style="left: 190px; top: 110px"></div>
+        <div class="grass" style="left: 30px; top: 290px"></div>
+        <div class="grass" style="left: 205px; top: 320px"></div>
+        <div class="grass" style="right: 5px; top: 45px"></div>
+        <div class="grass" style="right: 150px; top: 190px"></div>
+        <div class="grass" style="right: 140px; top: 80px"></div>
+        <div class="grass" style="right: 50px; top: 180px"></div>
+        <div class="grass" style="right: 10px; top: 380px"></div>
+        <div class="grass" style="left: 50px; top: 370px"></div>
+        <div class="grass" style="left: 180px; top: 460px"></div>
+        <div class="grass" style="left: 30px; top: 600px"></div>
+        <div class="grass" style="left: 185px; top: 650px"></div>
+        <div class="grass" style="right: 55px; top: 545px"></div>
+        <div class="grass" style="right: 150px; top: 990px"></div>
+        <div class="grass" style="right: 140px; top: 450px"></div>
+        <div class="grass" style="right: 20px; top: 680px"></div>
+        <div class="grass" style="right: 100px; top: 780px"></div>
+        <div class="grass" style="left: 50px; top: 710px"></div>
+        <div class="grass" style="left: 150px; top: 810px"></div>
 
-    <div class="last-played" id="last-played" style="display:none;"></div>
+        <div id="livestock-market">
+          <span class="panel-title" id="livestock-market-button">🧺</span>
+          <div
+            id="livestock-market-items"
+            class="market-items"
+            style="display: none"
+          >
+            <!-- Livestock market items -->
+          </div>
+        </div>
+        <div id="livestock-list">
+          <!-- Livestock items will be added here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="last-played" id="last-played" style="display: none"></div>
 
     <div class="popup-overlay" id="minigame-popup-overlay">
-        <div class="popup" style="max-width: 600px;">
-            <div class="panel-title" id="minigame-popup-title">🌿 Plant Match</div>
-            <div id="minigame-container">
-                <div id="minigame-stats">
-                    <span>Score: <span id="minigame-score">0</span></span>
-                    <span>Moves: <span id="minigame-moves">20</span></span>
-                </div>
-                <div id="minigame-grid"
-                    style="display: grid; grid-template-columns: repeat(6, 50px); gap: 5px; justify-content: center;">
-                </div>
-                <button id="minigame-close" style="margin-top: 15px;">Close</button>
-            </div>
+      <div class="popup" style="max-width: 600px">
+        <div class="panel-title" id="minigame-popup-title">🌿 Plant Match</div>
+        <div id="minigame-container">
+          <div id="minigame-stats">
+            <span>Score: <span id="minigame-score">0</span></span>
+            <span>Moves: <span id="minigame-moves">20</span></span>
+          </div>
+          <div
+            id="minigame-grid"
+            style="
+              display: grid;
+              grid-template-columns: repeat(6, 50px);
+              gap: 5px;
+              justify-content: center;
+            "
+          ></div>
+          <button id="minigame-close" style="margin-top: 15px">Close</button>
         </div>
+      </div>
     </div>
 
     <div class="popup-overlay" id="dropcrops-popup-overlay">
-        <div class="popup" style="max-width: 600px;">
-            <div class="panel-title" id="dropcrops-popup-title">🥗 Drop Crops</div>
-            <div id="dropcrops-container">
-                <div id="dropcrops-stats" style="height:37px;">
-                    <span style="display:none;">Score: <span id="dropcrops-score">0</span></span>
-                    <span><span id="dropcrops-next" style="font-size:25px;"></span></span>
-                </div>
-                <div id="dropcrops-grid" style="justify-content: center;">
-                    <div id="dropcrops-canvas"></div>
-                </div>
-                <div id="dropcrops-info" style="margin-top:10px;"></div>
-                <button id="dropcrops-close" style="margin-top: 15px;">Close</button>
-            </div>
+      <div class="popup" style="max-width: 600px">
+        <div class="panel-title" id="dropcrops-popup-title">🥗 Drop Crops</div>
+        <div id="dropcrops-container">
+          <div id="dropcrops-stats" style="height: 37px">
+            <span style="display: none"
+              >Score: <span id="dropcrops-score">0</span></span
+            >
+            <span
+              ><span id="dropcrops-next" style="font-size: 25px"></span
+            ></span>
+          </div>
+          <div id="dropcrops-grid" style="justify-content: center">
+            <div id="dropcrops-canvas"></div>
+          </div>
+          <div id="dropcrops-info" style="margin-top: 10px"></div>
+          <button id="dropcrops-close" style="margin-top: 15px">Close</button>
         </div>
+      </div>
     </div>
 
     <div class="notification" id="notification"></div>
     <div class="popup-overlay" id="popup-overlay">
-        <div class="popup">
-            <div class="panel-title" id="popup-title">Confirm</div>
-            <div class="popup-message" id="popup-message"></div>
-            <div class="popup-buttons">
-                <button class="popup-button" id="popup-confirm">✔️</button>
-                <button class="popup-button popup-cancel" id="popup-cancel">❌</button>
-            </div>
+      <div class="popup">
+        <div class="panel-title" id="popup-title">Confirm</div>
+        <div class="popup-message" id="popup-message"></div>
+        <div class="popup-buttons">
+          <button class="popup-button" id="popup-confirm">✔️</button>
+          <button class="popup-button popup-cancel" id="popup-cancel">
+            ❌
+          </button>
         </div>
+      </div>
     </div>
 
     <audio id="background-audio" loop controls hidden>
-        <source src="music/CozyGardenSerenity.mp3" type="audio/mpeg">
+      <source src="music/CozyGardenSerenity.mp3" type="audio/mpeg" />
     </audio>
     <audio id="sfx" controlsList="nodownload" hidden></audio>
     <script src="assets/js/register.js"></script>
     <script src="dist/matter.min.js"></script>
     <script src="dist/main.js"></script>
-</body>
-
+  </body>
 </html>
