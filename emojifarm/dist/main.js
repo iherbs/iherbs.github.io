@@ -15,6 +15,7 @@
     inventory: {},
     pet: [],
     livestock: [],
+    livestockQuests: [],
     checksum: "",
     music: true,
     sfx: true,
@@ -216,6 +217,7 @@
   const pointsProgress = _("#points-progress");
   const pointsText = _("#points-text");
   const questContent = _("#quest-content");
+  const livestockQuestContent = _("#livestock-quests");
   const setting = _("#setting");
   const marketbtn = _("#market-button");
 
@@ -240,6 +242,7 @@
     startGameLoop();
     updateLastPlayedDisplay();
     generateQuests();
+    generateLivestockQuests();
     initLivestock();
   };
 
@@ -526,26 +529,7 @@
           }
         }
       });
-
-      // Update pet hunger
-      // if (gameState.pet) {
-      //   // Normal tick decreases hunger by 3 / dayDuration every day tick.
-      //   // Hunger decrease per second = (3 / dayDuration) / (dayDuration / dayTick) ? No.
-      //   // Let's check the core hunger logic in main loop.
-      //   const hungerDecreasePerSecond =
-      //     ((gameState.dayTick / gameState.dayDuration) * 3) /
-      //     (gameState.dayTick / 1000); // simplify
-      //   // Actually, core loop does: gameState.pet.hunger -= (3 / gameState.dayDuration);
-      //   // This is done every internal "tick".
-      //   // Let's check how many "ticks" passed.
-      //   // If core loop runs 10 times a second (100ms), and it decreases by X each tick,
-      //   // then it decreases by 10X per second.
-      //   // In the core loop: if (gameState.time % 10 === 0) { pet hunger update }
-      //   // This means it happens every 1 second (if gameState.time is seconds).
-      //   // Let's assume pet hunger drops by (3 / dayDuration) every 1 second of game time.
-      //   gameState.pet.hunger -= (3 / gameState.dayDuration) * gameSecondsPassed;
-      //   if (gameState.pet.hunger < 0) gameState.pet.hunger = 0;
-      // }
+      
     }
   };
 
@@ -1061,6 +1045,7 @@
       plotCount: data.plotCount,
       pet: data.pet,
       livestock: data.livestock,
+      livestockQuests: data.livestockQuests,
     });
 
     let hash = 0;
@@ -1169,6 +1154,7 @@
 
     // Pastikan ada hingga 3 quest saat memuat
     generateQuests();
+    generateLivestockQuests();
     initgarden();
   };
 
@@ -1504,6 +1490,95 @@
     });
   };
 
+  // Generate single livestock quest
+  const generateSingleLivestockQuest = () => {
+    const item =
+      livestockItems[Math.floor(Math.random() * livestockItems.length)];
+    const quantity = Math.floor(Math.random() * 5) + 1;
+    const usedNPCs = [
+      ...gameState.quests.map((q) => q.npc),
+      ...gameState.livestockQuests.map((q) => q.npc),
+    ];
+    const availableNPCs = npcs.filter((npc) => !usedNPCs.includes(npc));
+    if (availableNPCs.length === 0) return null;
+    const npc = availableNPCs[Math.floor(Math.random() * availableNPCs.length)];
+    return { npc, itemEmoji: item.emoji, quantity };
+  };
+
+  // Generate livestock quests up to 3
+  const generateLivestockQuests = () => {
+    while (
+      gameState.livestockQuests.length < 3 &&
+      npcs.length > gameState.quests.length + gameState.livestockQuests.length
+    ) {
+      const quest = generateSingleLivestockQuest();
+      if (quest) gameState.livestockQuests.push(quest);
+      else break;
+    }
+    updateLivestockQuestUI();
+    saveGame();
+  };
+
+  // Complete livestock quest by index
+  const completeLivestockQuest = (index) => {
+    const quest = gameState.livestockQuests[index];
+    const { itemEmoji, quantity } = quest;
+    const inventoryCount = gameState.inventory[itemEmoji] || 0;
+
+    if (inventoryCount >= quantity) {
+      gameState.inventory[itemEmoji] -= quantity;
+      if (gameState.inventory[itemEmoji] <= 0) {
+        delete gameState.inventory[itemEmoji];
+      }
+
+      playSound("done.wav");
+
+      gameState.points += 2; // Livestock quests give more points
+      const itemValue = getSellPrice(itemEmoji);
+      const reward = (itemValue + 2) * quantity; // Reward
+      gameState.money += reward;
+      gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
+
+      gameState.questCompletedCount += 1;
+      showNotification(`Livestock Quest completed! Gained 🪙${reward}!`);
+
+      checkLevelUp();
+      gameState.livestockQuests.splice(index, 1);
+      generateLivestockQuests();
+      updateUI();
+      updateLivestockUI();
+    } else {
+      showNotification(
+        `Not enough ${itemEmoji}! Need ${quantity}, have ${inventoryCount}.`,
+      );
+    }
+  };
+
+  // Update livestock quest UI
+  const updateLivestockQuestUI = () => {
+    if (!livestockQuestContent) return;
+    livestockQuestContent.innerHTML = "";
+
+    gameState.livestockQuests.forEach((quest, index) => {
+      const { npc, itemEmoji, quantity } = quest;
+      const inventoryCount = gameState.inventory[itemEmoji] || 0;
+      const isCompletable = inventoryCount >= quantity;
+
+      const questItem = document.createElement("div");
+      questItem.className = "quest-item ls-quest-item";
+      questItem.innerHTML = `
+                <div class="quest-details">
+                    ${quantity} ${itemEmoji}
+                </div>
+                <span class="quest-button" ${isCompletable ? "" : 'style="display:none;"'}><span class="check-icon"></span></span>
+                <div class="quest-npc">${npc}</div>
+            `;
+
+      questItem.addEventListener("click", () => completeLivestockQuest(index));
+      livestockQuestContent.appendChild(questItem);
+    });
+  };
+
   // Hitung poin yang dibutuhkan untuk level berikutnya
   const getPointsNeededForNextLevel = (currentLevel) => {
     return 5 * currentLevel; // 5 untuk level 2, 10 untuk level 3, 15 untuk level 4, dst.
@@ -1783,6 +1858,7 @@
   const openLivestockPage = () => {
     _("#farm-button").style.display = "block";
     _("#livestock-container").style.display = "flex";
+    updateLivestockQuestUI();
     updateLivestockUI();
   };
 

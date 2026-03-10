@@ -36,15 +36,17 @@
   display: none;
   position: absolute;
   top: 0px;
-  left: 0px;
+  left: 50%;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  max-width: 800px;
   height: 100vh;
   background: var(--grass);
   z-index: 5;
   overflow: hidden;
   padding: 20px;
+  transform: translate(-50%, 0px);
 }
 
 #livestock-content {
@@ -157,4 +159,35 @@
   50% {
     transform: scale(1.2);
   }
+}
+
+#livestock-quests-container {
+  position: relative;
+  padding: 10px 0px;
+  margin-bottom: 0px;
+}
+
+#livestock-quests-container::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -20px;
+  width: 111%;
+  height: 100px;
+  background-color: var(--soil);
+  box-shadow: inset 0px 0px 3px 1px #c6a267;
+  z-index: 0;
+}
+
+#livestock-quests {
+  position: relative;
+  display: grid;
+  bottom: 65px;
+  grid-template-rows: repeat(1, auto);
+  grid-auto-flow: column;
+  grid-gap: 0px;
+}
+
+.ls-quest-item {
+  padding: 10px;
 }
