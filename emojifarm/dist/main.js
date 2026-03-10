@@ -507,6 +507,45 @@
         }, 300);
       }
       gameState.time = remainingSeconds;
+
+      // Update livestock production
+      gameState.livestock.forEach((ls) => {
+        if (ls.isProducing && !ls.yieldReady) {
+          const lsInfo = livestockTypes.find((l) => l.type === ls.type);
+          if (lsInfo) {
+            // production increases by real seconds * 0.1 (since tick is 100ms)
+            // Wait, calculateOfflineProgress uses gameSecondsPassed.
+            // Tick increases production by 0.1 every 100ms.
+            // That means production increases by 1.0 every 1 second of real time.
+            ls.production += secondsPassed;
+
+            if (ls.production >= lsInfo.growthTime) {
+              ls.production = lsInfo.growthTime;
+              ls.yieldReady = true;
+            }
+          }
+        }
+      });
+
+      // Update pet hunger
+      // if (gameState.pet) {
+      //   // Normal tick decreases hunger by 3 / dayDuration every day tick.
+      //   // Hunger decrease per second = (3 / dayDuration) / (dayDuration / dayTick) ? No.
+      //   // Let's check the core hunger logic in main loop.
+      //   const hungerDecreasePerSecond =
+      //     ((gameState.dayTick / gameState.dayDuration) * 3) /
+      //     (gameState.dayTick / 1000); // simplify
+      //   // Actually, core loop does: gameState.pet.hunger -= (3 / gameState.dayDuration);
+      //   // This is done every internal "tick".
+      //   // Let's check how many "ticks" passed.
+      //   // If core loop runs 10 times a second (100ms), and it decreases by X each tick,
+      //   // then it decreases by 10X per second.
+      //   // In the core loop: if (gameState.time % 10 === 0) { pet hunger update }
+      //   // This means it happens every 1 second (if gameState.time is seconds).
+      //   // Let's assume pet hunger drops by (3 / dayDuration) every 1 second of game time.
+      //   gameState.pet.hunger -= (3 / gameState.dayDuration) * gameSecondsPassed;
+      //   if (gameState.pet.hunger < 0) gameState.pet.hunger = 0;
+      // }
     }
   };
 
