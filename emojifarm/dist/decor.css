@@ -19,6 +19,7 @@
     bottom: 0px;
     left: 0px;
     background: #f0f8ff;
+    box-shadow:10px 11px 0px 0px #f0f8ff;
     z-index: 0;
 }
 
