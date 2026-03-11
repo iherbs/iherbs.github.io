@@ -173,7 +173,7 @@
   bottom: 2px;
   left: -20px;
   width: 111%;
-  height: 100px;
+  height: 105px;
   background-color: var(--soil);
   box-shadow: inset 0px 0px 3px 1px #c6a267;
   z-index: 0;
@@ -182,7 +182,7 @@
 #livestock-quests {
   position: relative;
   display: grid;
-  bottom: 65px;
+  bottom: 70px;
   grid-template-rows: repeat(1, auto);
   grid-auto-flow: column;
   grid-gap: 0px;

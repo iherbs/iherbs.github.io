@@ -529,7 +529,6 @@
           }
         }
       });
-      
     }
   };
 
@@ -1805,6 +1804,9 @@
         if (index === 0) {
           _("#pet-emoji-one").innerHTML = pet.emoji;
           petEmojiContainerOne.style.display = "block";
+          petEmojiContainerOne.className = "";
+          petEmojiContainerOne.classList.add("pet-emoji-container");
+          petEmojiContainerOne.classList.add("pet-emoji-" + pet.id);
           // petEmojiContainerOne.style.animation = 'movewalk 20s ease infinite';
           // Tambahkan event listener untuk klik hewan
           petEmojiContainerOne.addEventListener("click", () => {
@@ -1824,6 +1826,9 @@
           _("#pet-emoji-two").innerHTML = pet.emoji;
           // hunger bar kedua jika ada hewan kedua
           petEmojiContainerTwo.style.display = "block";
+          petEmojiContainerTwo.className = "";
+          petEmojiContainerTwo.classList.add("pet-emoji-container");
+          petEmojiContainerTwo.classList.add("pet-emoji-" + pet.id);
           // petEmojiContainerTwo.style.animation = 'movewalk 25s ease infinite';
           // Tambahkan event listener untuk klik hewan
           petEmojiContainerTwo.addEventListener("click", () => {
@@ -1936,7 +1941,7 @@
 
         // Emoji container
         const emojiSpan = document.createElement("span");
-        emojiSpan.className = "livestock-emoji emoji-" + ls.type;
+        emojiSpan.className = "livestock-emoji";
         item.appendChild(emojiSpan);
 
         // Production bar container
@@ -2059,6 +2064,7 @@
       const emojiEl = item.querySelector(".livestock-emoji");
       if (emojiEl.textContent !== ls.emoji) emojiEl.textContent = ls.emoji;
       emojiEl.style.transform = `scaleX(${ls.dir})`;
+      emojiEl.classList.add("emoji-" + ls.type);
 
       const prodFill = _(`#ls-prod-${index}`);
       const prodProgress = (ls.production / lsInfo.growthTime) * 100;
@@ -2202,6 +2208,7 @@
 
     if (ls.yieldCount === undefined) ls.yieldCount = 0;
     ls.yieldCount++;
+    playSound("tap.wav");
 
     updateUI();
     updateLivestockUI();

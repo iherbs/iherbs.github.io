@@ -926,6 +926,34 @@ button {
     position: relative;
 }
 
+.pet-emoji-dog,
+.pet-emoji-cat,
+.pet-emoji-blackcat,
+.pet-emoji-rabbit {
+    font-size: 3rem;
+}
+
+.pet-emoji-swan,
+.pet-emoji-dodo,
+.pet-emoji-hedgehog {
+    font-size: 3.5rem;
+}
+
+.pet-emoji-butterfly,
+.pet-emoji-snail,
+.pet-emoji-poodle,
+.pet-emoji-jellyfish,
+.pet-emoji-crab,
+.pet-emoji-pufferfish,
+.pet-emoji-fish,
+.pet-emoji-tropicfish {
+    font-size: 2.5rem;
+}
+
+.pet-emoji-dinosaur {
+    font-size: 5.5rem;
+}
+
 @keyframes movewalk {
     0% {
         left: 10%;
