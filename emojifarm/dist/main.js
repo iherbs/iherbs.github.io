@@ -997,7 +997,7 @@
   const showNotification = (message) => {
     clearTimeout(notificationTimeout);
     notification.classList.remove("show-notification");
-    notification.textContent = message;
+    notification.innerHTML = message;
     notification.classList.add("show-notification");
     notificationTimeout = setTimeout(() => {
       notification.classList.remove("show-notification");
