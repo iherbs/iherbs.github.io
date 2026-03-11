@@ -745,7 +745,7 @@
         );
         updatePetUI();
         if (gameState.pet[0].hunger < 20 && gameState.pet[0].hunger >= 19.9) {
-          showNotification(`Your pet is hungry! Feed your pet.`);
+          showNotification(`Your pet is hungry!<br>Feed your pet.`);
         }
       }
 
@@ -1449,7 +1449,7 @@
       gameState.questCompletedCount += 1;
 
       // Notifikasi dan update
-      showNotification(`Quest completed! Gained 🪙${reward}!`);
+      showNotification(`Quest completed!<br>Gained 🪙${reward}!`);
 
       // Periksa kenaikan level
       checkLevelUp();
@@ -1461,7 +1461,7 @@
       updateUI();
     } else {
       showNotification(
-        `Not enough ${plantEmoji}! Need ${quantity}, have ${inventoryCount}.`,
+        `Not enough ${plantEmoji}!<br>Need ${quantity}, have ${inventoryCount}.`,
       );
       // if (_('#market').style.transform == 'translateY(170px)' || _('#market').style.transform == '') {
       //     _('#market').style.transform = 'translateY(0px)';
@@ -1553,7 +1553,7 @@
       gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
       gameState.questCompletedCount += 1;
-      showNotification(`Quest completed! Gained 🪙${reward}!`);
+      showNotification(`Quest completed!<br>Gained 🪙${reward}!`);
 
       checkLevelUp();
       gameState.livestockQuests.splice(index, 1);
@@ -1562,7 +1562,7 @@
       updateLivestockUI();
     } else {
       showNotification(
-        `Not enough ${itemEmoji}! Need ${quantity}, have ${inventoryCount}.`,
+        `Not enough ${itemEmoji}!<br>Need ${quantity}, have ${inventoryCount}.`,
       );
     }
   };
@@ -1604,7 +1604,7 @@
       gameState.points -= pointsNeeded; // Kurangi poin yang digunakan
       gameState.level += 1; // Naik level
       pointsNeeded = getPointsNeededForNextLevel(gameState.level); // Hitung poin untuk level berikutnya
-      showNotification(`Level up! Reached Level ${gameState.level}!`);
+      showNotification(`Level up!<br>Reached Level ${gameState.level}!`);
 
       playSound("levelup.wav");
 
@@ -1717,7 +1717,7 @@
 
     if (options.length === 0) {
       showNotification(
-        "No food available! Buy pet food or harvest more crops.",
+        "No food available!<br>Buy pet food or harvest more crops.",
       );
       return;
     }
@@ -1786,7 +1786,7 @@
       updatePetUI();
       updateUI();
       showNotification(
-        `Fed with ${option.name}! Hunger: ${Math.round(gameState.pet[0].hunger)}`,
+        `Fed with ${option.name}!<br>Hunger: ${Math.round(gameState.pet[0].hunger)}`,
       );
       saveGame();
       feedPet();
@@ -2150,7 +2150,7 @@
     if (currentYields < lsInfo.minYieldsToSlaughter) {
       const remaining = lsInfo.minYieldsToSlaughter - currentYields;
       showNotification(
-        `${ls.emoji} needs to produce ${lsInfo.yield} ${remaining} more time(s)!`,
+        `${ls.emoji} needs to produce ${lsInfo.yield}<br>${remaining} more time(s)!`,
       );
       return;
     }
@@ -4230,6 +4230,296 @@
   // ================================= GARDEN GRID ========================================
   // ======================================================================================
 
+  // ======================================================================================
+  // ============================== INVENTORY TRANSFER ====================================
+  // ======================================================================================
+
+  let peer = null;
+  let transferConn = null;
+  let selectedTransferItem = null;
+  let qrcode = null;
+  let html5QrCode = null;
+
+  const initTransfer = () => {
+    _("#inventory-transfer-btn").addEventListener("click", openTransferPopup);
+    _("#transfer-close").addEventListener("click", closeTransferPopup);
+    _("#transfer-send-mode").addEventListener("click", showSendForm);
+    _("#transfer-receive-mode").addEventListener("click", showReceiveForm);
+    _("#transfer-gen-code").addEventListener("click", startTransferHost);
+    _("#transfer-connect-btn").addEventListener("click", connectToHost);
+    _("#transfer-scan-btn").addEventListener("click", toggleQRScanner);
+
+    _("#transfer-qty-min").addEventListener("click", () => {
+      let qty = parseInt(_("#transfer-qty").value) - 1;
+      _("#transfer-qty").value = Math.max(1, qty);
+    });
+
+    _("#transfer-qty-plus").addEventListener("click", () => {
+      let qty = parseInt(_("#transfer-qty").value) + 1;
+      const maxCount = gameState.inventory[selectedTransferItem] || 0;
+      _("#transfer-qty").value = Math.min(maxCount, qty);
+    });
+  };
+
+  const openTransferPopup = () => {
+    _("#transfer-input-code").value = "";
+    _("#transfer-popup-overlay").classList.add("show");
+    resetTransferUI();
+  };
+
+  const closeTransferPopup = () => {
+    _("#transfer-qty-section").style.display = "none";
+    _("#transfer-popup-overlay").classList.remove("show");
+    if (peer) {
+      peer.destroy();
+      peer = null;
+    }
+    transferConn = null;
+    stopQRScanner();
+  };
+
+  const resetTransferUI = () => {
+    _("#transfer-setup").style.display = "block";
+    _("#transfer-send-form").style.display = "none";
+    _("#transfer-receive-form").style.display = "none";
+    _("#transfer-qrcode-container").style.display = "none";
+    _("#transfer-status").textContent = "";
+    _("#transfer-id-display").textContent = "----";
+    if (_("#transfer-qrcode")) _("#transfer-qrcode").innerHTML = "";
+    selectedTransferItem = null;
+    stopQRScanner();
+  };
+
+  const showSendForm = () => {
+    _("#transfer-setup").style.display = "none";
+    _("#transfer-send-form").style.display = "block";
+    populateTransferItems();
+  };
+
+  const showReceiveForm = () => {
+    _("#transfer-setup").style.display = "none";
+    _("#transfer-receive-form").style.display = "block";
+  };
+
+  const populateTransferItems = () => {
+    const list = _("#transfer-items-list");
+    list.innerHTML = "";
+    Object.entries(gameState.inventory).forEach(([emoji, count]) => {
+      if (count > 0) {
+        const item = document.createElement("div");
+        item.className = "market-item";
+        item.innerHTML = `
+          <div class="market-item-emoji">${emoji}</div>
+          <div class="market-item-count">${count}</div>
+        `;
+        item.addEventListener("click", () => {
+          document
+            .querySelectorAll("#transfer-items-list .market-item")
+            .forEach((el) => el.classList.remove("selected"));
+          item.classList.add("selected");
+          selectedTransferItem = emoji;
+          _("#transfer-qty-section").style.display = "block";
+          _("#transfer-item-selected").textContent = emoji;
+          _("#transfer-qty").value = 1;
+          _("#transfer-qty").max = count;
+          _("#transfer-qty").addEventListener("input", () => {
+            if (parseInt(_("#transfer-qty").value) > count) {
+              _("#transfer-qty").value = count;
+            }
+            if (parseInt(_("#transfer-qty").value) < 1) {
+              _("#transfer-qty").value = 1;
+            }
+          });
+        });
+        list.appendChild(item);
+      }
+    });
+
+    if (list.innerHTML === "") {
+      list.innerHTML = "<p>Inventory is empty</p>";
+    }
+  };
+
+  const startTransferHost = () => {
+    const qty = parseInt(_("#transfer-qty").value);
+    if (!selectedTransferItem || qty <= 0) {
+      showNotification("Please select an item and quantity");
+      return;
+    }
+
+    _("#transfer-send-form").style.display = "none";
+    _("#transfer-status").textContent = "Initializing Peer...";
+
+    // Generate random short ID for easier typing
+    const shortId =
+      "EF-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    peer = new Peer(shortId);
+
+    peer.on("open", (id) => {
+      _("#transfer-id-display").textContent = id;
+      _("#transfer-qrcode-container").style.display = "block";
+      _("#transfer-status").textContent = "Share this code with receiver";
+
+      // Generate QR Code
+      if (_("#transfer-qrcode")) {
+        _("#transfer-qrcode").innerHTML = "";
+        new QRCode(_("#transfer-qrcode"), {
+          text: id,
+          width: 128,
+          height: 128,
+        });
+      }
+    });
+
+    peer.on("connection", (conn) => {
+      transferConn = conn;
+      _("#transfer-status").textContent = "Connected! Sending item...";
+
+      conn.on("open", () => {
+        const data = {
+          type: "TRANSFER_ITEM",
+          emoji: selectedTransferItem,
+          quantity: qty,
+        };
+        conn.send(data);
+
+        // Success handler
+        setTimeout(() => {
+          gameState.inventory[selectedTransferItem] -= qty;
+          if (gameState.inventory[selectedTransferItem] <= 0) {
+            delete gameState.inventory[selectedTransferItem];
+          }
+          updateUI();
+          saveGame();
+          showNotification(`Transferred ${qty} ${selectedTransferItem}!`);
+          closeTransferPopup();
+        }, 1000);
+      });
+
+      conn.on("error", (err) => {
+        _("#transfer-status").textContent = "Error: " + err;
+      });
+    });
+
+    peer.on("error", (err) => {
+      _("#transfer-status").textContent = "Connection Error";
+      console.error(err);
+    });
+  };
+
+  const connectToHost = () => {
+    const code = _("#transfer-input-code").value.trim().toUpperCase();
+    if (!code) {
+      showNotification("Please enter a code");
+      return;
+    }
+
+    _("#transfer-status").textContent = "Connecting...";
+
+    // Receiver uses random ID
+    peer = new Peer();
+
+    peer.on("open", () => {
+      const conn = peer.connect(code);
+      transferConn = conn;
+
+      conn.on("open", () => {
+        _("#transfer-status").textContent = "Connected! Waiting for data...";
+      });
+
+      conn.on("data", (data) => {
+        if (data.type === "TRANSFER_ITEM") {
+          const { emoji, quantity } = data;
+
+          if (!gameState.inventory[emoji]) {
+            gameState.inventory[emoji] = 0;
+          }
+          gameState.inventory[emoji] += quantity;
+
+          updateUI();
+          saveGame();
+
+          _("#transfer-status").textContent = `Received ${quantity} ${emoji}!`;
+          showNotification(`Received ${quantity} ${emoji}!`);
+
+          setTimeout(() => {
+            closeTransferPopup();
+          }, 2000);
+        }
+      });
+
+      conn.on("error", (err) => {
+        _("#transfer-status").textContent = "Connection failed";
+      });
+    });
+
+    peer.on("error", (err) => {
+      _("#transfer-status").textContent = "Peer JS Error";
+      console.error(err);
+    });
+  };
+
+  const toggleQRScanner = () => {
+    if (html5QrCode && html5QrCode.isScanning) {
+      stopQRScanner();
+    } else {
+      startQRScanner();
+    }
+  };
+
+  const startQRScanner = () => {
+    _("#transfer-reader").style.display = "block";
+    _("#transfer-status").textContent = "Opening camera...";
+    _("#transfer-scan-btn").textContent = "🛑 Stop Scanning";
+
+    html5QrCode = new Html5Qrcode("transfer-reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+    html5QrCode
+      .start(
+        { facingMode: "environment" },
+        config,
+        (decodedText) => {
+          // success
+          _("#transfer-input-code").value = decodedText;
+          _("#transfer-status").textContent = "Code scanned!";
+          showNotification("Code scanned successfully!");
+          stopQRScanner();
+          connectToHost(); // Auto connect after scan
+        },
+        (errorMessage) => {
+          // parse error, ignore it
+        },
+      )
+      .catch((err) => {
+        _("#transfer-status").textContent = "Camera error: " + err;
+        _("#transfer-reader").style.display = "none";
+        _("#transfer-scan-btn").textContent = "📷 Scan QR Code";
+      });
+  };
+
+  const stopQRScanner = () => {
+    if (html5QrCode) {
+      html5QrCode
+        .stop()
+        .then(() => {
+          html5QrCode.clear();
+          html5QrCode = null;
+          _("#transfer-reader").style.display = "none";
+          _("#transfer-scan-btn").textContent = "📷 Scan QR Code";
+        })
+        .catch((err) => {
+          console.error("Stop error", err);
+          // Force cleanup even if stop fails
+          html5QrCode = null;
+          _("#transfer-reader").style.display = "none";
+          _("#transfer-scan-btn").textContent = "📷 Scan QR Code";
+        });
+    }
+  };
+
   // Initialize the game
+  initTransfer();
   initGame();
 })();
