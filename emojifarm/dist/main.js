@@ -227,6 +227,7 @@
   const popupConfirm = _("#popup-confirm");
   const popupCancel = _("#popup-cancel");
 
+  const maxplant = plantTypes.length - 2;
   // Initialize the game
   const initGame = () => {
     if (!localStorage.getItem("emojiFarm")) {
@@ -282,7 +283,7 @@
                         <li>You’ll see a 6x6 grid filled with crop emojis (e.g., 🌾, 🌽).</li>
                         <li>Swap adjacent crops by clicking one, then clicking a neighboring crop to form rows or columns of 3 or more identical crops.</li>
                         <li>Matching 3 crops earns 10 points, 4 crops earns 20 points, and 5+ crops earns 30 points. Matching 4 or more also adds that crop to your <em>Inventory</em> (e.g., match 4 🌾 to get 1 Wheat).</li>
-                        <li>You have 20 moves to reach 500 points. If you succeed, you’ll earn 🪙.</li>
+                        <li>You will have moves to reach 500 points. If you succeed, you’ll earn 🪙.</li>
                     </ul>
                 </li>
                 <li><strong>Tips</strong>:
@@ -406,6 +407,7 @@
 
   // Dapatkan tanaman yang tersedia di market berdasarkan level
   const getAvailablePlants = (level) => {
+    level = level > maxplant ? maxplant : level;
     // Pada Level 1, hanya Wheat dan Corn
     const basePlants = plantTypes.slice(0, 2); // 🌾, 🌽
     // Tambah 1 tanaman per level setelah Level 1
@@ -1259,6 +1261,17 @@
     _("#wrapinventory").style.display = "none";
   });
 
+  var marketitems = document.getElementById("market-items");
+
+  marketitems.addEventListener("wheel", (event) => {
+    event.preventDefault(); // Prevents default vertical scroll
+
+    marketitems.scrollBy({
+      left: event.deltaY, // Scrolls horizontally based on vertical delta
+      behavior: "smooth", // Optional: adds smooth scrolling
+    });
+  });
+
   let reset = false;
   setting.addEventListener("click", async () => {
     let emofont = document.body.className;
@@ -1374,7 +1387,7 @@
         parseInt(gameState.level) % 2 === 0
           ? parseInt(gameState.level) - 10
           : parseInt(gameState.level) - 11;
-      if (parseInt(gameState.level) > 40) {
+      if (parseInt(gameState.level) > maxplant) {
         startIndex = 5;
       }
     }
@@ -1406,6 +1419,7 @@
       if (quest) gameState.quests.push(quest);
     }
     updateQuestUI();
+    updateLivestockQuestUI();
     saveGame();
   };
 
@@ -1539,7 +1553,7 @@
       gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
       gameState.questCompletedCount += 1;
-      showNotification(`Livestock Quest completed! Gained 🪙${reward}!`);
+      showNotification(`Quest completed! Gained 🪙${reward}!`);
 
       checkLevelUp();
       gameState.livestockQuests.splice(index, 1);
@@ -2211,6 +2225,7 @@
     playSound("tap.wav");
 
     updateUI();
+    updateLivestockQuestUI();
     updateLivestockUI();
     saveGame();
     showNotification(`Got ${lsInfo.yield}`);
@@ -2279,7 +2294,8 @@
   // Initialize minigame
   const initMinigame = () => {
     minigameState.grid = [];
-    minigameState.moves = 20;
+    minigameState.moves =
+      gameState.level < 20 ? 20 : Math.min(gameState.level, maxplant);
     minigameState.score = 0;
     minigameState.selectedCell = null;
     minigameState.isProcessing = false;
@@ -2288,8 +2304,9 @@
   };
 
   // Generate minigame grid
+  let lvpln = gameState.level;
   const generateMinigameGrid = () => {
-    const getavailablePlants = getAvailablePlants(gameState.level).filter(
+    const getavailablePlants = getAvailablePlants(lvpln).filter(
       (p) => p.emoji !== "🟫",
     );
     const availablePlants = getavailablePlants.reverse();
@@ -2608,7 +2625,7 @@
 
   // Fill empty slots with new plants
   const fillGrid = () => {
-    const getavailablePlants = getAvailablePlants(gameState.level).filter(
+    const getavailablePlants = getAvailablePlants(lvpln).filter(
       (p) => p.emoji !== "🟫",
     );
     const availablePlants = getavailablePlants.reverse();
@@ -2665,11 +2682,17 @@
   const openMinigame = async () => {
     const levelrequire = 5;
     if (gameState.level >= levelrequire) {
-      const availablePlants = getAvailablePlants(gameState.level).filter(
+      lvpln =
+        gameState.level >= 25
+          ? Math.floor(
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
+          : gameState.level;
+      const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
       );
       availablePlants.sort((a, b) => b.cost - a.cost);
-      const entryCost = availablePlants[0].cost * 10;
+      let entryCost = availablePlants[0].cost * 10;
       const confirmed = await showPopup(`Play Plant Match for 🪙${entryCost}?`);
       if (confirmed) {
         if (gameState.money >= entryCost) {
@@ -3146,7 +3169,7 @@
     gameOverDiv.className = "game-over";
     gameOverDiv.style.display = "flex";
     if (finish) {
-      const availablePlants = getAvailablePlants(gameState.level).filter(
+      const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
       );
       availablePlants.sort((a, b) => b.cost - a.cost);
@@ -3200,7 +3223,13 @@
     const levelrequire = 10,
       maxlvl = 9;
     if (gameState.level >= levelrequire) {
-      const availablePlants = getAvailablePlants(gameState.level).filter(
+      lvpln =
+        gameState.level >= 25
+          ? Math.floor(
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
+          : gameState.level;
+      const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
       );
       let newsort = [...availablePlants].map((p) => p.emoji);
@@ -3211,6 +3240,7 @@
       const confirmed = await showPopup(`Play Drop Crops for 🪙${entryCost}?`);
       if (confirmed) {
         newsort.reverse();
+
         _("#dropcrops-info").innerHTML = newsort
           .toString()
           .replace(/,/g, " > ");
@@ -3245,6 +3275,10 @@
       `Close Drop Crops without finishing it will not return your 🪙.<br>Are you sure to close it?`,
     );
     if (confirmed) {
+      emojiBodies.forEach((data, body) => removeEmoji(body));
+      emojiBodies.clear();
+      score = 0;
+      scoreElement.textContent = "0";
       _("#dropcrops-popup-overlay").classList.remove("show");
     }
   });
