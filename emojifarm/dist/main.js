@@ -2215,8 +2215,8 @@
     playSound("tap.wav");
 
     updateUI();
-    updateLivestockQuestUI();
     updateLivestockUI();
+    updateLivestockQuestUI();
     saveGame();
     showNotification(`Got ${lsInfo.yield}`);
   };
@@ -2236,6 +2236,7 @@
 
     updateUI();
     updateLivestockUI();
+    updateLivestockQuestUI();
     saveGame();
     showNotification(`Put ${ls.emoji} for ${lsInfo.meat}!`);
   };
