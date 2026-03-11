@@ -122,12 +122,16 @@
     position: fixed;
     background: #ffffff;
     width: 100%;
+    max-width: 800px;
+    left: 50%;
     bottom: 0px;
     height: 200px;
     padding-top: 30px;
-    transform: translateY(220px);
+    transform: translate(-50%, 220px);
     transition: all 0.3s ease;
     box-shadow: 0 -3px 5px rgba(50, 50, 50, 0.1);
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
     z-index: 2;
 }
 

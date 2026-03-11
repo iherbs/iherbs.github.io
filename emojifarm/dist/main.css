@@ -582,6 +582,7 @@ button {
 
 #market-button {
     position: fixed;
+    cursor: pointer;
     bottom: -29px;
     left: 50%;
     transform: translateX(-50%);
@@ -600,12 +601,15 @@ button {
 #market {
     position: fixed;
     width: 100.5%;
-    left: 0px;
+    max-width: 800px;
+    left: 50%;
     bottom: 0px;
-    transform: translateY(170px);
+    transform: translate(-50%,170px);
     background: #ffffff;
     box-shadow: 0 0px 5px rgba(50, 50, 50, 0.1);
     transition: all 0.3s ease;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
     z-index: 3;
 }
 

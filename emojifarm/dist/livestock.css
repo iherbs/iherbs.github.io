@@ -64,8 +64,6 @@
 
 .livestock-item {
   position: absolute;
-  width: 80px;
-  height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -129,20 +127,26 @@
 
 .ready-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  right: -16px;
   background: #ffffff;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   animation: bounce 1s infinite;
 }
 
+.emoji-cow~.ready-badge{
+  top: 0px;
+}
+
+.emoji-chicken~.ready-badge{
+  top: -15px;
+}
 .emoji-cow {
   font-size: 4.5rem;
 }

@@ -340,10 +340,10 @@
   };
 
   const toggleMarket = () => {
-    if (_("#market").style.transform == "translateY(0px)") {
-      _("#market").style.transform = "translateY(170px)";
+    if (_("#market").style.transform == "translate(-50%, 0px)") {
+      _("#market").style.transform = "translate(-50%, 170px)";
     } else {
-      _("#market").style.transform = "translateY(0px)";
+      _("#market").style.transform = "translate(-50%, 0px)";
     }
   };
 
@@ -473,7 +473,7 @@
                 showNotification(`can't buy, not good for your 🪙 health`);
               }
             } else {
-              showNotification(`Not enough 🪙 to buy Land!`);
+              showNotification(`Not enough 🪙<br>to buy Land!`);
             }
           }
         } else {
@@ -621,7 +621,7 @@
             // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
             saveGame();
           } else {
-            showNotification(`Not enough 🪙 to buy ${selectedSeed}!`);
+            showNotification(`Not enough 🪙<br>to buy ${selectedSeed}!`);
             // Reset selected item in market
             // document.querySelectorAll('.market-item').forEach(i => i.classList.remove('selected'));
           }
@@ -665,7 +665,7 @@
             showNotification(`can't buy, not good for your 🪙 health`);
           }
         } else {
-          showNotification(`Not enough 🪙 to use ${item.emoji}!`);
+          showNotification(`Not enough 🪙<br>to use ${item.emoji}!`);
         }
       }
       // selectedSeed = null;
@@ -1261,23 +1261,11 @@
     _("#wrapinventory").style.display = "none";
   });
 
-  var marketitems = document.getElementById("market-items");
-
-  marketitems.addEventListener("wheel", (event) => {
-    event.preventDefault(); // Prevents default vertical scroll
-
-    marketitems.scrollBy({
-      left: event.deltaY, // Scrolls horizontally based on vertical delta
-      behavior: "smooth", // Optional: adds smooth scrolling
-    });
-  });
-
   let reset = false;
   setting.addEventListener("click", async () => {
     let emofont = document.body.className;
     const set = showPopup(
-      `
-            <button type="button" id="resetgame">
+      `<button type="button" id="resetgame">
                 Reset Game
             </button>
             <div style="margin-top:10px">
@@ -1546,9 +1534,9 @@
 
       playSound("done.wav");
 
-      gameState.points += 2; // Livestock quests give more points
+      gameState.points += 1; // Livestock quests give more points
       const itemValue = getSellPrice(itemEmoji);
-      const reward = (itemValue + 2) * quantity; // Reward
+      const reward = (itemValue + 1) * quantity; // Reward
       gameState.money += reward;
       gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
@@ -1681,7 +1669,7 @@
             }
           } else {
             showNotification(
-              `Not enough 🪙 to ${actionText.toLowerCase()} ${pet.emoji}!`,
+              `Not enough 🪙<br>to ${actionText.toLowerCase()} ${pet.emoji}!`,
             );
           }
         }
@@ -1749,7 +1737,7 @@
       }
       const option = options.find((opt) => opt.emoji === selectedOption.value);
       if (option.type === "buy" && gameState.money < option.cost) {
-        showNotification(`Not enough 🪙 to buy ${option.emoji}!`);
+        showNotification(`Not enough 🪙<br>to buy ${option.emoji}!`);
         return;
       }
       if (option.type === "inventory" && !gameState.inventory[option.emoji]) {
@@ -1904,7 +1892,7 @@
     ).length;
 
     if (currentCount >= lsInfo.max) {
-      showNotification(`Max ${lsInfo.max} ${lsInfo.name}!`);
+      showNotification(`Max ${lsInfo.max} ${lsInfo.emoji}!`);
       return;
     }
 
@@ -1934,7 +1922,7 @@
           showNotification(`can't buy, not good for your 🪙 health`);
         }
       } else {
-        showNotification(`Not enough 🪙 to buy ${lsInfo.name}!`);
+        showNotification(`Not enough 🪙<br>to buy ${lsInfo.name}!`);
       }
     }
   };
@@ -2078,6 +2066,8 @@
       const emojiEl = item.querySelector(".livestock-emoji");
       if (emojiEl.textContent !== ls.emoji) emojiEl.textContent = ls.emoji;
       emojiEl.style.transform = `scaleX(${ls.dir})`;
+      emojiEl.classList.remove("emoji-cow");
+      emojiEl.classList.remove("emoji-chicken");
       emojiEl.classList.add("emoji-" + ls.type);
 
       const prodFill = _(`#ls-prod-${index}`);
@@ -2706,7 +2696,7 @@
             showNotification(`Can't play, not good for your 🪙 health`);
           }
         } else {
-          showNotification(`Not enough 🪙 to play!`);
+          showNotification(`Not enough 🪙<br>to play!`);
         }
       }
     } else {
@@ -3256,7 +3246,7 @@
             showNotification(`Can't play, not good for your 🪙 health`);
           }
         } else {
-          showNotification(`Not enough 🪙 to play!`);
+          showNotification(`Not enough 🪙<br>to play!`);
         }
       }
     } else {
@@ -3749,10 +3739,10 @@
   });
 
   const toggleGardenInventory = () => {
-    if (_("#wrapgrid-inventory").style.transform == "translateY(-45px)") {
-      _("#wrapgrid-inventory").style.transform = "translateY(220px)";
+    if (_("#wrapgrid-inventory").style.transform == "translate(-50%, -45px)") {
+      _("#wrapgrid-inventory").style.transform = "translate(-50%, 220px)";
     } else {
-      _("#wrapgrid-inventory").style.transform = "translateY(-45px)";
+      _("#wrapgrid-inventory").style.transform = "translate(-50%, -45px)";
     }
   };
 

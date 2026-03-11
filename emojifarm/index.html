@@ -295,7 +295,7 @@
 
           <div id="transfer-receive-form" style="display: none;">
             <p>Enter Transfer Code:</p>
-            <input type="text" id="transfer-input-code" placeholder="Enter code here" style="width:80%;padding:10px;margin-bottom:10px;text-align:center;text-transform:uppercase;border-radius:5px;border:1px solid #ccc;">
+            <input type="text" id="transfer-input-code" placeholder="Enter code here" autocomplete="off" style="width:80%;padding:10px;margin-bottom:10px;text-align:center;text-transform:uppercase;border-radius:5px;border:1px solid #ccc;">
             <br>
             <button class="popup-button" id="transfer-connect-btn">Connect & Receive</button>
             <br><br>
@@ -305,7 +305,7 @@
 
           <div id="transfer-status" style="font-size: 0.9rem;font-weight: bold;color: #2E8B57;"></div>
 
-          <button id="transfer-close" style="margin-top: 15px">Close</button>
+          <button id="transfer-close" class="popup-button popup-cancel" style="margin-top: 15px">❌</button>
         </div>
       </div>
     </div>
