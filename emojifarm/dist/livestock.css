@@ -71,7 +71,6 @@
   cursor: pointer;
   z-index: 10;
   -webkit-tap-highlight-color: transparent;
-  transition: left 0.1s linear, top 0.1s linear;
 }
 
 .livestock-item.dragging {
@@ -145,13 +144,14 @@
   animation: bounce 1s infinite;
 }
 
-.emoji-cow~.ready-badge{
+.emoji-cow~.ready-badge {
   top: 0px;
 }
 
-.emoji-chicken~.ready-badge{
+.emoji-chicken~.ready-badge {
   top: -15px;
 }
+
 .emoji-cow {
   font-size: 4.5rem;
 }
@@ -161,10 +161,12 @@
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
