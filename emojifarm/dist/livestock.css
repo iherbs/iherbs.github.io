@@ -73,10 +73,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.livestock-item.dragging {
-  transition: none;
-}
-
 .livestock-emoji {
   -webkit-tap-highlight-color: transparent;
   margin-bottom: 2px;

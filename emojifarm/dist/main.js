@@ -1714,15 +1714,15 @@
         Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options
-              .map(
-                (opt) => `
+        .map(
+          (opt) => `
                 <div class="feeditem">
                     <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
                     <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === "buy" ? `🪙${opt.cost}` : "From Inventory"})</label>
                 </div>
             `,
-              )
-              .join("")}
+        )
+        .join("")}
             </div>
         `;
 
@@ -1970,7 +1970,6 @@
 
           const rect = list.getBoundingClientRect();
           gameState.livestock[index].isDragging = true;
-          item.classList.add("dragging");
 
           // Stop current movement towards target
           gameState.livestock[index].newX = gameState.livestock[index].x;
@@ -2013,7 +2012,6 @@
             document.removeEventListener("touchend", onDragEnd);
 
             gameState.livestock[index].isDragging = false;
-            item.classList.remove("dragging");
 
             if (!isDragging) {
               handleLivestockInteraction(index);
@@ -2678,8 +2676,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -3219,8 +3217,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
