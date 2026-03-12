@@ -1970,6 +1970,7 @@
 
           const rect = list.getBoundingClientRect();
           gameState.livestock[index].isDragging = true;
+          item.classList.add("dragging");
 
           // Stop current movement towards target
           gameState.livestock[index].newX = gameState.livestock[index].x;
@@ -2012,6 +2013,7 @@
             document.removeEventListener("touchend", onDragEnd);
 
             gameState.livestock[index].isDragging = false;
+            item.classList.remove("dragging");
 
             if (!isDragging) {
               handleLivestockInteraction(index);

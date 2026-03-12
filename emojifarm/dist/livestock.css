@@ -71,6 +71,11 @@
   cursor: pointer;
   z-index: 10;
   -webkit-tap-highlight-color: transparent;
+  transition: left 0.1s linear, top 0.1s linear;
+}
+
+.livestock-item.dragging {
+  transition: none;
 }
 
 .livestock-emoji {
