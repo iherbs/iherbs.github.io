@@ -1551,7 +1551,6 @@ input:checked + .slider:before {
   overflow: hidden;
   position: absolute;
   bottom: 15px;
-  border: 1px solid #ccc;
 }
 
 .station-progress-bar {
@@ -1684,6 +1683,8 @@ input:checked + .slider:before {
   gap: 10px;
   padding-top: 5px;
   padding-bottom: 12px;
+  padding-left: 7px;
+  padding-right: 7px;
   scrollbar-width: thin;
   font-size: 0.9rem;
   scrollbar-color: #e67e22 #ddd;

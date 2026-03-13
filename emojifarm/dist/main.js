@@ -5055,7 +5055,7 @@
     // Add to inventory
     gameState.inventory[recipe.emoji] =
       (gameState.inventory[recipe.emoji] || 0) + 1;
-    showNotification(`Cooked ${recipe.emoji} ${recipe.name}!`);
+    // showNotification(`Cooked ${recipe.emoji} ${recipe.name}!`);
 
     gameState.kitchen.stations[index] = null; // Free the stove
     playSound("tap.wav");
