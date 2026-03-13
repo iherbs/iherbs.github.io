@@ -72,6 +72,7 @@
           <b>🐔</b>
           <b>🐮</b>
         </span>
+        <span id="kitchen-button">🥘</span>
       </div>
       <span id="farm-button">🌱</span>
 
@@ -79,7 +80,11 @@
         <div class="inventory">
           <div class="panel-title">
             📦 Inventory
-            <span id="inventory-transfer-btn" style="cursor:pointer;margin-left:10px;font-size:1.2rem;">🔁</span>
+            <span
+              id="inventory-transfer-btn"
+              style="cursor: pointer; margin-left: 10px; font-size: 1.2rem"
+              >🔁</span
+            >
             <span id="inventory-close">❌</span>
           </div>
           <div class="inventory-items" id="inventory">
@@ -217,6 +222,33 @@
       </div>
     </div>
 
+    <div id="kitchen-container" style="display: none">
+      <div id="kitchen-content">
+        <div class="panel-title">
+          <span style="font-size: 45px">🥘</span>
+          <span id="kitchen-close">❌</span>
+        </div>
+        <div id="kitchen-stations">
+          <!-- 4 Cooking Stations will be generated here -->
+        </div>
+        <div id="kitchen-recipes-container">
+          <div class="panel-title" style="margin-top: 10px; margin-left: 10px">
+            📜 Recipes
+          </div>
+          <div id="kitchen-recipes">
+            <!-- Recipes will be added here -->
+          </div>
+        </div>
+        <div id="kitchen-quests-container">
+          <div id="street">
+            <div id="kitchen-quests">
+              <!-- Kitchen quests will be added here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="last-played" id="last-played" style="display: none"></div>
 
     <div class="popup-overlay" id="minigame-popup-overlay">
@@ -264,48 +296,149 @@
 
     <div class="popup-overlay" id="transfer-popup-overlay">
       <div class="popup" style="max-width: 400px">
-        <div class="panel-title" id="transfer-popup-title">🔁 Transfer Item</div>
-        <div id="transfer-container" style="padding: 15px; text-align: center;">
+        <div class="panel-title" id="transfer-popup-title">
+          🔁 Transfer Item
+        </div>
+        <div id="transfer-container" style="padding: 15px; text-align: center">
           <div id="transfer-setup">
             <p>Choose action:</p>
-            <button class="popup-button btntransfer" id="transfer-send-mode" style="margin-bottom: 5px;">📤<br>Send</button>
-            <button class="popup-button btntransfer" id="transfer-receive-mode">📥<br>Receive</button>
+            <button
+              class="popup-button btntransfer"
+              id="transfer-send-mode"
+              style="margin-bottom: 5px"
+            >
+              📤<br />Send
+            </button>
+            <button class="popup-button btntransfer" id="transfer-receive-mode">
+              📥<br />Receive
+            </button>
           </div>
 
-          <div id="transfer-send-form" style="display: none;">
+          <div id="transfer-send-form" style="display: none">
             <p>Select item to send:</p>
-            <div id="transfer-items-list" class="market-items" style="margin-bottom: 10px; justify-content: center; flex-wrap: wrap; max-height: 200px; overflow-y: auto;"></div>
-            <div id="transfer-qty-section" style="display: none;">
-              <span id="transfer-item-selected" style="font-size: 1.5rem;"></span>
-              <br>
-              <button type="button" class="popup-button" id="transfer-qty-min" style="padding: 5px 10px;">➖</button>
-              <input type="text" id="transfer-qty" min="1" value="1" style="width:60px;margin:10px;padding:5px;text-align:center;border-radius:5px;border:1px solid #ccc;" readonly>
-              <button type="button" class="popup-button" id="transfer-qty-plus" style="padding: 5px 10px;">➕</button>
-              <br>
-              <button class="popup-button" id="transfer-gen-code" style="margin-top: 10px;">Generate Code</button>
+            <div
+              id="transfer-items-list"
+              class="market-items"
+              style="
+                margin-bottom: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+                max-height: 200px;
+                overflow-y: auto;
+              "
+            ></div>
+            <div id="transfer-qty-section" style="display: none">
+              <span
+                id="transfer-item-selected"
+                style="font-size: 1.5rem"
+              ></span>
+              <br />
+              <button
+                type="button"
+                class="popup-button"
+                id="transfer-qty-min"
+                style="padding: 5px 10px"
+              >
+                ➖
+              </button>
+              <input
+                type="text"
+                id="transfer-qty"
+                min="1"
+                value="1"
+                style="
+                  width: 60px;
+                  margin: 10px;
+                  padding: 5px;
+                  text-align: center;
+                  border-radius: 5px;
+                  border: 1px solid #ccc;
+                "
+                readonly
+              />
+              <button
+                type="button"
+                class="popup-button"
+                id="transfer-qty-plus"
+                style="padding: 5px 10px"
+              >
+                ➕
+              </button>
+              <br />
+              <button
+                class="popup-button"
+                id="transfer-gen-code"
+                style="margin-top: 10px"
+              >
+                Generate Code
+              </button>
             </div>
           </div>
 
-          <div id="transfer-qrcode-container" style="display: none;">
+          <div id="transfer-qrcode-container" style="display: none">
             <p>Your Transfer Code:</p>
-            <h2 id="transfer-id-display" style="color: #2E8B57; user-select: all; letter-spacing: 2px;">----</h2>
-            <div id="transfer-qrcode" style="display: flex; justify-content: center; margin: 15px 0;"></div>
-            <p style="font-size: 0.8rem; color: #666;">Waiting for receiver to connect...</p>
+            <h2
+              id="transfer-id-display"
+              style="color: #2e8b57; user-select: all; letter-spacing: 2px"
+            >
+              ----
+            </h2>
+            <div
+              id="transfer-qrcode"
+              style="display: flex; justify-content: center; margin: 15px 0"
+            ></div>
+            <p style="font-size: 0.8rem; color: #666">
+              Waiting for receiver to connect...
+            </p>
           </div>
 
-          <div id="transfer-receive-form" style="display: none;">
+          <div id="transfer-receive-form" style="display: none">
             <p>Enter Transfer Code:</p>
-            <input type="text" id="transfer-input-code" placeholder="Enter code here" autocomplete="off" style="width:80%;padding:10px;margin-bottom:10px;text-align:center;text-transform:uppercase;border-radius:5px;border:1px solid #ccc;">
-            <br>
-            <button class="popup-button" id="transfer-connect-btn">Connect & Receive</button>
-            <br><br>
-            <button class="popup-button" id="transfer-scan-btn" style="margin-bottom:15px; background-color: #ffffff;">📷 Scan QR Code</button>
-            <div id="transfer-reader" style="width: 100%; margin-bottom: 15px; display: none;"></div>
+            <input
+              type="text"
+              id="transfer-input-code"
+              placeholder="Enter code here"
+              autocomplete="off"
+              style="
+                width: 80%;
+                padding: 10px;
+                margin-bottom: 10px;
+                text-align: center;
+                text-transform: uppercase;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+              "
+            />
+            <br />
+            <button class="popup-button" id="transfer-connect-btn">
+              Connect & Receive
+            </button>
+            <br /><br />
+            <button
+              class="popup-button"
+              id="transfer-scan-btn"
+              style="margin-bottom: 15px; background-color: #ffffff"
+            >
+              📷 Scan QR Code
+            </button>
+            <div
+              id="transfer-reader"
+              style="width: 100%; margin-bottom: 15px; display: none"
+            ></div>
           </div>
 
-          <div id="transfer-status" style="font-size: 0.9rem;font-weight: bold;color: #2E8B57;"></div>
+          <div
+            id="transfer-status"
+            style="font-size: 0.9rem; font-weight: bold; color: #2e8b57"
+          ></div>
 
-          <button id="transfer-close" class="popup-button popup-cancel" style="margin-top: 15px">❌</button>
+          <button
+            id="transfer-close"
+            class="popup-button popup-cancel"
+            style="margin-top: 15px"
+          >
+            ❌
+          </button>
         </div>
       </div>
     </div>

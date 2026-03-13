@@ -16,6 +16,12 @@
     pet: [],
     livestock: [],
     livestockQuests: [],
+    kitchenQuests: [],
+    kitchen: {
+      stations: [null, null, null, null], // 4 Stoves
+      unlockedRecipes: [], // Default unlocked recipes
+      unlockedCount: 0, // Number of unlocked stoves
+    },
     checksum: "",
     music: true,
     sfx: true,
@@ -185,6 +191,171 @@
     },
   ];
 
+  const recipes = [
+    {
+      id: "popcorn",
+      emoji: "🍿",
+      name: "Popcorn",
+      ingredients: { "🌽": 1 },
+      time: 10,
+      value: 30,
+      cost: 100,
+    },
+    {
+      id: "french_fries",
+      emoji: "🍟",
+      name: "French Fries",
+      ingredients: { "🥔": 1 },
+      time: 50,
+      value: 22,
+      cost: 300,
+    },
+    {
+      id: "wine",
+      emoji: "🍷",
+      name: "Wine",
+      ingredients: { "🍇": 1 },
+      time: 80,
+      value: 37,
+      cost: 500,
+    },
+    {
+      id: "juice",
+      emoji: "🍹",
+      name: "Juice",
+      ingredients: { "🍍": 1 },
+      time: 80,
+      value: 47,
+      cost: 500,
+    },
+    {
+      id: "salad",
+      emoji: "🥗",
+      name: "Salad",
+      ingredients: { "🥬": 1, "🍅": 1, "🥒": 1 },
+      time: 90,
+      value: 55,
+      cost: 700,
+    },
+    {
+      id: "omelet",
+      emoji: "🍳",
+      name: "Omelet",
+      ingredients: { "🥚": 1 },
+      time: 90,
+      value: 10,
+      cost: 700,
+    },
+    {
+      id: "spaghetti",
+      emoji: "🍝",
+      name: "Spaghetti",
+      ingredients: { "🌾": 1, "🍅": 1, "🥚": 1 },
+      time: 95,
+      value: 45,
+      cost: 600,
+    },
+    {
+      id: "cheese",
+      emoji: "🧀",
+      name: "Cheese",
+      ingredients: { "🥛": 1 },
+      time: 100,
+      value: 18,
+      cost: 800,
+    },
+    {
+      id: "bread",
+      emoji: "🍞",
+      name: "Bread",
+      ingredients: { "🌾": 1, "🥛": 1 },
+      time: 100,
+      value: 25,
+      cost: 900,
+    },
+    {
+      id: "ice_cream",
+      emoji: "🍦",
+      name: "Ice Cream",
+      ingredients: { "🥛": 1, "🍓": 1 },
+      time: 110,
+      value: 35,
+      cost: 500,
+    },
+    {
+      id: "pancake",
+      emoji: "🥞",
+      name: "Pancake",
+      ingredients: { "🌾": 1, "🥚": 1, "🥛": 1 },
+      time: 120,
+      value: 35,
+      cost: 700,
+    },
+    {
+      id: "cake",
+      emoji: "🍰",
+      name: "Cake",
+      ingredients: { "🌾": 1, "🥚": 1, "🍓": 1 },
+      time: 120,
+      value: 40,
+      cost: 1000,
+    },
+    {
+      id: "soup",
+      emoji: "🍲",
+      name: "Soup",
+      ingredients: { "🥬": 1, "🍗": 1, "🥒": 1, "🍅": 1, "🥚": 1 },
+      time: 130,
+      value: 180,
+      cost: 1200,
+    },
+    {
+      id: "sandwich",
+      emoji: "🥪",
+      name: "Sandwich",
+      ingredients: { "🍞": 1, "🥬": 1, "🥒": 1, "🍅": 1, "🥚": 1 },
+      time: 140,
+      value: 85,
+      cost: 1100,
+    },
+    {
+      id: "taco",
+      emoji: "🌮",
+      name: "Taco",
+      ingredients: { "🌽": 1, "🥩": 1, "🥬": 1 },
+      time: 150,
+      value: 250,
+      cost: 1200,
+    },
+    {
+      id: "hot_dog",
+      emoji: "🌭",
+      name: "Hot Dog",
+      ingredients: { "🍞": 1, "🥬": 1, "🥩": 1 },
+      time: 160,
+      value: 240,
+      cost: 1400,
+    },
+    {
+      id: "pizza",
+      emoji: "🍕",
+      name: "Pizza",
+      ingredients: { "🌾": 1, "🍅": 1, "🥩": 1, "🧀": 1 },
+      time: 170,
+      value: 220,
+      cost: 1700,
+    },
+    {
+      id: "burger",
+      emoji: "🍔",
+      name: "Burger",
+      ingredients: { "🍞": 1, "🥬": 1, "🥒": 1, "🍅": 1, "🥩": 1, "🧀": 1 },
+      time: 180,
+      value: 300,
+      cost: 2000,
+    },
+  ];
+
   const maxmoney = 999999;
   let selectedSeed = null;
   let gameInterval = null;
@@ -245,6 +416,7 @@
     generateQuests();
     generateLivestockQuests();
     initLivestock();
+    initKitchen();
   };
 
   // Show tutorial popup
@@ -799,6 +971,16 @@
         }
       }
 
+      // Update kitchen
+      const isActiveCooking = gameState.kitchen.stations.some(
+        (s) => s !== null,
+      );
+      if (isActiveCooking) {
+        if (_("#kitchen-container").style.display === "flex") {
+          updateKitchenStations();
+        }
+      }
+
       updateTimeDisplay();
       const hasGrowingPlants = gameState.plots.some((plot) => plot.plant);
       if (hasGrowingPlants) {
@@ -982,6 +1164,8 @@
 
     // Perbarui quest UI untuk memeriksa ketersediaan inventory
     updateQuestUI();
+    updateLivestockQuestUI();
+    updateKitchenQuestsUI();
   };
 
   // Update last played display
@@ -1026,6 +1210,8 @@
     if (plant) return plant.name;
     const livestockItem = livestockItems.find((l) => l.emoji === emoji);
     if (livestockItem) return livestockItem.name;
+    const recipe = recipes.find((r) => r.emoji === emoji);
+    if (recipe) return recipe.name;
     return "Unknown Plant";
   };
 
@@ -1034,6 +1220,8 @@
     if (plant) return plant.cost + 2;
     const livestockItem = livestockItems.find((l) => l.emoji === emoji);
     if (livestockItem) return livestockItem.value;
+    const recipe = recipes.find((r) => r.emoji === emoji);
+    if (recipe) return recipe.value;
     return 0;
   };
   const calculateChecksum = (data) => {
@@ -1047,6 +1235,8 @@
       pet: data.pet,
       livestock: data.livestock,
       livestockQuests: data.livestockQuests,
+      kitchenQuests: data.kitchenQuests,
+      kitchen: data.kitchen,
     });
 
     let hash = 0;
@@ -1071,7 +1261,32 @@
       try {
         const parsed = JSON.parse(savedGame);
         const expectedChecksum = calculateChecksum(parsed);
-        if (parsed.checksum !== expectedChecksum) {
+        let isValid = parsed.checksum === expectedChecksum;
+
+        // Fallback for older saves where 'kitchen' was not part of the checksum
+        if (!isValid) {
+          const oldStr = JSON.stringify({
+            money: parsed.money,
+            level: parsed.level,
+            points: parsed.points,
+            inventory: parsed.inventory,
+            plots: parsed.plots,
+            plotCount: parsed.plotCount,
+            pet: parsed.pet,
+            livestock: parsed.livestock,
+            livestockQuests: parsed.livestockQuests,
+            kitchenQuests: parsed.kitchenQuests,
+          });
+          let oldHash = 0;
+          for (let i = 0; i < oldStr.length; i++) {
+            oldHash = ((oldHash << 5) - oldHash + oldStr.charCodeAt(i)) | 0;
+          }
+          if (parsed.checksum === oldHash) {
+            isValid = true;
+          }
+        }
+
+        if (!isValid) {
           throw new Error("Data tampered");
         }
 
@@ -1096,6 +1311,49 @@
         // Migrate livestock if not present
         if (!parsed.livestock) {
           parsed.livestock = [];
+        }
+
+        // Migrate kitchen if not present or old format
+        if (
+          !parsed.kitchen ||
+          !parsed.kitchen.stations ||
+          !Array.isArray(parsed.kitchen.stations)
+        ) {
+          parsed.kitchen = {
+            stations: [null, null, null, null],
+            unlockedRecipes: [],
+            unlockedCount: 0,
+          };
+        } else {
+          // Ensure unlockedRecipes exists
+          if (!parsed.kitchen.unlockedRecipes) {
+            parsed.kitchen.unlockedRecipes = [];
+          }
+
+          // Ensure unlockedCount exists
+          if (!parsed.kitchen.hasOwnProperty("unlockedCount")) {
+            parsed.kitchen.unlockedCount = 0;
+          }
+
+          if (parsed.kitchen.stations.length !== 4) {
+            // Ensure there are always exactly 4 stations
+            while (parsed.kitchen.stations.length < 4)
+              parsed.kitchen.stations.push(null);
+            parsed.kitchen.stations = parsed.kitchen.stations.slice(0, 4);
+          }
+        }
+
+        // Migrate kitchen quests if not present
+        if (!parsed.kitchenQuests) {
+          parsed.kitchenQuests = [];
+        } else {
+          // Fix for emoji mismatch if IDs were stored instead of emojis
+          parsed.kitchenQuests.forEach((q) => {
+            const recipe = recipes.find((r) => r.id === q.recipeEmoji);
+            if (recipe) {
+              q.recipeEmoji = recipe.emoji;
+            }
+          });
         }
 
         // Migrate quests if not present or old format (single quest)
@@ -1156,6 +1414,7 @@
     // Pastikan ada hingga 3 quest saat memuat
     generateQuests();
     generateLivestockQuests();
+    generateKitchenQuests();
     initgarden();
   };
 
@@ -1265,10 +1524,7 @@
   setting.addEventListener("click", async () => {
     let emofont = document.body.className;
     const set = showPopup(
-      `<button type="button" id="resetgame">
-                Reset Game
-            </button>
-            <div style="margin-top:10px">
+      `<div style="margin-top:10px">
                 Music
                 <label class="switch">
                     <input type="checkbox" id="btnmusic" ${gameState.music ? "checked" : ""}>
@@ -1282,7 +1538,7 @@
                     <span class="slider round"></span>
                 </label>
             </div>
-            <div style="margin-top:10px">
+            <div style="margin-top:10px;">
                 <div class="custom-select">
                     <div class="selected-option" id="selectedEmoji">
                         <span id="selected-font" class="${emofont}">🌾🌽🪙</span>
@@ -1295,6 +1551,9 @@
                     </div>
                 </div>
             </div>
+            <button type="button" id="resetgame" style="margin-top:25px">
+                Reset Game
+            </button>
             <div style="margin-top:15px">
                 <span id="help" class="buttonaddition">❓</span>
             </div>
@@ -1342,7 +1601,7 @@
     _("#resetgame").addEventListener("click", async () => {
       const confirmed = await showPopup(`
                 Are you sure you want to reset the game? This will erase all progress.<br>
-                Type "reset" to confirm.<br><input type="text" id="reset-input" style="width:100px;margin:10px;padding:5px 8px;border-radius:5px;border:2px solid #2E8B57;outline:none;" autocomplete="off">
+                Type "reset" to confirm.<br><input type="text" id="reset-input" style="width:100px;margin:10px;padding:5px 8px;border-radius:5px;border:2px solid #2E8B57;outline:none;text-align:center;" autocomplete="off">
             `);
       if (confirmed) {
         const resetinput = _("#reset-input").value;
@@ -1580,6 +1839,105 @@
     });
   };
 
+  // Kitchen Quests Logic
+  const generateSingleKitchenQuest = () => {
+    const unlockedRecipes = gameState.kitchen.unlockedRecipes || [];
+    if (unlockedRecipes.length === 0) return null;
+
+    const recipeId =
+      unlockedRecipes[Math.floor(Math.random() * unlockedRecipes.length)];
+    const recipe = recipes.find((r) => r.id === recipeId);
+    const recipeEmoji = recipe ? recipe.emoji : "❓";
+    const quantity = Math.floor(Math.random() * 7) + 1; // 1 to 7
+
+    const usedNPCs = [
+      ...gameState.quests.map((q) => q.npc),
+      ...gameState.livestockQuests.map((q) => q.npc),
+      ...gameState.kitchenQuests.map((q) => q.npc),
+    ];
+    const availableNPCs = npcs.filter((npc) => !usedNPCs.includes(npc));
+    if (availableNPCs.length === 0) return null;
+
+    const npc = availableNPCs[Math.floor(Math.random() * availableNPCs.length)];
+    return { npc, recipeEmoji, quantity };
+  };
+
+  const generateKitchenQuests = () => {
+    if (!gameState.kitchenQuests) gameState.kitchenQuests = [];
+    while (
+      gameState.kitchenQuests.length < 3 &&
+      npcs.length >
+        gameState.quests.length +
+          gameState.livestockQuests.length +
+          gameState.kitchenQuests.length
+    ) {
+      const quest = generateSingleKitchenQuest();
+      if (quest) gameState.kitchenQuests.push(quest);
+      else break;
+    }
+    updateKitchenQuestsUI();
+    saveGame();
+  };
+
+  const completeKitchenQuest = (index) => {
+    const quest = gameState.kitchenQuests[index];
+    const { recipeEmoji, quantity } = quest;
+    const inventoryCount = gameState.inventory[recipeEmoji] || 0;
+
+    if (inventoryCount >= quantity) {
+      gameState.inventory[recipeEmoji] -= quantity;
+      if (gameState.inventory[recipeEmoji] <= 0) {
+        delete gameState.inventory[recipeEmoji];
+      }
+
+      playSound("done.wav");
+
+      gameState.points += 1; // Kitchen quests give points
+      const recipe = recipes.find((r) => r.emoji === recipeEmoji);
+      const reward = (recipe ? recipe.value + 3 : 10) * quantity;
+      gameState.money += reward;
+      gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
+
+      gameState.questCompletedCount += 1;
+      showNotification(`Order completed!<br>Gained 🪙${reward}!`);
+
+      checkLevelUp();
+      gameState.kitchenQuests.splice(index, 1);
+      generateKitchenQuests();
+      updateUI();
+      updateKitchenStations();
+    } else {
+      showNotification(
+        `Not enough ${recipeEmoji}!<br>Need ${quantity}, have ${inventoryCount}.`,
+      );
+    }
+  };
+
+  const updateKitchenQuestsUI = () => {
+    const questList = _("#kitchen-quests");
+    if (!questList) return;
+    questList.innerHTML = "";
+
+    gameState.kitchenQuests.forEach((quest, index) => {
+      const { npc, recipeEmoji, quantity } = quest;
+      const inventoryCount = gameState.inventory[recipeEmoji] || 0;
+      const isCompletable = inventoryCount >= quantity;
+
+      const questItem = document.createElement("div");
+      questItem.className = "quest-item kitchen-quest-item";
+      questItem.innerHTML = `
+                <div class="quest-details">
+                    ${quantity} ${recipeEmoji}
+                </div>
+                <span class="quest-button" ${isCompletable ? "" : 'style="display:none;"'}><span class="check-icon"></span></span>
+                <div class="quest-npc kitchen-quest-npc">${npc}</div>
+            `;
+
+      questItem.addEventListener("click", () => completeKitchenQuest(index));
+      questList.appendChild(questItem);
+    });
+  };
+
   // Hitung poin yang dibutuhkan untuk level berikutnya
   const getPointsNeededForNextLevel = (currentLevel) => {
     return 5 * currentLevel; // 5 untuk level 2, 10 untuk level 3, 15 untuk level 4, dst.
@@ -1714,15 +2072,15 @@
         Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options
-        .map(
-          (opt) => `
+              .map(
+                (opt) => `
                 <div class="feeditem">
                     <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
                     <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === "buy" ? `🪙${opt.cost}` : "From Inventory"})</label>
                 </div>
             `,
-        )
-        .join("")}
+              )
+              .join("")}
             </div>
         `;
 
@@ -2676,8 +3034,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-          ) + 10
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -3217,8 +3575,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-          ) + 10
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -4488,6 +4846,265 @@
         _("#transfer-reader").style.display = "none";
         _("#transfer-scan-btn").textContent = "📷 Scan QR Code";
       });
+  };
+
+  const initKitchen = () => {
+    _("#kitchen-button").addEventListener("click", openKitchenPage);
+    _("#kitchen-close").addEventListener("click", closeKitchenPage);
+  };
+
+  const openKitchenPage = () => {
+    _("#kitchen-container").style.display = "flex";
+    populateRecipes();
+    updateKitchenQuestsUI();
+    updateKitchenStations();
+  };
+
+  const closeKitchenPage = () => {
+    _("#kitchen-container").style.display = "none";
+  };
+
+  const populateRecipes = () => {
+    const recipeContainer = _("#kitchen-recipes");
+    recipeContainer.innerHTML = "";
+
+    recipes.forEach((recipe) => {
+      const card = document.createElement("div");
+      card.className = "recipe-card";
+
+      const isUnlocked = gameState.kitchen.unlockedRecipes.includes(recipe.id);
+
+      if (!isUnlocked) {
+        card.innerHTML = `
+          <div class="recipe-emoji">${recipe.emoji}</div>
+          <div class="recipe-name">${recipe.name}</div>
+          <div class="recipe-ingredients" style="color:#e67e22; font-weight:bold;">Cost: 🪙${recipe.cost}</div>
+          <button class="recipe-button buy">
+            📜 Buy
+          </button>
+        `;
+        card.querySelector(".recipe-button").addEventListener("click", () => {
+          buyRecipe(recipe.id);
+        });
+      } else {
+        let ingredientStatus = true;
+        let ingredientText = [];
+        for (const [emoji, qty] of Object.entries(recipe.ingredients)) {
+          const has = gameState.inventory[emoji] || 0;
+          ingredientText.push(`${emoji}${qty}`);
+          if (has < qty) ingredientStatus = false;
+        }
+
+        card.innerHTML = `
+          <div class="recipe-emoji">${recipe.emoji}</div>
+          <div class="recipe-name">${recipe.name}</div>
+          <div class="recipe-ingredients">${ingredientText.join(" + ")}</div>
+          <button class="recipe-button ${ingredientStatus ? "" : "disabled"}">
+            ${ingredientStatus ? "🥘 Cook" : "❌"}
+          </button>
+        `;
+
+        if (ingredientStatus) {
+          card.querySelector(".recipe-button").addEventListener("click", () => {
+            startCooking(recipe.id);
+          });
+        }
+      }
+
+      recipeContainer.appendChild(card);
+    });
+  };
+
+  const startCooking = (recipeId) => {
+    // Find empty station among unlocked ones
+    const emptyIndex = gameState.kitchen.stations.findIndex(
+      (s, i) => s === null && i < gameState.kitchen.unlockedCount,
+    );
+    if (emptyIndex === -1) {
+      if (gameState.kitchen.unlockedCount === 0) {
+        showNotification("Unlock a stove first!");
+      } else {
+        showNotification("All unlocked stoves are busy!");
+      }
+      return;
+    }
+
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (!recipe) return;
+
+    // Check ingredients again
+    for (const [emoji, qty] of Object.entries(recipe.ingredients)) {
+      if ((gameState.inventory[emoji] || 0) < qty) {
+        showNotification(`Not enough ingredients for ${recipe.name}!`);
+        return;
+      }
+    }
+
+    // Consume ingredients
+    for (const [emoji, qty] of Object.entries(recipe.ingredients)) {
+      gameState.inventory[emoji] -= qty;
+      if (gameState.inventory[emoji] <= 0) delete gameState.inventory[emoji];
+    }
+
+    gameState.kitchen.stations[emptyIndex] = {
+      recipeId: recipeId,
+      startTime: Date.now(),
+      duration: recipe.time * 1000, // to ms
+      completed: false,
+    };
+
+    playSound("growth.wav"); // Use existing sound for now
+    updateUI();
+    populateRecipes(); // Update button states (insufficient ingredients after use)
+    updateKitchenStations();
+    saveGame();
+  };
+
+  const updateKitchenStations = () => {
+    const list = _("#kitchen-stations");
+
+    // Initialize exactly 4 divs if not already there
+    if (list.children.length !== 4) {
+      list.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        const div = document.createElement("div");
+        div.id = `station-${i}`;
+        div.className = "kitchen-station idle";
+
+        div.addEventListener("click", () => {
+          const station = gameState.kitchen.stations[i];
+          if (station) {
+            const elapsed = Date.now() - station.startTime;
+            const isReady = elapsed >= station.duration;
+            if (isReady) {
+              finishCooking(i);
+            }
+          }
+        });
+
+        list.appendChild(div);
+      }
+    }
+
+    gameState.kitchen.stations.forEach((station, index) => {
+      const stationDiv = _(`#station-${index}`);
+
+      // If stove is locked
+      if (index >= gameState.kitchen.unlockedCount) {
+        const stoveCost = (index + 1) * 500; // 500, 1000, 1500, 2000
+
+        if (stationDiv.className !== "kitchen-station locked") {
+          stationDiv.className = "kitchen-station locked";
+          stationDiv.innerHTML = `
+            <div class="station-locked-icon">🔒</div>
+            <button class="recipe-button buy" style="font-size: 0.7rem !important; padding: 5px;">
+              Buy Stove<br>🪙${stoveCost}
+            </button>
+          `;
+          stationDiv.querySelector("button").addEventListener("click", (e) => {
+            e.stopPropagation();
+            buyStove(index, stoveCost);
+          });
+        }
+        return;
+      }
+
+      if (station === null) {
+        if (stationDiv.className !== "kitchen-station idle") {
+          stationDiv.className = "kitchen-station idle";
+          stationDiv.innerHTML = "";
+        }
+        return;
+      }
+
+      const recipe = recipes.find((r) => r.id === station.recipeId);
+      const elapsed = Date.now() - station.startTime;
+      const progress = Math.min((elapsed / station.duration) * 100, 100);
+      const isReady = progress >= 100;
+
+      const newClass = `kitchen-station ${isReady ? "ready" : "cooking"}`;
+      if (stationDiv.className !== newClass) stationDiv.className = newClass;
+
+      let innerHTML = `<div class="station-emoji wave-animation">${recipe.emoji}</div>`;
+
+      if (isReady) {
+        innerHTML += `<div class="station-ready-text">Collect!</div>`;
+      } else {
+        innerHTML += `
+            <div class="station-progress-container">
+              <div class="station-progress-bar" style="width: ${progress}%"></div>
+            </div>`;
+      }
+
+      if (stationDiv.innerHTML !== innerHTML) {
+        stationDiv.innerHTML = innerHTML;
+      }
+    });
+  };
+
+  const finishCooking = (index) => {
+    const station = gameState.kitchen.stations[index];
+    if (!station) return;
+    const recipe = recipes.find((r) => r.id === station.recipeId);
+
+    // Add to inventory
+    gameState.inventory[recipe.emoji] =
+      (gameState.inventory[recipe.emoji] || 0) + 1;
+    showNotification(`Cooked ${recipe.emoji} ${recipe.name}!`);
+
+    gameState.kitchen.stations[index] = null; // Free the stove
+    playSound("done.wav"); // Use done sound for collecting
+    updateUI();
+    updateKitchenStations();
+    saveGame();
+  };
+
+  const buyRecipe = (recipeId) => {
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (!recipe) return;
+
+    if (gameState.kitchen.unlockedRecipes.includes(recipeId)) {
+      showNotification("You already have this recipe!");
+      return;
+    }
+
+    if (gameState.money < recipe.cost) {
+      showNotification("Not enough money to buy this recipe!");
+      return;
+    }
+
+    showPopup(
+      `Buy ${recipe.emoji} ${recipe.name} recipe for 🪙${recipe.cost}?`,
+    ).then((confirmed) => {
+      if (confirmed) {
+        gameState.money -= recipe.cost;
+        gameState.kitchen.unlockedRecipes.push(recipeId);
+        updateUI();
+        populateRecipes();
+        saveGame();
+        showNotification(`Unlocked ${recipe.emoji} ${recipe.name}!`);
+        playSound("tap.wav");
+      }
+    });
+  };
+
+  const buyStove = (index, cost) => {
+    if (gameState.money < cost) {
+      showNotification("Not enough money to buy this stove!");
+      return;
+    }
+
+    showPopup(`Buy Stove #${index + 1} for 🪙${cost}?`).then((confirmed) => {
+      if (confirmed) {
+        gameState.money -= cost;
+        gameState.kitchen.unlockedCount++;
+        updateUI();
+        updateKitchenStations();
+        saveGame();
+        showNotification(`Unlocked Stove #${index + 1}!`);
+        playSound("tap.wav");
+      }
+    });
   };
 
   const stopQRScanner = () => {
