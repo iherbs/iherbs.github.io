@@ -429,16 +429,16 @@ button {
 }
 
 #livestock-button {
-  position: absolute;
-  right: -12px;
-  top: 70px;
+  position: absolute !important;
+  right: -12px !important;
+  top: 70px !important;
   font-size: 25px !important;
 }
 
 #kitchen-button {
-  position: absolute;
-  right: -12px;
-  top: 130px;
+  position: absolute !important;
+  right: -12px !important;
+  top: 130px !important;
   font-size: 25px !important;
 }
 
