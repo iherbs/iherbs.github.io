@@ -2528,12 +2528,14 @@
         ) {
           gameState.inventory[lsInfo.food] -= 3;
           feed = true;
+          playSound("cow.wav");
         } else if (
           lsInfo.type == "chicken" &&
           (gameState.inventory[lsInfo.food] || 0) >= 1
         ) {
           gameState.inventory[lsInfo.food]--;
           feed = true;
+          playSound("chicken.wav");
         }
 
         if (feed) {
@@ -4010,6 +4012,8 @@
     _("#garden-container").style.display = "none";
     _("#livestock-container").style.display = "none";
     _("#farm-button").style.display = "none";
+    _("#kitchen-container").style.display = "none";
+    closeKitchenPage();
     clearSelectedEmoji();
   });
 
@@ -4855,18 +4859,14 @@
 
   const initKitchen = () => {
     _("#kitchen-button").addEventListener("click", openKitchenPage);
-    _("#kitchen-close").addEventListener("click", closeKitchenPage);
   };
 
   const openKitchenPage = () => {
     _("#kitchen-container").style.display = "flex";
+    _("#farm-button").style.display = "block";
     populateRecipes();
     updateKitchenQuestsUI();
     updateKitchenStations();
-  };
-
-  const closeKitchenPage = () => {
-    _("#kitchen-container").style.display = "none";
   };
 
   const populateRecipes = () => {
@@ -4945,6 +4945,7 @@
       }
     }
 
+    playSound("cook.wav");
     // Consume ingredients
     for (const [emoji, qty] of Object.entries(recipe.ingredients)) {
       gameState.inventory[emoji] -= qty;
@@ -4958,7 +4959,6 @@
       completed: false,
     };
 
-    playSound("growth.wav"); // Use existing sound for now
     updateUI();
     populateRecipes(); // Update button states (insufficient ingredients after use)
     updateKitchenStations();
@@ -5058,7 +5058,7 @@
     showNotification(`Cooked ${recipe.emoji} ${recipe.name}!`);
 
     gameState.kitchen.stations[index] = null; // Free the stove
-    playSound("done.wav"); // Use done sound for collecting
+    playSound("tap.wav");
     updateUI();
     updateKitchenStations();
     saveGame();
