@@ -415,6 +415,7 @@
     updateLastPlayedDisplay();
     generateQuests();
     generateLivestockQuests();
+    generateKitchenQuests();
     initLivestock();
     initKitchen();
   };
@@ -1936,6 +1937,10 @@
       questItem.addEventListener("click", () => completeKitchenQuest(index));
       questList.appendChild(questItem);
     });
+
+    if (gameState.kitchenQuests.length == 0) {
+      questList.style.height = "77px";
+    }
   };
 
   // Hitung poin yang dibutuhkan untuk level berikutnya
@@ -5068,6 +5073,11 @@
       return;
     }
 
+    if (gameState.money - recipe.cost < 50) {
+      showNotification(`can't buy, not good for your 🪙 health`);
+      return;
+    }
+
     if (gameState.money < recipe.cost) {
       showNotification("Not enough money to buy this recipe!");
       return;
@@ -5084,11 +5094,18 @@
         saveGame();
         showNotification(`Unlocked ${recipe.emoji} ${recipe.name}!`);
         playSound("tap.wav");
+
+        generateKitchenQuests();
       }
     });
   };
 
   const buyStove = (index, cost) => {
+    if (gameState.money - cost < 50) {
+      showNotification(`can't buy, not good for your 🪙 health`);
+      return;
+    }
+
     if (gameState.money < cost) {
       showNotification("Not enough money to buy this stove!");
       return;
