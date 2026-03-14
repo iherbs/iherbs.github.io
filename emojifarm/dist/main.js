@@ -1546,9 +1546,11 @@
                         <span class="arrow">▼</span>
                     </div>
                     <div class="options" id="font-options" style="display:none;">
-                        <span class="selectEmoji defemoji" data="defemoji">🌾🌽🪙</span>
-                        <span class="selectEmoji twemoji" data="twemoji">🌾🌽🪙</span>
                         <span class="selectEmoji notoemoji" data="notoemoji">🌾🌽🪙</span>
+                        <span class="selectEmoji twemoji" data="twemoji">🌾🌽🪙</span>
+                        <span class="selectEmoji fluentemoji" data="fluentemoji">🌾🌽🪙</span>
+                        <span class="selectEmoji openmoji" data="openmoji">🌾🌽🪙</span>
+                        <span class="selectEmoji emojione" data="emojione">🌾🌽🪙</span>
                     </div>
                 </div>
             </div>

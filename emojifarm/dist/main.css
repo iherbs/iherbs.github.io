@@ -27,6 +27,24 @@
   src: url("../font/NotoColorEmoji.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "fluentemoji";
+  font-style: "normal";
+  src: url("../font/FluentEmojiColor.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "openmoji";
+  font-style: "normal";
+  src: url("../font/openmoji.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "emojione";
+  font-style: "normal";
+  src: url("../font/emojione.ttf") format("truetype");
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --theme-color: #ffffff;
@@ -61,6 +79,18 @@ body {
 
 .notoemoji {
   font-family: "Delius", "notoemoji", sans-serif;
+}
+
+.fluentemoji {
+  font-family: "Delius", "fluentemoji", sans-serif;
+}
+
+.openmoji {
+  font-family: "Delius", "openmoji", sans-serif;
+}
+
+.emojione {
+  font-family: "Delius", "emojione", sans-serif;
 }
 
 button {
