@@ -668,42 +668,42 @@
     const now = new Date();
     const lastPlayed = new Date(gameState.lastPlayed);
     const secondsPassed = (now - lastPlayed) / 1000;
-    const gameSecondsPassed = secondsPassed * gameState.realTimeScale;
-    if (gameSecondsPassed > 0) {
-      const maxDays = 120; // Batas maksimum 120 hari offline
-      const daysPassed = Math.min(
-        Math.floor(gameSecondsPassed / gameState.dayDuration),
-        maxDays,
-      );
-      const remainingSeconds = gameSecondsPassed % gameState.dayDuration;
-      if (daysPassed > 0) {
-        for (let i = 0; i < daysPassed; i++) {
-          advanceDay();
-        }
-        setTimeout(() => {
-          showNotification(`Welcome back!`);
-        }, 300);
-      }
-      gameState.time = remainingSeconds;
 
-      // Update livestock production
+    if (secondsPassed > 0) {
+      // 1. Unified Time Tracking
+      const gameSecondsPassed = secondsPassed * (gameState.realTimeScale || 60);
+      gameState.time =
+        (gameState.time + gameSecondsPassed) % gameState.dayDuration;
+
+      // 2. Farming Plot Growth (Bulk calculation)
+      gameState.plots.forEach((plot, index) => {
+        if (plot.plant) {
+          plot.growth += gameSecondsPassed;
+          const growthTime = getGrowthTime(plot.plant);
+          if (plot.growth > growthTime) plot.growth = growthTime;
+          updatePlotUI(index);
+        }
+      });
+
+      // 3. Livestock Production (Bulk calculation)
       gameState.livestock.forEach((ls) => {
         if (ls.isProducing && !ls.yieldReady) {
           const lsInfo = livestockTypes.find((l) => l.type === ls.type);
           if (lsInfo) {
-            // production increases by real seconds * 0.1 (since tick is 100ms)
-            // Wait, calculateOfflineProgress uses gameSecondsPassed.
-            // Tick increases production by 0.1 every 100ms.
-            // That means production increases by 1.0 every 1 second of real time.
-            ls.production += secondsPassed;
-
-            if (ls.production >= lsInfo.growthTime) {
-              ls.production = lsInfo.growthTime;
+            // Synchronized with realTimeScale
+            ls.production += gameSecondsPassed;
+            const productionLimit = lsInfo.growthTime * gameState.dayDuration;
+            if (ls.production >= productionLimit) {
+              ls.production = productionLimit;
               ls.yieldReady = true;
             }
           }
         }
       });
+
+      setTimeout(() => {
+        showNotification(`Welcome back!`);
+      }, 300);
     }
   };
 
@@ -908,7 +908,8 @@
     }
     let lastAutoHarvest = 0;
     gameInterval = setInterval(() => {
-      gameState.time += 0.1;
+      const timeIncrement = 0.1 * (gameState.realTimeScale || 1);
+      gameState.time += timeIncrement;
 
       // Kurangi hunger setiap hari (10 per hari, 60 detik)
       if (gameState.pet.length > 0) {
@@ -956,10 +957,11 @@
           }
 
           if (ls.isProducing && !ls.yieldReady) {
-            ls.production += 0.1;
+            ls.production += timeIncrement;
             const lsInfo = livestockTypes.find((l) => l.type === ls.type);
-            if (ls.production >= lsInfo.growthTime) {
-              ls.production = lsInfo.growthTime;
+            const productionLimit = lsInfo.growthTime * gameState.dayDuration;
+            if (ls.production >= productionLimit) {
+              ls.production = productionLimit;
               ls.yieldReady = true;
               showNotification(`${ls.emoji} has produced ${lsInfo.yield}`);
             }
@@ -984,7 +986,7 @@
       updateTimeDisplay();
       const hasGrowingPlants = gameState.plots.some((plot) => plot.plant);
       if (hasGrowingPlants) {
-        updatePlantGrowth(0.1);
+        updatePlantGrowth(timeIncrement);
       }
       if (gameState.time >= gameState.dayDuration) {
         nextDay();
@@ -1224,7 +1226,7 @@
   // Helper functions to get plant info
   const getGrowthTime = (emoji) => {
     const plant = plantTypes.find((p) => p.emoji === emoji);
-    return plant ? plant.growthTime : 0;
+    return plant ? plant.growthTime * (gameState.dayDuration || 60) : 0;
   };
 
   const getPlantValue = (emoji) => {
@@ -2505,7 +2507,7 @@
       }
 
       const prodFill = _(`#ls-prod-${ls.id}`);
-      const prodProgress = (ls.production / lsInfo.growthTime) * 100;
+      const prodProgress = (ls.production / (lsInfo.growthTime * (gameState.dayDuration || 60))) * 100;
       const widthStr = `${prodProgress}%`;
       if (prodFill.style.width !== widthStr) prodFill.style.width = widthStr;
 
@@ -3189,12 +3191,18 @@
   dangerZone.className = "danger-zone";
   gameCanvas.appendChild(dangerZone);
 
+  // Guide Line
+  const guideLine = document.createElement("div");
+  guideLine.className = "drop-guide-line";
+  guideLine.style.display = "none";
+  gameCanvas.appendChild(guideLine);
+
   // Create engine
   const engine = Engine.create({
-    gravity: { x: 0, y: 1, scale: 0.001 },
-    constraintIterations: 2,
-    positionIterations: 4,
-    velocityIterations: 4,
+    gravity: { x: 0, y: 1.2, scale: 0.001 }, // Slightly stronger gravity
+    constraintIterations: 4,
+    positionIterations: 8,
+    velocityIterations: 8,
     enableSleeping: true,
   });
 
@@ -3209,7 +3217,7 @@
       canvasHeight + WALL_THICKNESS / 2 - 5,
       canvasWidth,
       WALL_THICKNESS,
-      { isStatic: true, friction: 0, render: { visible: false } },
+      { isStatic: true, friction: 0.2, render: { visible: false } },
     ),
     // left
     Bodies.rectangle(
@@ -3217,7 +3225,7 @@
       canvasHeight / 2,
       WALL_THICKNESS - 10,
       canvasHeight,
-      { isStatic: true, friction: 0, render: { visible: false } },
+      { isStatic: true, friction: 0.1, render: { visible: false } },
     ),
     // right
     Bodies.rectangle(
@@ -3225,7 +3233,7 @@
       canvasHeight / 2,
       WALL_THICKNESS,
       canvasHeight,
-      { isStatic: true, friction: 0, render: { visible: false } },
+      { isStatic: true, friction: 0.1, render: { visible: false } },
     ),
   ];
   World.add(engine.world, walls);
@@ -3250,7 +3258,7 @@
   let lastUpdateTime = performance.now();
 
   const getRandomEmojiIndex = () => {
-    const weights = [0.4, 0.3, 0.15, 0.08, 0.05, 0.02];
+    const weights = [0.45, 0.35, 0.12, 0.05, 0.03]; // More early crops
     let rand = Math.random(),
       sum = 0;
     for (let i = 0; i < weights.length; i++) {
@@ -3260,19 +3268,17 @@
     return 0;
   };
 
-  const createEmoji = (x, y, emojiIndex) => {
-    if (isGameOver) {
-      // console.log('Game over, cannot spawn emoji');
-      return null;
-    }
+  const createEmoji = (x, y, emojiIndex, isMerge = false) => {
+    if (isGameOver) return null;
 
     const size = EMOJI_SIZES[emojiIndex];
     const emoji = EMOJI_SEQUENCE[emojiIndex];
 
     const body = Bodies.circle(x, y, size / 2, {
-      restitution: 0.1,
-      friction: 0.5,
-      density: 0.001 * size,
+      restitution: 0.3, // Bouncier!
+      friction: 0.1,
+      frictionAir: 0.01,
+      density: 0.001,
       render: { visible: false },
       label: `emoji-${emojiIndex}`,
       sleepThreshold: 60,
@@ -3286,27 +3292,22 @@
     });
 
     World.add(engine.world, body);
-    createEmojiElement(body);
-    // console.log(`Created emoji: ${emoji} at (${x}, ${y}) with size ${size}`);
+    createEmojiElement(body, isMerge);
     return body;
   };
 
-  const createEmojiElement = (body) => {
+  const createEmojiElement = (body, isMerge = false) => {
     const emojiData = emojiBodies.get(body);
-    if (!emojiData) {
-      console.error("No emoji data for body");
-      return;
-    }
+    if (!emojiData) return;
 
     const element = document.createElement("div");
-    element.className = "emoji";
+    element.className = "emoji" + (isMerge ? " merged" : "");
     element.textContent = emojiData.emoji;
     element.style.fontSize = `${EMOJI_SIZES[emojiData.index]}px`;
     element.style.zIndex = "20";
     gameCanvas.appendChild(element);
     emojiData.element = element;
     updateEmojiElementPosition(body);
-    // console.log(`Created DOM element for emoji: ${emojiData.emoji}`);
   };
 
   const updateEmojiElementPosition = (body) => {
@@ -3329,7 +3330,9 @@
     previewElement.style.zIndex = "25";
     previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
     gameCanvas.appendChild(previewElement);
-    // console.log('Created preview element');
+    
+    // Also show guide line
+    guideLine.style.display = "block";
   };
 
   // Update preview position
@@ -3337,12 +3340,16 @@
     if (!previewElement || isGameOver) return;
     const size = EMOJI_SIZES[nextEmojiIndex];
     // Batasi posisi x agar tetap di dalam canvas
-    const clampedX =
-      Math.max(size / 2, Math.min(canvasWidth - size / 2, x)) + 5;
-    previewElement.style.left = `${clampedX - size / 2 - WALL_THICKNESS}px`;
-    previewElement.style.top = `30px`; // Tetap di tengah danger zone
+    const margin = WALL_THICKNESS + 5;
+    const clampedX = Math.max(size / 2 + 5, Math.min(canvasWidth - size / 2 - 5, x));
+    
+    previewElement.style.left = `${clampedX - size / 2}px`;
+    previewElement.style.top = `15px`;
     previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
     previewElement.style.fontSize = `${EMOJI_SIZES[nextEmojiIndex]}px`;
+
+    // Update Guide Line position
+    guideLine.style.left = `${clampedX}px`;
   };
 
   // Remove preview element
@@ -3350,12 +3357,13 @@
     if (previewElement) {
       previewElement.remove();
       previewElement = null;
-      // console.log('Removed preview element');
     }
+    // Also hide guide line
+    guideLine.style.display = "none";
   };
 
   Events.on(engine, "collisionStart", function (event) {
-    if (merging || isGameOver) return;
+    if (isGameOver) return; // Removed merging flag check to allow simultaneous merges
 
     const pairs = event.pairs;
     for (let pair of pairs) {
@@ -3365,8 +3373,6 @@
       ) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-
-        if (bodyA.isSleeping && bodyB.isSleeping) continue;
 
         const emojiDataA = emojiBodies.get(bodyA);
         const emojiDataB = emojiBodies.get(bodyB);
@@ -3379,9 +3385,7 @@
           !emojiDataB.merged &&
           emojiDataA.index < EMOJI_SEQUENCE.length - 1
         ) {
-          merging = true;
           mergeEmojis(bodyA, bodyB);
-          merging = false;
         }
       }
     }
@@ -3401,9 +3405,25 @@
     removeEmoji(bodyB);
 
     const newEmojiIndex = emojiDataA.index + 1;
-    const newBody = createEmoji(mergeX, mergeY, newEmojiIndex);
+    const newBody = createEmoji(mergeX, mergeY, newEmojiIndex, true);
 
     playSound("match.wav");
+    
+    // Add "Push" force to nearby objects when merging
+    const blastRadius = EMOJI_SIZES[newEmojiIndex] * 1.5;
+    emojiBodies.forEach((data, otherBody) => {
+      if (otherBody === newBody) return;
+      const dist = Matter.Vector.magnitude(Matter.Vector.sub(otherBody.position, {x: mergeX, y: mergeY}));
+      if (dist < blastRadius) {
+        const force = (1 - dist / blastRadius) * 0.05;
+        const angle = Math.atan2(otherBody.position.y - mergeY, otherBody.position.x - mergeX);
+        Body.applyForce(otherBody, otherBody.position, {
+          x: Math.cos(angle) * force,
+          y: Math.sin(angle) * force
+        });
+      }
+    });
+
     if (newEmojiIndex === EMOJI_SEQUENCE.length - 1) {
       gameOver(true);
       return;
@@ -3413,9 +3433,10 @@
     scoreElement.textContent = score;
 
     if (newBody) {
+      // Small pop upward for the new body
       Body.applyForce(newBody, newBody.position, {
-        x: (Math.random() - 0.5) * 0.01,
-        y: -0.02,
+        x: (Math.random() - 0.5) * 0.005,
+        y: -0.01,
       });
     }
   };
@@ -3427,7 +3448,6 @@
     emojiData.merged = true;
     if (emojiData.element) {
       emojiData.element.remove();
-      // console.log(`Removed emoji: ${emojiData.emoji}`);
     }
     World.remove(engine.world, body);
     emojiBodies.delete(body);
@@ -3451,22 +3471,16 @@
   };
 
   const spawnEmoji = (x) => {
-    if (!gameStarted) {
-      return;
-    }
-    if (!canSpawn || isGameOver) {
-      // console.log('Cannot spawn: canSpawn=', canSpawn, 'isGameOver=', isGameOver);
-      return;
-    }
+    if (!gameStarted || !canSpawn || isGameOver) return;
 
     canSpawn = false;
-    setTimeout(() => (canSpawn = true), 500);
+    setTimeout(() => (canSpawn = true), 600); // Slightly longer cooldown
 
-    // console.log(`Spawning emoji at x=${x}`);
-    removePreviewElement(); // Hapus preview sebelum spawn
-    createEmoji(x, 50, nextEmojiIndex);
+    removePreviewElement();
+    const clampedX = Math.max(EMOJI_SIZES[nextEmojiIndex] / 2 + 5, Math.min(canvasWidth - EMOJI_SIZES[nextEmojiIndex] / 2 - 5, x));
+    createEmoji(clampedX, 50, nextEmojiIndex);
     updateNextEmoji();
-    createPreviewElement(); // Buat preview baru setelah spawn
+    createPreviewElement();
   };
 
   // Event handlers untuk preview
@@ -3493,7 +3507,6 @@
     if (!canSpawn || isGameOver) return;
     const rect = gameCanvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    // console.log(`Click at x=${x}`);
     spawnEmoji(x);
   });
 
@@ -3503,6 +3516,7 @@
     const rect = gameCanvas.getBoundingClientRect();
     const x = e.touches[0].clientX - rect.left;
     lastPositionX = x;
+    updatePreviewPosition(x); // Show preview immediately on touch
   });
 
   gameCanvas.addEventListener("touchend", function (e) {
@@ -3521,12 +3535,14 @@
 
         updateEmojiElementPosition(body);
 
-        if (body.position.y < DANGER_ZONE_Y + 15 && body.speed < 0.1) {
-          // console.log('Game over triggered: emoji in danger zone');
+        // Game over check (slightly more lenient buffer)
+        if (body.position.y < DANGER_ZONE_Y && body.speed < 0.05) {
           gameOver();
           return;
         }
-        if (body.position.y < DANGER_ZONE_Y) {
+        
+        // Visual warning check
+        if (body.position.y < DANGER_ZONE_Y + 40) {
           dangerZoneActive = true;
         }
 
@@ -3538,6 +3554,13 @@
           removeEmoji(body);
         }
       });
+
+      // Toggle visual warning
+      if (dangerZoneActive) {
+        dangerZone.classList.add("warning");
+      } else {
+        dangerZone.classList.remove("warning");
+      }
 
       lastUpdateTime = timestamp;
     }
