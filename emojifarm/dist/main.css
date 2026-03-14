@@ -1009,9 +1009,7 @@ button {
   position: absolute;
   font-size: 2.5rem;
   transition:
-    transform 0.3s ease-in-out,
-    left 3s ease-in-out,
-    top 3s ease-in-out;
+    transform 0.3s ease-in-out;
   cursor: grab;
   transform-origin: center;
   z-index: 1;
@@ -1470,7 +1468,7 @@ input:checked + .slider:before {
   position: fixed;
   display: grid;
   place-items: center;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   margin-bottom: 20px;
   padding: 10px;
@@ -1491,6 +1489,7 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   height: 120px;
+  width: 94px;
   max-width: 168px;
   position: relative;
   border: 2px solid #bdbdbd;

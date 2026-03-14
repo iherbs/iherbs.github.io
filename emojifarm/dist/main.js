@@ -1379,11 +1379,11 @@
             parsed.kitchen.unlockedCount = 0;
           }
 
-          if (parsed.kitchen.stations.length !== 4) {
-            // Ensure there are always exactly 4 stations
-            while (parsed.kitchen.stations.length < 4)
+          if (parsed.kitchen.stations.length !== 6) {
+            // Ensure there are always exactly 6 stations
+            while (parsed.kitchen.stations.length < 6)
               parsed.kitchen.stations.push(null);
-            parsed.kitchen.stations = parsed.kitchen.stations.slice(0, 4);
+            parsed.kitchen.stations = parsed.kitchen.stations.slice(0, 6);
           }
         }
 
@@ -3711,42 +3711,38 @@
     let isDragging = false;
     let randomMovementInterval;
     const container = document.getElementById("container");
-    let containerWidth = container.offsetWidth;
-    let lastX = Math.random() * (containerWidth - 50);
-    let lastY = Math.random() * (window.innerHeight - 50);
+    
+    // Target positions for roaming
+    let targetX = Math.random() * (container.offsetWidth - 50);
+    let targetY = Math.random() * (window.innerHeight - 50);
+    
+    // Live visual positions
+    let currentX = targetX;
+    let currentY = targetY;
 
     // Variabel untuk menyimpan posisi awal drag
     let startDragX, startDragY;
     let initialPetX, initialPetY;
 
     // Atur posisi awal
-    mypet.style.left = lastX + "px";
-    mypet.style.top = lastY + "px";
+    mypet.style.left = currentX + "px";
+    mypet.style.top = currentY + "px";
 
     // Fungsi untuk pergerakan acak
     function movemypetRandomly() {
       if (!isDragging) {
-        const maxX = containerWidth - 50;
-        const maxY = window.innerHeight - 50;
-        const randomX = Math.floor(Math.random() * maxX);
-        const randomY = Math.floor(Math.random() * maxY);
+        const liveContainerWidth = container.offsetWidth || 800;
+        const liveMaxY = window.innerHeight - 50;
+        
+        targetX = Math.floor(Math.random() * (liveContainerWidth - 50));
+        targetY = Math.floor(Math.random() * liveMaxY);
 
-        // Terapkan skala terlebih dahulu
-        if (randomX < lastX) {
-          mypet.style.transform = "scale(1, 1)"; // Ke kanan
+        // Terapkan skala (flip) berdasarkan arah target
+        if (targetX < currentX) {
+          mypet.style.transform = "scale(1, 1)"; // Ke kiri
         } else {
-          mypet.style.transform = "scale(-1, 1)"; // Ke kiri
+          mypet.style.transform = "scale(-1, 1)"; // Ke kanan
         }
-
-        // Tunda pergerakan hingga skala selesai
-        setTimeout(() => {
-          if (!isDragging) {
-            mypet.style.left = randomX + "px";
-            mypet.style.top = randomY + "px";
-            lastX = randomX;
-            lastY = randomY;
-          }
-        }, 300); // Sesuaikan dengan durasi transisi transform (0.3s)
       }
     }
 
@@ -3760,6 +3756,21 @@
       }, initialDelay);
     }
 
+    // --- Animation Loop 60FPS (Lerping) ---
+    function animate() {
+        if (!isDragging) {
+            // Smoothly move current position towards target
+            // 0.01 factor at 60FPS is nice and slow
+            currentX += (targetX - currentX) * 0.01;
+            currentY += (targetY - currentY) * 0.01;
+            
+            mypet.style.left = currentX + "px";
+            mypet.style.top = currentY + "px";
+        }
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
     // Hentikan pergerakan acak
     function stopRandomMovement() {
       clearInterval(randomMovementInterval);
@@ -3769,34 +3780,36 @@
     mypet.addEventListener("mousedown", (e) => {
       isDragging = true;
       stopRandomMovement();
-      e.preventDefault();
-
+      
+      mypet.classList.add("dragging");
+      
       startDragX = e.clientX;
       startDragY = e.clientY;
-      initialPetX = parseFloat(mypet.style.left) || 0;
-      initialPetY = parseFloat(mypet.style.top) || 0;
+      initialPetX = currentX;
+      initialPetY = currentY;
+      
+      e.preventDefault();
     });
 
     document.addEventListener("mousemove", (e) => {
       if (isDragging) {
-        mypet.classList.add("dragging");
+        if (!mypet.classList.contains("dragging")) mypet.classList.add("dragging");
 
         const dx = e.clientX - startDragX;
         const dy = e.clientY - startDragY;
 
-        let x = initialPetX + dx;
-        let y = initialPetY + dy;
+        currentX = initialPetX + dx;
+        currentY = initialPetY + dy;
 
-        // Batasi agar pet tidak keluar kontainer (optional tapi bagus untuk UX)
-        const maxX = (container.offsetWidth || window.innerWidth) - 50;
+        // Clamping to container
+        const liveContainerWidth = container.offsetWidth || 800;
+        const maxX = liveContainerWidth - 50;
         const maxY = window.innerHeight - 50;
-        x = Math.max(0, Math.min(maxX, x));
-        y = Math.max(0, Math.min(maxY, y));
+        currentX = Math.max(0, Math.min(maxX, currentX));
+        currentY = Math.max(0, Math.min(maxY, currentY));
 
-        mypet.style.left = x + "px";
-        mypet.style.top = y + "px";
-        lastX = x;
-        lastY = y;
+        mypet.style.left = currentX + "px";
+        mypet.style.top = currentY + "px";
       }
     });
 
@@ -3804,6 +3817,9 @@
       if (isDragging) {
         isDragging = false;
         mypet.classList.remove("dragging");
+        // Update target to current position to avoid snap-back
+        targetX = currentX;
+        targetY = currentY;
         startRandomMovement();
       }
     });
@@ -3812,35 +3828,37 @@
     mypet.addEventListener("touchstart", (e) => {
       isDragging = true;
       stopRandomMovement();
-      e.preventDefault();
+      
+      mypet.classList.add("dragging");
 
       const touch = e.touches[0];
       startDragX = touch.clientX;
       startDragY = touch.clientY;
-      initialPetX = parseFloat(mypet.style.left) || 0;
-      initialPetY = parseFloat(mypet.style.top) || 0;
+      initialPetX = currentX;
+      initialPetY = currentY;
+
+      e.preventDefault();
     });
 
     document.addEventListener("touchmove", (e) => {
       if (isDragging) {
-        mypet.classList.add("dragging");
+        if (!mypet.classList.contains("dragging")) mypet.classList.add("dragging");
         const touch = e.touches[0];
 
         const dx = touch.clientX - startDragX;
         const dy = touch.clientY - startDragY;
 
-        let x = initialPetX + dx;
-        let y = initialPetY + dy;
+        currentX = initialPetX + dx;
+        currentY = initialPetY + dy;
 
-        const maxX = (container.offsetWidth || window.innerWidth) - 50;
+        const liveContainerWidth = container.offsetWidth || 800;
+        const maxX = liveContainerWidth - 50;
         const maxY = window.innerHeight - 50;
-        x = Math.max(0, Math.min(maxX, x));
-        y = Math.max(0, Math.min(maxY, y));
+        currentX = Math.max(0, Math.min(maxX, currentX));
+        currentY = Math.max(0, Math.min(maxY, currentY));
 
-        mypet.style.left = x + "px";
-        mypet.style.top = y + "px";
-        lastX = x;
-        lastY = y;
+        mypet.style.left = currentX + "px";
+        mypet.style.top = currentY + "px";
       }
     });
 
@@ -3848,6 +3866,8 @@
       if (isDragging) {
         isDragging = false;
         mypet.classList.remove("dragging");
+        targetX = currentX;
+        targetY = currentY;
         startRandomMovement();
       }
     });
@@ -5068,10 +5088,10 @@
   const updateKitchenStations = () => {
     const list = _("#kitchen-stations");
 
-    // Initialize exactly 4 divs if not already there
-    if (list.children.length !== 4) {
+    // Initialize exactly 6 divs if not already there
+    if (list.children.length !== 6) {
       list.innerHTML = "";
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 6; i++) {
         const div = document.createElement("div");
         div.id = `station-${i}`;
         div.className = "kitchen-station idle";
@@ -5100,16 +5120,20 @@
 
         if (stationDiv.className !== "kitchen-station locked") {
           stationDiv.className = "kitchen-station locked";
-          stationDiv.innerHTML = `
-            <div class="station-locked-icon">🔒</div>
-            <button class="recipe-button buy" style="font-size: 0.7rem !important; padding: 5px;">
-              Buy Stove<br>🪙${stoveCost}
-            </button>
-          `;
-          stationDiv.querySelector("button").addEventListener("click", (e) => {
-            e.stopPropagation();
-            buyStove(index, stoveCost);
-          });
+          stationDiv.innerHTML = `<div class="station-locked-icon">🔒</div>`;
+          
+          // Only show Buy button if it's the NEXT stove in sequence
+          if (index === gameState.kitchen.unlockedCount) {
+             stationDiv.innerHTML += `
+              <button class="recipe-button buy" style="font-size: 0.7rem !important; padding: 5px;">
+                Buy Stove<br>🪙${stoveCost}
+              </button>
+            `;
+            stationDiv.querySelector("button").addEventListener("click", (e) => {
+              e.stopPropagation();
+              buyStove(index, stoveCost);
+            });
+          }
         }
         return;
       }
@@ -5208,6 +5232,11 @@
 
     if (gameState.money < cost) {
       showNotification("Not enough money to buy this stove!");
+      return;
+    }
+
+    if (index !== gameState.kitchen.unlockedCount) {
+      showNotification("You must buy stoves in order!");
       return;
     }
 
