@@ -50,13 +50,13 @@
     { emoji: "🍋‍🟩", name: "Lime", growthTime: 33, value: 30, cost: 24 },
     { emoji: "🍌", name: "Banana", growthTime: 40, value: 38, cost: 30 },
     { emoji: "🍉", name: "Watermelon", growthTime: 40, value: 38, cost: 32 },
-    { emoji: "🍇", name: "Grapes", growthTime: 45, value: 45, cost: 35 },
+    { emoji: "🍍", name: "Pineapple", growthTime: 45, value: 45, cost: 35 },
     { emoji: "🫐", name: "Blueberries", growthTime: 44, value: 44, cost: 37 },
     { emoji: "🍈", name: "Melon", growthTime: 50, value: 48, cost: 40 },
     { emoji: "🍒", name: "Cherry", growthTime: 50, value: 45, cost: 38 },
     { emoji: "🍑", name: "Peach", growthTime: 60, value: 55, cost: 44 },
     { emoji: "🥭", name: "Mango", growthTime: 55, value: 50, cost: 42 },
-    { emoji: "🍍", name: "Pineapple", growthTime: 55, value: 50, cost: 45 },
+    { emoji: "🍇", name: "Grapes", growthTime: 55, value: 50, cost: 45 },
     { emoji: "🥥", name: "Coconut", growthTime: 57, value: 52, cost: 46 },
     { emoji: "🥝", name: "Kiwi", growthTime: 62, value: 58, cost: 48 },
     { emoji: "🥑", name: "Avocado", growthTime: 60, value: 55, cost: 50 },
@@ -159,9 +159,9 @@
   ];
   const livestockItems = [
     { emoji: "🥚", name: "Egg", value: 10 },
-    { emoji: "🍗", name: "Chicken", value: 100 },
+    { emoji: "🍗", name: "Chicken", value: 110 },
     { emoji: "🥛", name: "Milk", value: 20 },
-    { emoji: "🥩", name: "Beef", value: 160 },
+    { emoji: "🥩", name: "Beef", value: 180 },
   ];
 
   const livestockTypes = [
@@ -198,7 +198,7 @@
       name: "Popcorn",
       ingredients: { "🌽": 1 },
       time: 10,
-      value: 30,
+      value: 8,
       cost: 100,
     },
     {
@@ -206,8 +206,8 @@
       emoji: "🍟",
       name: "French Fries",
       ingredients: { "🥔": 1 },
-      time: 20,
-      value: 22,
+      time: 12,
+      value: 23,
       cost: 300,
     },
     {
@@ -215,8 +215,8 @@
       emoji: "🍹",
       name: "Juice",
       ingredients: { "🍍": 1 },
-      time: 30,
-      value: 37,
+      time: 14,
+      value: 38,
       cost: 500,
     },
     {
@@ -224,8 +224,8 @@
       emoji: "🍷",
       name: "Wine",
       ingredients: { "🍇": 1 },
-      time: 40,
-      value: 47,
+      time: 16,
+      value: 48,
       cost: 500,
     },
     {
@@ -233,8 +233,8 @@
       emoji: "🥗",
       name: "Salad",
       ingredients: { "🥬": 1, "🍅": 1, "🥒": 1 },
-      time: 50,
-      value: 55,
+      time: 17,
+      value: 59,
       cost: 700,
     },
     {
@@ -242,35 +242,35 @@
       emoji: "🍳",
       name: "Omelet",
       ingredients: { "🥚": 1 },
-      time: 60,
-      value: 10,
+      time: 20,
+      value: 12,
       cost: 700,
-    },
-    {
-      id: "spaghetti",
-      emoji: "🍝",
-      name: "Spaghetti",
-      ingredients: { "🌾": 1, "🍅": 1, "🥚": 1 },
-      time: 70,
-      value: 45,
-      cost: 600,
     },
     {
       id: "cheese",
       emoji: "🧀",
       name: "Cheese",
       ingredients: { "🥛": 1 },
-      time: 80,
-      value: 18,
-      cost: 800,
+      time: 25,
+      value: 45,
+      cost: 600,
     },
     {
       id: "bread",
       emoji: "🍞",
       name: "Bread",
       ingredients: { "🌾": 1, "🥛": 1 },
-      time: 90,
+      time: 28,
       value: 25,
+      cost: 800,
+    },
+    {
+      id: "spaghetti",
+      emoji: "🍝",
+      name: "Spaghetti",
+      ingredients: { "🌾": 1, "🍅": 1, "🥚": 1 },
+      time: 30,
+      value: 33,
       cost: 900,
     },
     {
@@ -278,8 +278,8 @@
       emoji: "🍦",
       name: "Ice Cream",
       ingredients: { "🥛": 1, "🍓": 1 },
-      time: 100,
-      value: 35,
+      time: 33,
+      value: 45,
       cost: 500,
     },
     {
@@ -287,8 +287,8 @@
       emoji: "🥞",
       name: "Pancake",
       ingredients: { "🌾": 1, "🥚": 1, "🥛": 1 },
-      time: 110,
-      value: 35,
+      time: 35,
+      value: 55,
       cost: 700,
     },
     {
@@ -296,35 +296,35 @@
       emoji: "🍰",
       name: "Cake",
       ingredients: { "🌾": 1, "🥚": 1, "🍓": 1 },
-      time: 120,
-      value: 40,
+      time: 38,
+      value: 55,
       cost: 1000,
-    },
-    {
-      id: "soup",
-      emoji: "🍲",
-      name: "Soup",
-      ingredients: { "🥬": 1, "🍗": 1, "🥒": 1, "🍅": 1, "🥚": 1 },
-      time: 130,
-      value: 180,
-      cost: 1200,
     },
     {
       id: "sandwich",
       emoji: "🥪",
       name: "Sandwich",
       ingredients: { "🍞": 1, "🥬": 1, "🥒": 1, "🍅": 1, "🥚": 1 },
-      time: 140,
-      value: 85,
+      time: 48,
+      value: 110,
       cost: 1100,
+    },
+    {
+      id: "soup",
+      emoji: "🍲",
+      name: "Soup",
+      ingredients: { "🥬": 1, "🍗": 1, "🥒": 1, "🍅": 1, "🥚": 1 },
+      time: 42,
+      value: 200,
+      cost: 1200,
     },
     {
       id: "taco",
       emoji: "🌮",
       name: "Taco",
       ingredients: { "🌽": 1, "🥩": 1, "🥬": 1 },
-      time: 150,
-      value: 250,
+      time: 50,
+      value: 220,
       cost: 1200,
     },
     {
@@ -332,7 +332,7 @@
       emoji: "🌭",
       name: "Hot Dog",
       ingredients: { "🍞": 1, "🥬": 1, "🥩": 1 },
-      time: 160,
+      time: 55,
       value: 240,
       cost: 1400,
     },
@@ -341,8 +341,8 @@
       emoji: "🍔",
       name: "Burger",
       ingredients: { "🍞": 1, "🥬": 1, "🥒": 1, "🍅": 1, "🥩": 1, "🧀": 1 },
-      time: 170,
-      value: 270,
+      time: 58,
+      value: 300,
       cost: 1700,
     },
     {
@@ -350,8 +350,8 @@
       emoji: "🍕",
       name: "Pizza",
       ingredients: { "🍞": 1, "🍅": 1, "🥩": 1, "🫑": 1, "🍄": 1, "🧀": 1 },
-      time: 200,
-      value: 300,
+      time: 66,
+      value: 330,
       cost: 2000,
     },
   ];
@@ -1841,7 +1841,7 @@
 
       gameState.points += 1; // Livestock quests give more points
       const itemValue = getSellPrice(itemEmoji);
-      const reward = (itemValue + 1) * quantity; // Reward
+      const reward = (itemValue + 5) * quantity; // Reward
       gameState.money += reward;
       gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
@@ -1940,7 +1940,7 @@
 
       gameState.points += 1; // Kitchen quests give points
       const recipe = recipes.find((r) => r.emoji === recipeEmoji);
-      const reward = (recipe ? recipe.value + 3 : 10) * quantity;
+      const reward = (recipe ? recipe.value + 5 : 10) * quantity;
       gameState.money += reward;
       gameState.money = gameState.money > maxmoney ? maxmoney : gameState.money;
 
@@ -3711,11 +3711,11 @@
     let isDragging = false;
     let randomMovementInterval;
     const container = document.getElementById("container");
-    
+
     // Target positions for roaming
     let targetX = Math.random() * (container.offsetWidth - 50);
     let targetY = Math.random() * (window.innerHeight - 50);
-    
+
     // Live visual positions
     let currentX = targetX;
     let currentY = targetY;
@@ -3733,7 +3733,7 @@
       if (!isDragging) {
         const liveContainerWidth = container.offsetWidth || 800;
         const liveMaxY = window.innerHeight - 50;
-        
+
         targetX = Math.floor(Math.random() * (liveContainerWidth - 50));
         targetY = Math.floor(Math.random() * liveMaxY);
 
@@ -3758,16 +3758,16 @@
 
     // --- Animation Loop 60FPS (Lerping) ---
     function animate() {
-        if (!isDragging) {
-            // Smoothly move current position towards target
-            // 0.01 factor at 60FPS is nice and slow
-            currentX += (targetX - currentX) * 0.01;
-            currentY += (targetY - currentY) * 0.01;
-            
-            mypet.style.left = currentX + "px";
-            mypet.style.top = currentY + "px";
-        }
-        requestAnimationFrame(animate);
+      if (!isDragging) {
+        // Smoothly move current position towards target
+        // 0.01 factor at 60FPS is nice and slow
+        currentX += (targetX - currentX) * 0.01;
+        currentY += (targetY - currentY) * 0.01;
+
+        mypet.style.left = currentX + "px";
+        mypet.style.top = currentY + "px";
+      }
+      requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
 
@@ -3780,20 +3780,21 @@
     mypet.addEventListener("mousedown", (e) => {
       isDragging = true;
       stopRandomMovement();
-      
+
       mypet.classList.add("dragging");
-      
+
       startDragX = e.clientX;
       startDragY = e.clientY;
       initialPetX = currentX;
       initialPetY = currentY;
-      
+
       e.preventDefault();
     });
 
     document.addEventListener("mousemove", (e) => {
       if (isDragging) {
-        if (!mypet.classList.contains("dragging")) mypet.classList.add("dragging");
+        if (!mypet.classList.contains("dragging"))
+          mypet.classList.add("dragging");
 
         const dx = e.clientX - startDragX;
         const dy = e.clientY - startDragY;
@@ -3828,7 +3829,7 @@
     mypet.addEventListener("touchstart", (e) => {
       isDragging = true;
       stopRandomMovement();
-      
+
       mypet.classList.add("dragging");
 
       const touch = e.touches[0];
@@ -3842,7 +3843,8 @@
 
     document.addEventListener("touchmove", (e) => {
       if (isDragging) {
-        if (!mypet.classList.contains("dragging")) mypet.classList.add("dragging");
+        if (!mypet.classList.contains("dragging"))
+          mypet.classList.add("dragging");
         const touch = e.touches[0];
 
         const dx = touch.clientX - startDragX;
@@ -5121,18 +5123,20 @@
         if (stationDiv.className !== "kitchen-station locked") {
           stationDiv.className = "kitchen-station locked";
           stationDiv.innerHTML = `<div class="station-locked-icon">🔒</div>`;
-          
+
           // Only show Buy button if it's the NEXT stove in sequence
           if (index === gameState.kitchen.unlockedCount) {
-             stationDiv.innerHTML += `
+            stationDiv.innerHTML += `
               <button class="recipe-button buy" style="font-size: 0.7rem !important; padding: 5px;">
                 Buy Stove<br>🪙${stoveCost}
               </button>
             `;
-            stationDiv.querySelector("button").addEventListener("click", (e) => {
-              e.stopPropagation();
-              buyStove(index, stoveCost);
-            });
+            stationDiv
+              .querySelector("button")
+              .addEventListener("click", (e) => {
+                e.stopPropagation();
+                buyStove(index, stoveCost);
+              });
           }
         }
         return;
