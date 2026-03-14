@@ -349,7 +349,7 @@
       id: "pizza",
       emoji: "🍕",
       name: "Pizza",
-      ingredients: { "🍞": 1, "🍅": 1, "🥩": 1, "🍄": 1, "🧀": 1 },
+      ingredients: { "🍞": 1, "🍅": 1, "🥩": 1, "🫑": 1, "🍄": 1, "🧀": 1 },
       time: 200,
       value: 300,
       cost: 2000,
@@ -1048,14 +1048,17 @@
       if (plot.plant) {
         // Show seedling if not fully grown
         if (plot.growth < getGrowthTime(plot.plant)) {
-          if (plantElement.textContent !== "🌱") plantElement.textContent = "🌱";
+          if (plantElement.textContent !== "🌱")
+            plantElement.textContent = "🌱";
           if (!plantElement.classList.contains("grow-animation")) {
             plantElement.classList.remove("wave-animation");
             plantElement.classList.add("grow-animation");
           }
-          if (progressIcon.textContent !== plot.plant) progressIcon.textContent = plot.plant;
+          if (progressIcon.textContent !== plot.plant)
+            progressIcon.textContent = plot.plant;
         } else {
-          if (plantElement.textContent !== plot.plant) plantElement.textContent = plot.plant;
+          if (plantElement.textContent !== plot.plant)
+            plantElement.textContent = plot.plant;
           if (!plantElement.classList.contains("wave-animation")) {
             plantElement.classList.add("wave-animation");
             plantElement.classList.remove("grow-animation");
@@ -1064,7 +1067,8 @@
         }
 
         const widthStr = `${(plot.growth / getGrowthTime(plot.plant)) * 100}%`;
-        if (progressBar.style.width !== widthStr) progressBar.style.width = widthStr;
+        if (progressBar.style.width !== widthStr)
+          progressBar.style.width = widthStr;
       } else {
         if (progressIcon.textContent !== "") progressIcon.textContent = "";
         if (plantElement.textContent !== "") plantElement.textContent = "";
@@ -2175,12 +2179,15 @@
         // Perbarui hunger bar
         if (index === 0) {
           const emojiSpan = _("#pet-emoji-one");
-          if (emojiSpan.innerHTML !== pet.emoji) emojiSpan.innerHTML = pet.emoji;
-          if (petEmojiContainerOne.style.display !== "block") petEmojiContainerOne.style.display = "block";
-          
+          if (emojiSpan.innerHTML !== pet.emoji)
+            emojiSpan.innerHTML = pet.emoji;
+          if (petEmojiContainerOne.style.display !== "block")
+            petEmojiContainerOne.style.display = "block";
+
           const newClass = "pet-emoji-container pet-emoji-" + pet.id;
-          if (petEmojiContainerOne.className !== newClass) petEmojiContainerOne.className = newClass;
-          
+          if (petEmojiContainerOne.className !== newClass)
+            petEmojiContainerOne.className = newClass;
+
           if (!petEmojiContainerOne.dataset.listenerAdded) {
             const tapAnim = () => {
               _(`#love-animation-one`).classList.add("love-heart");
@@ -2194,13 +2201,16 @@
           }
         } else {
           const emojiSpan = _("#pet-emoji-two");
-          if (emojiSpan.innerHTML !== pet.emoji) emojiSpan.innerHTML = pet.emoji;
+          if (emojiSpan.innerHTML !== pet.emoji)
+            emojiSpan.innerHTML = pet.emoji;
 
-          if (petEmojiContainerTwo.style.display !== "block") petEmojiContainerTwo.style.display = "block";
-          
+          if (petEmojiContainerTwo.style.display !== "block")
+            petEmojiContainerTwo.style.display = "block";
+
           const newClass = "pet-emoji-container pet-emoji-" + pet.id;
-          if (petEmojiContainerTwo.className !== newClass) petEmojiContainerTwo.className = newClass;
-          
+          if (petEmojiContainerTwo.className !== newClass)
+            petEmojiContainerTwo.className = newClass;
+
           if (!petEmojiContainerTwo.dataset.listenerAdded) {
             const tapAnim = () => {
               _(`#love-animation-two`).classList.add("love-heart");
