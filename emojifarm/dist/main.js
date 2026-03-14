@@ -206,25 +206,25 @@
       emoji: "🍟",
       name: "French Fries",
       ingredients: { "🥔": 1 },
-      time: 50,
+      time: 20,
       value: 22,
       cost: 300,
-    },
-    {
-      id: "wine",
-      emoji: "🍷",
-      name: "Wine",
-      ingredients: { "🍇": 1 },
-      time: 80,
-      value: 37,
-      cost: 500,
     },
     {
       id: "juice",
       emoji: "🍹",
       name: "Juice",
       ingredients: { "🍍": 1 },
-      time: 80,
+      time: 30,
+      value: 37,
+      cost: 500,
+    },
+    {
+      id: "wine",
+      emoji: "🍷",
+      name: "Wine",
+      ingredients: { "🍇": 1 },
+      time: 40,
       value: 47,
       cost: 500,
     },
@@ -233,7 +233,7 @@
       emoji: "🥗",
       name: "Salad",
       ingredients: { "🥬": 1, "🍅": 1, "🥒": 1 },
-      time: 90,
+      time: 50,
       value: 55,
       cost: 700,
     },
@@ -242,7 +242,7 @@
       emoji: "🍳",
       name: "Omelet",
       ingredients: { "🥚": 1 },
-      time: 90,
+      time: 60,
       value: 10,
       cost: 700,
     },
@@ -251,7 +251,7 @@
       emoji: "🍝",
       name: "Spaghetti",
       ingredients: { "🌾": 1, "🍅": 1, "🥚": 1 },
-      time: 95,
+      time: 70,
       value: 45,
       cost: 600,
     },
@@ -260,7 +260,7 @@
       emoji: "🧀",
       name: "Cheese",
       ingredients: { "🥛": 1 },
-      time: 100,
+      time: 80,
       value: 18,
       cost: 800,
     },
@@ -269,7 +269,7 @@
       emoji: "🍞",
       name: "Bread",
       ingredients: { "🌾": 1, "🥛": 1 },
-      time: 100,
+      time: 90,
       value: 25,
       cost: 900,
     },
@@ -278,7 +278,7 @@
       emoji: "🍦",
       name: "Ice Cream",
       ingredients: { "🥛": 1, "🍓": 1 },
-      time: 110,
+      time: 100,
       value: 35,
       cost: 500,
     },
@@ -287,7 +287,7 @@
       emoji: "🥞",
       name: "Pancake",
       ingredients: { "🌾": 1, "🥚": 1, "🥛": 1 },
-      time: 120,
+      time: 110,
       value: 35,
       cost: 700,
     },
@@ -951,8 +951,7 @@
 
             // Move towards target
             if (ls.newX !== undefined) {
-              ls.x += (ls.newX - ls.x) * 0.01;
-              ls.y += (ls.newY - ls.y) * 0.01;
+              // Position lerping is now handled by requestAnimationFrame for 60FPS smoothness
             }
           }
 
@@ -991,6 +990,30 @@
         nextDay();
       }
     }, 100);
+
+    // --- High-Frequency Animation Loop (60FPS) for Smooth Livestock Movement ---
+    const syncLivestockMovement = () => {
+      const container = _("#livestock-container");
+      if (container && container.style.display === "flex") {
+        gameState.livestock.forEach((ls) => {
+          if (!ls.isDragging && ls.newX !== undefined) {
+            // Smoothly interpolate towards target (Lerp)
+            // 0.02 factor at 60FPS is roughly equivalent to 0.12 per 100ms
+            ls.x += (ls.newX - ls.x) * 0.005;
+            ls.y += (ls.newY - ls.y) * 0.005;
+
+            // Only update DOM if it exists to avoid unnecessary lookups
+            const item = document.getElementById(`ls-item-${ls.id}`);
+            if (item) {
+              item.style.left = `calc(${ls.x}% - 40px)`;
+              item.style.top = `calc(${ls.y}% - 40px)`;
+            }
+          }
+        });
+      }
+      requestAnimationFrame(syncLivestockMovement);
+    };
+    requestAnimationFrame(syncLivestockMovement);
   };
 
   // Update plant growth based on elapsed time
@@ -1321,6 +1344,17 @@
         // Migrate livestock if not present
         if (!parsed.livestock) {
           parsed.livestock = [];
+        } else {
+          // Ensure all livestock have a unique ID
+          parsed.livestock.forEach((ls) => {
+            if (!ls.id) {
+              ls.id =
+                "ls_" +
+                Date.now() +
+                "_" +
+                Math.random().toString(36).substr(2, 9);
+            }
+          });
         }
 
         // Migrate kitchen if not present or old format
@@ -2280,6 +2314,11 @@
         if (gameState.money - lsInfo.cost >= 50) {
           gameState.money -= lsInfo.cost;
           gameState.livestock.push({
+            id:
+              "ls_" +
+              Date.now() +
+              "_" +
+              Math.random().toString(36).substr(2, 9),
             type: type,
             emoji: lsInfo.emoji,
             production: 0,
@@ -2307,14 +2346,24 @@
     const list = _("#livestock-list");
     if (!list) return;
 
-    gameState.livestock.forEach((ls, index) => {
-      const lsInfo = livestockTypes.find((l) => l.type === ls.type);
-      let item = _(`#ls-item-${index}`);
+    // --- 1. Cleanup (Remove DOM elements that no longer exist in gameState) ---
+    const existingIds = gameState.livestock.map((ls) => ls.id);
+    const activeDomElements = list.querySelectorAll(".livestock-item");
+    activeDomElements.forEach((el) => {
+      const elId = el.id.replace("ls-item-", "");
+      if (!existingIds.includes(elId)) {
+        el.remove();
+      }
+    });
 
-      // --- 1. Initialization (Create only if not exist) ---
+    gameState.livestock.forEach((ls) => {
+      const lsInfo = livestockTypes.find((l) => l.type === ls.type);
+      let item = _(`#ls-item-${ls.id}`);
+
+      // --- 2. Initialization (Create only if not exist) ---
       if (!item) {
         item = document.createElement("div");
-        item.id = `ls-item-${index}`;
+        item.id = `ls-item-${ls.id}`;
         item.className = "livestock-item";
 
         // Emoji container
@@ -2325,10 +2374,10 @@
         // Production bar container
         const barContainer = document.createElement("div");
         barContainer.className = "livestock-status-bars";
-        barContainer.id = `ls-bars-${index}`;
+        barContainer.id = `ls-bars-${ls.id}`;
         barContainer.innerHTML = `
                 <div class="status-bar-bg">
-                    <div class="status-bar-fill prod-fill" id="ls-prod-${index}"></div>
+                    <div class="status-bar-fill prod-fill" id="ls-prod-${ls.id}"></div>
                 </div>
             `;
         item.appendChild(barContainer);
@@ -2345,11 +2394,17 @@
           isDragging = false;
 
           const rect = list.getBoundingClientRect();
-          gameState.livestock[index].isDragging = true;
+          // Always find fresh reference from gameState by ID
+          const getLs = () => gameState.livestock.find((l) => l.id === ls.id);
+          const currentLs = getLs();
+          if (!currentLs) return;
+
+          currentLs.isDragging = true;
+          item.classList.add("dragging");
 
           // Stop current movement towards target
-          gameState.livestock[index].newX = gameState.livestock[index].x;
-          gameState.livestock[index].newY = gameState.livestock[index].y;
+          currentLs.newX = currentLs.x;
+          currentLs.newY = currentLs.y;
 
           const onDragMove = (moveEvent) => {
             const moveTouch = moveEvent.type.includes("touch")
@@ -2358,24 +2413,26 @@
             const dx = moveTouch.clientX - startX;
             const dy = moveTouch.clientY - startY;
 
+            const targetLs = getLs();
+            if (!targetLs) return;
+
             if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
               isDragging = true;
-              let newX = gameState.livestock[index].x + (dx / rect.width) * 100;
-              let newY =
-                gameState.livestock[index].y + (dy / rect.height) * 100;
+              let newX = targetLs.x + (dx / rect.width) * 100;
+              let newY = targetLs.y + (dy / rect.height) * 100;
 
               // Clamp bounds (0 to 100%)
               newX = Math.max(0, Math.min(100, newX));
               newY = Math.max(0, Math.min(100, newY));
 
-              gameState.livestock[index].x = newX;
-              gameState.livestock[index].y = newY;
+              targetLs.x = newX;
+              targetLs.y = newY;
 
               // Update start position for next frame
               startX = moveTouch.clientX;
               startY = moveTouch.clientY;
 
-              // Update UI immediately
+              // Update UI immediately for responsiveness
               item.style.left = `calc(${newX}% - 40px)`;
               item.style.top = `calc(${newY}% - 40px)`;
             }
@@ -2387,30 +2444,28 @@
             document.removeEventListener("touchmove", onDragMove);
             document.removeEventListener("touchend", onDragEnd);
 
-            gameState.livestock[index].isDragging = false;
+            const targetLs = getLs();
+            if (targetLs) {
+              targetLs.isDragging = false;
+              item.classList.remove("dragging");
 
-            if (!isDragging) {
-              handleLivestockInteraction(index);
-            } else {
-              // Force a new valid target and direction immediately after dragging
-              gameState.livestock[index].newX = Math.max(
-                0,
-                Math.min(
-                  80,
-                  gameState.livestock[index].x + (Math.random() * 40 - 20),
-                ),
-              );
-              gameState.livestock[index].newY = Math.max(
-                0,
-                Math.min(
-                  80,
-                  gameState.livestock[index].y + (Math.random() * 40 - 20),
-                ),
-              );
-              gameState.livestock[index].dir =
-                gameState.livestock[index].newX > gameState.livestock[index].x
-                  ? -1
-                  : 1;
+              if (!isDragging) {
+                // Must find current index because handleLivestockInteraction still uses index
+                const idx = gameState.livestock.findIndex(
+                  (l) => l.id === ls.id,
+                );
+                if (idx !== -1) handleLivestockInteraction(idx);
+              } else {
+                targetLs.newX = Math.max(
+                  0,
+                  Math.min(80, targetLs.x + (Math.random() * 40 - 20)),
+                );
+                targetLs.newY = Math.max(
+                  0,
+                  Math.min(80, targetLs.y + (Math.random() * 40 - 20)),
+                );
+                targetLs.dir = targetLs.newX > targetLs.x ? -1 : 1;
+              }
             }
           };
 
@@ -2429,31 +2484,36 @@
       }
 
       if (ls.isProducing) {
-        _(`#ls-bars-${index}`).style.display = "block";
+        _(`#ls-bars-${ls.id}`).style.display = "block";
       } else {
-        _(`#ls-bars-${index}`).style.display = "none";
+        _(`#ls-bars-${ls.id}`).style.display = "none";
       }
 
-      // --- 2. Update (Frequent property sync) ---
-      // Center the 80x80 hitbox on the coordinates
+      // --- 3. Update (Frequent property sync) ---
       item.style.left = `calc(${ls.x}% - 40px)`;
       item.style.top = `calc(${ls.y}% - 40px)`;
 
       const emojiEl = item.querySelector(".livestock-emoji");
       if (emojiEl.textContent !== ls.emoji) emojiEl.textContent = ls.emoji;
-      emojiEl.style.transform = `scaleX(${ls.dir})`;
-      emojiEl.classList.remove("emoji-cow");
-      emojiEl.classList.remove("emoji-chicken");
-      emojiEl.classList.add("emoji-" + ls.type);
 
-      const prodFill = _(`#ls-prod-${index}`);
+      const transformStr = `scaleX(${ls.dir})`;
+      if (emojiEl.style.transform !== transformStr)
+        emojiEl.style.transform = transformStr;
+
+      if (!emojiEl.classList.contains("emoji-" + ls.type)) {
+        emojiEl.classList.remove("emoji-cow", "emoji-chicken");
+        emojiEl.classList.add("emoji-" + ls.type);
+      }
+
+      const prodFill = _(`#ls-prod-${ls.id}`);
       const prodProgress = (ls.production / lsInfo.growthTime) * 100;
-      prodFill.style.width = `${prodProgress}%`;
+      const widthStr = `${prodProgress}%`;
+      if (prodFill.style.width !== widthStr) prodFill.style.width = widthStr;
 
       // Ready badge logic
       let badge = item.querySelector(".ready-badge");
       if (ls.yieldReady) {
-        _(`#ls-bars-${index}`).style.display = "none";
+        _(`#ls-bars-${ls.id}`).style.display = "none";
         if (!badge) {
           badge = document.createElement("div");
           badge.className = "ready-badge";
@@ -2462,15 +2522,6 @@
         }
       } else if (badge) {
         badge.remove();
-      }
-    });
-
-    // Cleanup removed animals
-    const displayedItems = list.querySelectorAll(".livestock-item");
-    displayedItems.forEach((el) => {
-      const idx = parseInt(el.id.replace("ls-item-", ""));
-      if (isNaN(idx) || idx >= gameState.livestock.length) {
-        el.remove();
       }
     });
   };
@@ -3659,9 +3710,14 @@
   mypets.forEach((mypet, index) => {
     let isDragging = false;
     let randomMovementInterval;
-    let containerWidth = document.getElementById("container").offsetWidth;
+    const container = document.getElementById("container");
+    let containerWidth = container.offsetWidth;
     let lastX = Math.random() * (containerWidth - 50);
     let lastY = Math.random() * (window.innerHeight - 50);
+
+    // Variabel untuk menyimpan posisi awal drag
+    let startDragX, startDragY;
+    let initialPetX, initialPetY;
 
     // Atur posisi awal
     mypet.style.left = lastX + "px";
@@ -3714,13 +3770,29 @@
       isDragging = true;
       stopRandomMovement();
       e.preventDefault();
+
+      startDragX = e.clientX;
+      startDragY = e.clientY;
+      initialPetX = parseFloat(mypet.style.left) || 0;
+      initialPetY = parseFloat(mypet.style.top) || 0;
     });
 
     document.addEventListener("mousemove", (e) => {
       if (isDragging) {
         mypet.classList.add("dragging");
-        const x = e.clientX - (window.innerWidth - containerWidth) / 2;
-        const y = e.clientY - 25;
+
+        const dx = e.clientX - startDragX;
+        const dy = e.clientY - startDragY;
+
+        let x = initialPetX + dx;
+        let y = initialPetY + dy;
+
+        // Batasi agar pet tidak keluar kontainer (optional tapi bagus untuk UX)
+        const maxX = (container.offsetWidth || window.innerWidth) - 50;
+        const maxY = window.innerHeight - 50;
+        x = Math.max(0, Math.min(maxX, x));
+        y = Math.max(0, Math.min(maxY, y));
+
         mypet.style.left = x + "px";
         mypet.style.top = y + "px";
         lastX = x;
@@ -3741,14 +3813,30 @@
       isDragging = true;
       stopRandomMovement();
       e.preventDefault();
+
+      const touch = e.touches[0];
+      startDragX = touch.clientX;
+      startDragY = touch.clientY;
+      initialPetX = parseFloat(mypet.style.left) || 0;
+      initialPetY = parseFloat(mypet.style.top) || 0;
     });
 
     document.addEventListener("touchmove", (e) => {
       if (isDragging) {
         mypet.classList.add("dragging");
         const touch = e.touches[0];
-        const x = touch.clientX - 25;
-        const y = touch.clientY - 25;
+
+        const dx = touch.clientX - startDragX;
+        const dy = touch.clientY - startDragY;
+
+        let x = initialPetX + dx;
+        let y = initialPetY + dy;
+
+        const maxX = (container.offsetWidth || window.innerWidth) - 50;
+        const maxY = window.innerHeight - 50;
+        x = Math.max(0, Math.min(maxX, x));
+        y = Math.max(0, Math.min(maxY, y));
+
         mypet.style.left = x + "px";
         mypet.style.top = y + "px";
         lastX = x;
