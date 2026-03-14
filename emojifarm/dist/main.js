@@ -337,20 +337,20 @@
       cost: 1400,
     },
     {
-      id: "pizza",
-      emoji: "🍕",
-      name: "Pizza",
-      ingredients: { "🌾": 1, "🍅": 1, "🥩": 1, "🧀": 1 },
-      time: 170,
-      value: 220,
-      cost: 1700,
-    },
-    {
       id: "burger",
       emoji: "🍔",
       name: "Burger",
       ingredients: { "🍞": 1, "🥬": 1, "🥒": 1, "🍅": 1, "🥩": 1, "🧀": 1 },
-      time: 180,
+      time: 170,
+      value: 270,
+      cost: 1700,
+    },
+    {
+      id: "pizza",
+      emoji: "🍕",
+      name: "Pizza",
+      ingredients: { "🍞": 1, "🍅": 1, "🥩": 1, "🍄": 1, "🧀": 1 },
+      time: 200,
       value: 300,
       cost: 2000,
     },
@@ -670,7 +670,7 @@
     const secondsPassed = (now - lastPlayed) / 1000;
     const gameSecondsPassed = secondsPassed * gameState.realTimeScale;
     if (gameSecondsPassed > 0) {
-      const maxDays = 200; // Batas maksimum 200 hari offline
+      const maxDays = 120; // Batas maksimum 120 hari offline
       const daysPassed = Math.min(
         Math.floor(gameSecondsPassed / gameState.dayDuration),
         maxDays,
@@ -1048,22 +1048,27 @@
       if (plot.plant) {
         // Show seedling if not fully grown
         if (plot.growth < getGrowthTime(plot.plant)) {
-          plantElement.textContent = "🌱";
-          plantElement.classList.remove("wave-animation");
-          plantElement.classList.add("grow-animation");
-          progressIcon.textContent = plot.plant;
+          if (plantElement.textContent !== "🌱") plantElement.textContent = "🌱";
+          if (!plantElement.classList.contains("grow-animation")) {
+            plantElement.classList.remove("wave-animation");
+            plantElement.classList.add("grow-animation");
+          }
+          if (progressIcon.textContent !== plot.plant) progressIcon.textContent = plot.plant;
         } else {
-          plantElement.textContent = plot.plant;
-          plantElement.classList.add("wave-animation");
-          plantElement.classList.remove("grow-animation");
-          progressIcon.textContent = "";
+          if (plantElement.textContent !== plot.plant) plantElement.textContent = plot.plant;
+          if (!plantElement.classList.contains("wave-animation")) {
+            plantElement.classList.add("wave-animation");
+            plantElement.classList.remove("grow-animation");
+          }
+          if (progressIcon.textContent !== "") progressIcon.textContent = "";
         }
 
-        progressBar.style.width = `${(plot.growth / getGrowthTime(plot.plant)) * 100}%`;
+        const widthStr = `${(plot.growth / getGrowthTime(plot.plant)) * 100}%`;
+        if (progressBar.style.width !== widthStr) progressBar.style.width = widthStr;
       } else {
-        progressIcon.textContent = "";
-        plantElement.textContent = "";
-        progressBar.style.width = "0%";
+        if (progressIcon.textContent !== "") progressIcon.textContent = "";
+        if (plantElement.textContent !== "") plantElement.textContent = "";
+        if (progressBar.style.width !== "0%") progressBar.style.width = "0%";
       }
     }
   };
@@ -2169,48 +2174,44 @@
       gameState.pet.forEach((pet, index) => {
         // Perbarui hunger bar
         if (index === 0) {
-          _("#pet-emoji-one").innerHTML = pet.emoji;
-          petEmojiContainerOne.style.display = "block";
-          petEmojiContainerOne.className = "";
-          petEmojiContainerOne.classList.add("pet-emoji-container");
-          petEmojiContainerOne.classList.add("pet-emoji-" + pet.id);
-          // petEmojiContainerOne.style.animation = 'movewalk 20s ease infinite';
-          // Tambahkan event listener untuk klik hewan
-          petEmojiContainerOne.addEventListener("click", () => {
-            _(`#love-animation-one`).classList.add("love-heart");
-            setTimeout(() => {
-              _(`#love-animation-one`).classList.remove("love-heart");
-            }, 1500);
-          });
-
-          petEmojiContainerOne.addEventListener("touchstart", (e) => {
-            _(`#love-animation-one`).classList.add("love-heart");
-            setTimeout(() => {
-              _(`#love-animation-one`).classList.remove("love-heart");
-            }, 1500);
-          });
+          const emojiSpan = _("#pet-emoji-one");
+          if (emojiSpan.innerHTML !== pet.emoji) emojiSpan.innerHTML = pet.emoji;
+          if (petEmojiContainerOne.style.display !== "block") petEmojiContainerOne.style.display = "block";
+          
+          const newClass = "pet-emoji-container pet-emoji-" + pet.id;
+          if (petEmojiContainerOne.className !== newClass) petEmojiContainerOne.className = newClass;
+          
+          if (!petEmojiContainerOne.dataset.listenerAdded) {
+            const tapAnim = () => {
+              _(`#love-animation-one`).classList.add("love-heart");
+              setTimeout(() => {
+                _(`#love-animation-one`).classList.remove("love-heart");
+              }, 1500);
+            };
+            petEmojiContainerOne.addEventListener("click", tapAnim);
+            petEmojiContainerOne.addEventListener("touchstart", tapAnim);
+            petEmojiContainerOne.dataset.listenerAdded = "true";
+          }
         } else {
-          _("#pet-emoji-two").innerHTML = pet.emoji;
-          // hunger bar kedua jika ada hewan kedua
-          petEmojiContainerTwo.style.display = "block";
-          petEmojiContainerTwo.className = "";
-          petEmojiContainerTwo.classList.add("pet-emoji-container");
-          petEmojiContainerTwo.classList.add("pet-emoji-" + pet.id);
-          // petEmojiContainerTwo.style.animation = 'movewalk 25s ease infinite';
-          // Tambahkan event listener untuk klik hewan
-          petEmojiContainerTwo.addEventListener("click", () => {
-            _(`#love-animation-two`).classList.add("love-heart");
-            setTimeout(() => {
-              _(`#love-animation-two`).classList.remove("love-heart");
-            }, 1500);
-          });
+          const emojiSpan = _("#pet-emoji-two");
+          if (emojiSpan.innerHTML !== pet.emoji) emojiSpan.innerHTML = pet.emoji;
 
-          petEmojiContainerTwo.addEventListener("touchstart", (e) => {
-            _(`#love-animation-two`).classList.add("love-heart");
-            setTimeout(() => {
-              _(`#love-animation-two`).classList.remove("love-heart");
-            }, 1500);
-          });
+          if (petEmojiContainerTwo.style.display !== "block") petEmojiContainerTwo.style.display = "block";
+          
+          const newClass = "pet-emoji-container pet-emoji-" + pet.id;
+          if (petEmojiContainerTwo.className !== newClass) petEmojiContainerTwo.className = newClass;
+          
+          if (!petEmojiContainerTwo.dataset.listenerAdded) {
+            const tapAnim = () => {
+              _(`#love-animation-two`).classList.add("love-heart");
+              setTimeout(() => {
+                _(`#love-animation-two`).classList.remove("love-heart");
+              }, 1500);
+            };
+            petEmojiContainerTwo.addEventListener("click", tapAnim);
+            petEmojiContainerTwo.addEventListener("touchstart", tapAnim);
+            petEmojiContainerTwo.dataset.listenerAdded = "true";
+          }
         }
 
         hungerProgress.style.width = `${pet.hunger}%`;
@@ -4015,7 +4016,6 @@
     _("#livestock-container").style.display = "none";
     _("#farm-button").style.display = "none";
     _("#kitchen-container").style.display = "none";
-    closeKitchenPage();
     clearSelectedEmoji();
   });
 
