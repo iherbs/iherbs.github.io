@@ -670,7 +670,7 @@
     const secondsPassed = (now - lastPlayed) / 1000;
     const gameSecondsPassed = secondsPassed * gameState.realTimeScale;
     if (gameSecondsPassed > 0) {
-      const maxDays = 60; // Batas maksimum 60 hari offline
+      const maxDays = 200; // Batas maksimum 200 hari offline
       const daysPassed = Math.min(
         Math.floor(gameSecondsPassed / gameState.dayDuration),
         maxDays,
