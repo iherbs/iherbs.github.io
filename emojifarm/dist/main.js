@@ -174,7 +174,7 @@
       food: "🌽",
       yield: "🥚",
       meat: "🍗",
-      growthTime: 50,
+      growthTime: 80,
       minYieldsToSlaughter: 3,
     },
     {
@@ -186,7 +186,7 @@
       food: "🌾",
       yield: "🥛",
       meat: "🥩",
-      growthTime: 100,
+      growthTime: 190,
       minYieldsToSlaughter: 5,
     },
   ];
@@ -963,7 +963,7 @@
             if (ls.production >= productionLimit) {
               ls.production = productionLimit;
               ls.yieldReady = true;
-              showNotification(`${ls.emoji} has produced ${lsInfo.yield}`);
+              // showNotification(`${ls.emoji} has produced ${lsInfo.yield}`);
             }
           }
         });
@@ -2507,7 +2507,9 @@
       }
 
       const prodFill = _(`#ls-prod-${ls.id}`);
-      const prodProgress = (ls.production / (lsInfo.growthTime * (gameState.dayDuration || 60))) * 100;
+      const prodProgress =
+        (ls.production / (lsInfo.growthTime * (gameState.dayDuration || 60))) *
+        100;
       const widthStr = `${prodProgress}%`;
       if (prodFill.style.width !== widthStr) prodFill.style.width = widthStr;
 
@@ -3330,7 +3332,7 @@
     previewElement.style.zIndex = "25";
     previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
     gameCanvas.appendChild(previewElement);
-    
+
     // Also show guide line
     guideLine.style.display = "block";
   };
@@ -3341,8 +3343,11 @@
     const size = EMOJI_SIZES[nextEmojiIndex];
     // Batasi posisi x agar tetap di dalam canvas
     const margin = WALL_THICKNESS + 5;
-    const clampedX = Math.max(size / 2 + 5, Math.min(canvasWidth - size / 2 - 5, x));
-    
+    const clampedX = Math.max(
+      size / 2 + 5,
+      Math.min(canvasWidth - size / 2 - 5, x),
+    );
+
     previewElement.style.left = `${clampedX - size / 2}px`;
     previewElement.style.top = `15px`;
     previewElement.textContent = EMOJI_SEQUENCE[nextEmojiIndex];
@@ -3408,18 +3413,23 @@
     const newBody = createEmoji(mergeX, mergeY, newEmojiIndex, true);
 
     playSound("match.wav");
-    
+
     // Add "Push" force to nearby objects when merging
     const blastRadius = EMOJI_SIZES[newEmojiIndex] * 1.5;
     emojiBodies.forEach((data, otherBody) => {
       if (otherBody === newBody) return;
-      const dist = Matter.Vector.magnitude(Matter.Vector.sub(otherBody.position, {x: mergeX, y: mergeY}));
+      const dist = Matter.Vector.magnitude(
+        Matter.Vector.sub(otherBody.position, { x: mergeX, y: mergeY }),
+      );
       if (dist < blastRadius) {
         const force = (1 - dist / blastRadius) * 0.05;
-        const angle = Math.atan2(otherBody.position.y - mergeY, otherBody.position.x - mergeX);
+        const angle = Math.atan2(
+          otherBody.position.y - mergeY,
+          otherBody.position.x - mergeX,
+        );
         Body.applyForce(otherBody, otherBody.position, {
           x: Math.cos(angle) * force,
-          y: Math.sin(angle) * force
+          y: Math.sin(angle) * force,
         });
       }
     });
@@ -3477,7 +3487,10 @@
     setTimeout(() => (canSpawn = true), 600); // Slightly longer cooldown
 
     removePreviewElement();
-    const clampedX = Math.max(EMOJI_SIZES[nextEmojiIndex] / 2 + 5, Math.min(canvasWidth - EMOJI_SIZES[nextEmojiIndex] / 2 - 5, x));
+    const clampedX = Math.max(
+      EMOJI_SIZES[nextEmojiIndex] / 2 + 5,
+      Math.min(canvasWidth - EMOJI_SIZES[nextEmojiIndex] / 2 - 5, x),
+    );
     createEmoji(clampedX, 50, nextEmojiIndex);
     updateNextEmoji();
     createPreviewElement();
@@ -3540,7 +3553,7 @@
           gameOver();
           return;
         }
-        
+
         // Visual warning check
         if (body.position.y < DANGER_ZONE_Y + 40) {
           dangerZoneActive = true;
