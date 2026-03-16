@@ -3244,17 +3244,17 @@
       showNotification(`Caught a ${f.emoji}!`);
     } else {
       showNotification(`GREAT! ${f.emoji} caught! ✨`);
-
-      // Add to inventory
-      if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
-      gameState.inventory[f.emoji]++;
-
-      // Level up progress or minor reward
-      // gameState.points += Math.ceil(f.weight * 2);
-      // checkLevelUp();
-      updateUI();
-      saveGame();
     }
+
+    // Add to inventory
+    if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
+    gameState.inventory[f.emoji]++;
+
+    // Level up progress or minor reward
+    // gameState.points += Math.ceil(f.weight * 2);
+    // checkLevelUp();
+    updateUI();
+    saveGame();
 
     f.element.style.transform += " scale(0)";
     f.element.style.opacity = "0";
@@ -4626,7 +4626,6 @@
     garden: [],
   };
   const gardenItem = {
-    "🪨": 10,
     "🪵": 10,
     "🚧": 10,
     "🌱": 10,
@@ -5143,22 +5142,21 @@
   };
 
   const returnEmojiFromGrid = (emoji) => {
-    // kalau inventory kembalikan ke inventory
-    const plant = plantTypes.find((p) => p.emoji === emoji);
-    if (plant != undefined) {
+    if (gardenItem[emoji] != undefined) {
+      // kalau garden item kembalikan ke garden inventory
+      if (!gardenState.inventory[emoji]) {
+        gardenState.inventory[emoji] = 0;
+      }
+      gardenState.inventory[emoji]++;
+      loadinventory();
+    } else {
+      // kalau inventory kembalikan ke inventory
       if (!gameState.inventory[emoji]) {
         gameState.inventory[emoji] = 0;
       }
       gameState.inventory[emoji]++;
       saveGame();
       updateUI();
-      loadinventory();
-    } else {
-      // kalau garden item kembalikan ke garden inventory
-      if (!gardenState.inventory[emoji]) {
-        gardenState.inventory[emoji] = 0;
-      }
-      gardenState.inventory[emoji]++;
       loadinventory();
     }
     saveGridState();
