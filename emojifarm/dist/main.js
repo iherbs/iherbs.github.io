@@ -1271,7 +1271,7 @@
     const fish = fishingTypes.find((f) => f.emoji === emoji);
     if (fish) return fish.value;
     if (emoji === "🪝") return hookPrice;
-    return 0;
+    return 5;
   };
 
   const calculateChecksum = (data) => {
