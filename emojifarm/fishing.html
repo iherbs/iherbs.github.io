@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Pond Fishing</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #4fb3ce;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        touch-action: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+
+      #pond {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(180deg, #5dc4e0 0%, #4fb3ce 100%);
+        overflow: hidden;
+        cursor: crosshair;
+        -webkit-touch-callout: none;
+      }
+
+      .lilypad {
+        position: absolute;
+        font-size: 3rem;
+        user-select: none;
+        z-index: 15;
+        transition: transform 0.5s ease-out;
+        pointer-events: none;
+        --base-rot: 0deg;
+        animation: float-lily 6s ease-in-out infinite;
+        filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.1));
+      }
+
+      .bobber {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        background: #f1c40f;
+        border: 3px solid white;
+        border-radius: 50%;
+        z-index: 20;
+        display: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: translate(-50%, -50%);
+        will-change: top, left;
+      }
+
+      #line-svg {
+        position: absolute;
+        z-index: 20;
+        pointer-events: none;
+        stroke: rgba(255, 255, 255, 0.4);
+        stroke-width: 1.2;
+        fill: none;
+      }
+
+      #ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+      }
+
+      #tension-container {
+        display: none;
+        position: absolute;
+        bottom: 20px;
+        width: 200px;
+        height: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 2px solid #000000;
+      }
+
+      #tension-bar {
+        position: absolute;
+        bottom: 0;
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          #2ecc71,
+          #62f10f,
+          #9af10f,
+          #f1c40f,
+          #f1a60f,
+          #f1880f,
+          #e74c3c
+        );
+        transition: width 0.1s linear;
+      }
+
+      .notification {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 24px;
+        border-radius: 30px;
+        z-index: 200;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      #stats {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px 20px;
+        border-radius: 15px;
+        align-self: flex-start;
+        pointer-events: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        color: #1e3a8a;
+        font-weight: bold;
+      }
+
+      .btn {
+        pointer-events: auto;
+        padding: 12px 24px;
+        border-radius: 30px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .bg-slate-700 {
+        background-color: #334155;
+      }
+      .bg-orange-500 {
+        background-color: #ffffff;
+      }
+      .text-white {
+        color: white;
+      }
+
+      #reel-btn {
+        width: 80px;
+        height: 50px;
+        padding: 0;
+        font-size: 25px;
+      }
+
+      .hidden {
+        display: none;
+      }
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .gap-4 {
+        gap: 1rem;
+      }
+      .mb-10 {
+        margin-bottom: 2.5rem;
+      }
+      .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      .ripple {
+        position: absolute;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple-effect 4s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes ripple-effect {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+      @keyframes float-lily {
+        0%,
+        100% {
+          transform: translate(0, 0) rotate(var(--base-rot));
+        }
+        25% {
+          transform: translate(5px, -5px) rotate(calc(var(--base-rot) + 2deg));
+        }
+        50% {
+          transform: translate(0, -10px) rotate(calc(var(--base-rot) - 1deg));
+        }
+        75% {
+          transform: translate(-5px, -5px) rotate(calc(var(--base-rot) + 1deg));
+        }
+      }
+
+      .fish-container {
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        z-index: 4;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          opacity 0.3s,
+          transform 0.1s;
+      }
+
+      /* Ikan SVG */
+      .fish-svg {
+        width: 100%;
+        height: 100%;
+        transform-origin: center center;
+      }
+
+      .fish {
+        position: absolute;
+        font-size: 2.5rem;
+        transition: transform 0.3s ease-out;
+        z-index: 10;
+        filter: drop-shadow(0 10px 5px rgba(0, 0, 0, 0.15));
+        pointer-events: none;
+      }
+
+      .fish-shadow {
+        position: absolute;
+        font-size: 2.5rem;
+        filter: brightness(0) opacity(0.15) blur(1px);
+        z-index: 4;
+        pointer-events: none;
+        transition: opacity 0.5s;
+      }
+
+      .fish-tail {
+        transform-origin: center;
+        animation: tail-wag 0.6s ease-in-out infinite;
+      }
+
+      @keyframes tail-wag {
+        0% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(5deg);
+        }
+        50% {
+          transform: rotate(0deg);
+        }
+        75% {
+          transform: rotate(-5deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pond">
+      <svg
+        id="line-svg"
+        style="
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+        "
+      >
+        <path id="fishing-line" d="" />
+      </svg>
+    </div>
+
+    <div id="ui-layer">
+      <div id="stats" style="font-size: 1.5rem; color: #2563eb">
+        🎣
+        <span id="score" style="margin-left: 5px">0</span>
+      </div>
+
+      <div class="notification" id="msg">Tap to cast line!</div>
+
+      <div class="flex flex-col items-center gap-4 mb-10">
+        <div id="tension-container">
+          <div id="tension-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const pond = document.getElementById("pond");
+      const tensionBar = document.getElementById("tension-bar");
+      const tensionContainer = document.getElementById("tension-container");
+      const scoreEl = document.getElementById("score");
+      const msgEl = document.getElementById("msg");
+      const fishingLine = document.getElementById("fishing-line");
+
+      let intouch = false;
+      let score = 0;
+      let gameState = "idle";
+      let bobberPos = { x: 0, y: 0 };
+      let tension = 0;
+      let caughtFish = null;
+      let fishArray = [];
+      let biteCheckInterval = null;
+      let isPressing = false;
+      let pressDuration = 0;
+
+      const lilypads = ["🍀", "🌿", "🍃", "🍂", "🍁", "🪷"];
+      // Konfigurasi Ikan Sesuai Permintaan
+      const fishes = [
+        {
+          emoji: "🐟",
+          type: "fish",
+          speed: 0.05,
+          pullStrength: 0.6,
+          minWeight: 0.5,
+          maxWeight: 1.5,
+          chance: 90,
+        },
+        {
+          emoji: "👞",
+          type: "trash",
+          speed: 0.22,
+          pullStrength: -4,
+          minWeight: 0,
+          maxWeight: 0,
+          chance: 80,
+        },
+        {
+          emoji: "🦐",
+          type: "fish",
+          speed: 0.12,
+          pullStrength: 0.4,
+          minWeight: 0.1,
+          maxWeight: 0.4,
+          chance: 70,
+        },
+        {
+          emoji: "🐠",
+          type: "fish",
+          speed: 0.08,
+          pullStrength: 0.8,
+          minWeight: 0.8,
+          maxWeight: 2.2,
+          chance: 20,
+        },
+        {
+          emoji: "🐡",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.8,
+          minWeight: 2.5,
+          maxWeight: 5.0,
+          chance: 10,
+        },
+      ];
+
+      // Menghitung 70px itu berapa persen dari lebar/tinggi layar
+      const fishSizePercentX = (70 / window.innerWidth) * 100;
+      const fishSizePercentY = (70 / window.innerHeight) * 100;
+
+      document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+
+      function initPond() {
+        for (let i = 0; i < 15; i++) createRipple();
+        for (let i = 0; i < 8; i++) createLilypad();
+        for (let i = 0; i < 6; i++) createFish();
+        requestAnimationFrame(updateFish);
+      }
+
+      function createFishSVG(id) {
+        const color = "#3498db";
+        return `
+          <svg class="fish-svg" id="svg-${id}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path class="fin-l" d="m 38.373494,40 q -20,0 -10,10" fill="${color}" opacity="0.6" id="path2" />
+            <path class="fish-tail" id="tail-${id}" d="M 50 75 L 35 100 Q 50 95 65 100 Z" fill="${color}" opacity="0.9" />
+            <path
+              d="m 50.000977,15 c -12,0 -15.904297,21.554688 -15.904297,38.554688 0,15 10.904297,26.445312 15.904297,36.445312 5,-10 15.902344,-21.445312 15.902344,-36.445312 C 65.903321,36.554688 62.000977,15 50.000977,15 Z"
+            />
+            <path
+              class="fin-l"
+              d="m 61.62846,40 q 20,0 10,10"
+              fill="${color}"
+              opacity="0.6"
+              id="path2227"
+            />
+          </svg>
+        `;
+      }
+
+      function createRipple() {
+        const r = document.createElement("div");
+        r.className = "ripple";
+        const size = Math.random() * 100 + 50;
+        r.style.width = size + "px";
+        r.style.height = size + "px";
+        r.style.left = Math.random() * 100 + "vw";
+        r.style.top = Math.random() * 100 + "vh";
+        r.style.animationDelay = Math.random() * 5 + "s";
+        pond.appendChild(r);
+      }
+
+      function createLilypad() {
+        const l = document.createElement("div");
+        l.className = "lilypad";
+        l.innerText = lilypads[Math.floor(Math.random() * lilypads.length)];
+        l.style.left = Math.random() * 85 + 5 + "vw";
+        l.style.top = Math.random() * 85 + 5 + "vh";
+        // l.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.8 + Math.random() * 0.5})`;
+
+        const baseRot = Math.random() * 360;
+        const duration = 5 + Math.random() * 5;
+        const delay = Math.random() * -10;
+
+        l.style.setProperty("--base-rot", `${baseRot}deg`);
+        l.style.animationDuration = `${duration}s`;
+        l.style.animationDelay = `${delay}s`;
+
+        pond.appendChild(l);
+      }
+
+      function getChanceFish() {
+        const totalChance = fishes.reduce((sum, f) => sum + f.chance, 0);
+        let rand = Math.random() * totalChance;
+        for (const fish of fishes) {
+          if (rand < fish.chance) return fish;
+          rand -= fish.chance;
+        }
+        return fishes[0];
+      }
+
+      function getNewFishData() {
+        const fish = getChanceFish();
+        const limitX = 100 - fishSizePercentX;
+        const limitY = 100 - fishSizePercentY;
+        const dynamicWeight = (
+          Math.random() * (fish.maxWeight - fish.minWeight) +
+          fish.minWeight
+        ).toFixed(2);
+
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          x: Math.random() * limitX,
+          y: Math.random() * limitY,
+          targetX: Math.random() * limitX,
+          targetY: Math.random() * limitY,
+          emoji: fish.emoji,
+          type: fish.type,
+          speed: fish.speed * 4,
+          weight: dynamicWeight,
+          pullStrength: fish.pullStrength,
+          isHooked: false,
+        };
+      }
+
+      function createFish() {
+        const fishData = getNewFishData();
+
+        const el = document.createElement("div");
+        el.className = "fish-container fish-shadow";
+        el.id = "fish-" + fishData.id;
+        el.innerHTML = createFishSVG(fishData.id);
+        el.style.left = fishData.x + "vw";
+        el.style.top = fishData.y + "vh";
+
+        pond.appendChild(el);
+        fishData.element = el;
+        fishArray.push(fishData);
+      }
+
+      function updateFish() {
+        const limitX = 100 - fishSizePercentX;
+        const limitY = 100 - fishSizePercentY;
+
+        fishArray.forEach((f) => {
+          if (f.isHooked) return;
+
+          if (Math.abs(f.x - f.targetX) < 2 && Math.abs(f.y - f.targetY) < 2) {
+            f.targetX = Math.random() * limitX + 2;
+            f.targetY = Math.random() * limitY + 2;
+          }
+
+          const dx = f.targetX - f.x;
+          const dy = f.targetY - f.y;
+          const angle = Math.atan2(dy, dx);
+
+          f.x += Math.cos(angle) * f.speed * 0.5;
+          f.y += Math.sin(angle) * f.speed * 0.5;
+
+          f.element.style.left = f.x + "vw";
+          f.element.style.top = f.y + "vh";
+          f.element.style.transform = `rotate(${(angle * 180) / Math.PI + 90}deg)`;
+        });
+
+        updateFishingLine();
+        requestAnimationFrame(updateFish);
+      }
+
+      function updateFishingLine() {
+        if (gameState === "idle") {
+          fishingLine.setAttribute("d", "");
+          return;
+        }
+        const startX = window.innerWidth / 2;
+        const startY = window.innerHeight;
+        const endX = (bobberPos.x / 100) * window.innerWidth;
+        const endY = (bobberPos.y / 100) * window.innerHeight;
+
+        const controlY = (startY + endY) / 2;
+        fishingLine.setAttribute(
+          "d",
+          `M ${startX} ${startY} Q ${startX} ${controlY} ${endX} ${endY}`,
+        );
+      }
+
+      pond.addEventListener("mousedown", (e) => {
+        if (intouch) return;
+        if (gameState == "reeling") {
+          isPressing = true;
+          return;
+        }
+        if (gameState == "fishing") {
+          const bobber = document.getElementById("active-bobber");
+          bobber.style.transition =
+            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
+          bobber.style.top = bobberPos.y - 1 + "vh";
+          if (gameState === "fishing") resetGame("Bait is gone.");
+          return;
+        }
+        if (gameState !== "idle") return;
+        castTo(e.clientX, e.clientY);
+      });
+
+      pond.addEventListener("touchstart", (e) => {
+        intouch = true;
+        if (gameState == "reeling") {
+          isPressing = true;
+          return;
+        }
+        if (gameState == "fishing") {
+          const bobber = document.getElementById("active-bobber");
+          bobber.style.transition =
+            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
+          bobber.style.top = bobberPos.y - 1 + "vh";
+          if (gameState === "fishing") resetGame("Bait is gone.");
+          return;
+        }
+        if (gameState !== "idle") return;
+        const touch = e.touches[0];
+        castTo(touch.clientX, touch.clientY);
+      });
+
+      pond.addEventListener("mouseup", () => {
+        if (gameState == "reeling") {
+          isPressing = false;
+          return;
+        }
+      });
+
+      pond.addEventListener("touchend", () => {
+        if (gameState == "reeling") {
+          isPressing = false;
+          return;
+        }
+      });
+
+      function castTo(clientX, clientY) {
+        gameState = "fishing";
+
+        bobberPos.x = (clientX / window.innerWidth) * 100;
+        bobberPos.y = (clientY / window.innerHeight) * 100;
+
+        const bobber = document.createElement("div");
+        bobber.className = "bobber";
+        bobber.id = "active-bobber";
+        bobber.style.left = bobberPos.x + "vw";
+        bobber.style.top = "-50px";
+        bobber.style.display = "block";
+        pond.appendChild(bobber);
+
+        bobber.style.top = bobberPos.y - 3 + "vh";
+        requestAnimationFrame(() => {
+          bobber.style.transition =
+            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
+          bobber.style.top = bobberPos.y + "vh";
+          setTimeout(checkBite, 700);
+        });
+      }
+
+      function checkBite() {
+        biteCheckInterval = setInterval(() => {
+          if (gameState !== "fishing") {
+            clearInterval(biteCheckInterval);
+            return;
+          }
+
+          for (const f of fishArray) {
+            const dist = Math.sqrt(
+              Math.pow(f.x - bobberPos.x, 2) + Math.pow(f.y - bobberPos.y, 2),
+            );
+            if (dist < 7 && !f.isHooked) {
+              f.isHooked = true;
+              caughtFish = f;
+              gameState = "reeling";
+
+              fishArray.forEach((otherFish) => {
+                if (otherFish.id !== f.id) {
+                  otherFish.isHooked = false;
+                  otherFish.element.classList.add("fish-shadow");
+                  otherFish.element.classList.remove("fish");
+                }
+              });
+
+              clearInterval(biteCheckInterval);
+              startReelingMode();
+              break;
+            }
+          }
+        }, 250);
+      }
+
+      function startReelingMode() {
+        const bobber = document.getElementById("active-bobber");
+        if (bobber) {
+          bobber.style.transition = "none";
+          bobber.style.backgroundColor = "#29d88f";
+        }
+
+        caughtFish.element.classList.remove("fish-shadow");
+        caughtFish.element.classList.add("fish");
+        caughtFish.element.style.filter = "none";
+        caughtFish.element.innerHTML = caughtFish.emoji;
+
+        if (caughtFish.type != "trash") {
+          showMsg("Fish caught, 🎣!");
+        }
+        tensionContainer.style.display = "block";
+
+        if (bobberPos.y >= 65) {
+          bobberPos.y -= 20;
+        }
+
+        startTensionLogic();
+      }
+
+      window.addEventListener("mouseup", () => (isPressing = false));
+      window.addEventListener("touchend", () => (isPressing = false));
+
+      function startTensionLogic() {
+        let struggleTimer = 0;
+        pressDuration = 0;
+
+        const loop = setInterval(() => {
+          if (gameState !== "reeling") {
+            clearInterval(loop);
+            return;
+          }
+
+          const targetX = 50;
+          const targetY = 100;
+
+          // Perlawanan ikan lebih berirama (tidak konstan menghentak)
+          struggleTimer += 0.15;
+          const struggle = Math.max(0, Math.sin(struggleTimer)) * 0.5;
+          const weightResistance = 1 / (1 + caughtFish.weight * 0.4);
+
+          if (isPressing) {
+            pressDuration += 0.02;
+            const durationMultiplier =
+              0.5 + Math.min(struggle, 0.2) + pressDuration * 0.5;
+            tension += 0.85 * durationMultiplier; // Sedikit lebih cepat nariknya
+            const dx = targetX - bobberPos.x;
+            const dy = targetY - bobberPos.y;
+            bobberPos.x += dx * 0.025 * weightResistance;
+            bobberPos.y += dy * 0.025 * weightResistance;
+          } else {
+            // Pengaruh PullStrength Ikan terhadap Tension dan tarikan balik
+            const randomDrop = Math.random() * 0.5 + 0.5;
+            pressDuration = Math.max(0, pressDuration - randomDrop);
+            tension -= 0.85;
+            bobberPos.y -= (0.15 + struggle) * caughtFish.pullStrength;
+            if (caughtFish.pullStrength < 0) {
+              const dx = targetX - bobberPos.x;
+              bobberPos.x += dx * 0.08;
+            } else {
+              bobberPos.x += (Math.random() - 0.5) * 1;
+            }
+          }
+
+          if (tension < 0) tension = 0;
+          tensionBar.style.width = tension + "%";
+
+          const bobber = document.getElementById("active-bobber");
+          if (bobber) {
+            bobber.style.top = bobberPos.y + "vh";
+            bobber.style.left = bobberPos.x + "vw";
+          }
+
+          if (caughtFish) {
+            caughtFish.element.style.left = bobberPos.x + "vw";
+            caughtFish.element.style.top = bobberPos.y + "vh";
+            const angle = Math.atan2(
+              targetY - bobberPos.y,
+              targetX - bobberPos.x,
+            );
+            caughtFish.element.style.transform = `translate(-57%, -95%) rotate(${angle / Math.PI + 270}deg)`;
+          }
+
+          if (tension >= 100) {
+            clearInterval(loop);
+            resetGame("Line snapped! 😫");
+          } else if (bobberPos.y >= 92) {
+            clearInterval(loop);
+            winFish();
+          } else if (bobberPos.y <= 8) {
+            clearInterval(loop);
+            resetGame("Fish escaped. 🏃‍♂️");
+          }
+        }, 30);
+      }
+
+      function winFish() {
+        if (caughtFish.type === "trash") {
+          showMsg(`You caught a ${caughtFish.emoji}!`);
+        } else {
+          score++;
+          scoreEl.innerText = score;
+          showMsg(
+            `GREAT! Caught ${caughtFish.emoji} ${caughtFish.weight}kg! ✨`,
+          );
+        }
+
+        const fishToFade = caughtFish;
+        fishToFade.element.style.transform += " scale(0)";
+        fishToFade.element.style.opacity = "0";
+        fishToFade.element.innerHTML = createFishSVG(caughtFish.id);
+
+        setTimeout(() => {
+          const index = fishArray.indexOf(fishToFade);
+          if (index > -1) {
+            if (fishToFade.element.parentNode)
+              pond.removeChild(fishToFade.element);
+            fishArray.splice(index, 1);
+          }
+          createFish();
+          resetGameUI();
+        }, 600);
+      }
+
+      function resetGame(message) {
+        showMsg(message);
+        fishArray.forEach((f) => {
+          if (f.isHooked) {
+            f.element.style.transform += " scale(0)";
+            f.element.style.opacity = "0";
+            f.element.innerHTML = createFishSVG(f.id);
+            const index = fishArray.indexOf(f);
+            if (index > -1) {
+              if (f.element.parentNode) pond.removeChild(f.element);
+              fishArray.splice(index, 1);
+            }
+            createFish();
+          }
+          f.isHooked = false;
+          f.element.classList.add("fish-shadow");
+          f.element.classList.remove("fish");
+          f.element.style.filter = "brightness(0) opacity(0.15) blur(2px)";
+          f.element.innerHTML = createFishSVG(f.id);
+        });
+
+        if (biteCheckInterval) clearInterval(biteCheckInterval);
+        setTimeout(resetGameUI, 500);
+      }
+
+      function resetGameUI() {
+        gameState = "idle";
+        tension = 0;
+        pressDuration = 0;
+        caughtFish = null;
+        tensionContainer.style.display = "none";
+
+        const b = document.getElementById("active-bobber");
+        if (b && b.parentNode) pond.removeChild(b);
+      }
+
+      function showMsg(text) {
+        msgEl.innerText = text;
+        msgEl.style.display = "block";
+        setTimeout(() => {
+          msgEl.style.display = "none";
+        }, 2000);
+      }
+
+      initPond();
+    </script>
+  </body>
+</html>
