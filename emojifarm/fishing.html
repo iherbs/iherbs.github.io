@@ -617,7 +617,8 @@
 
           for (const f of fishArray) {
             const dist = Math.sqrt(
-              Math.pow(f.x - bobberPos.x, 2) + Math.pow(f.y - bobberPos.y, 2),
+              Math.pow(f.x - bobberPos.x + 5, 2) +
+                Math.pow(f.y - bobberPos.y + 5, 2),
             );
             if (dist < 7 && !f.isHooked) {
               f.isHooked = true;
