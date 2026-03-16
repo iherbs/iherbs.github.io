@@ -13,6 +13,10 @@
       *::after {
         box-sizing: border-box;
       }
+      :root {
+        --full-height: 100vh;
+        --full-height: 100dvh;
+      }
       body {
         margin: 0;
         overflow: hidden;
@@ -20,7 +24,6 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         touch-action: none;
         user-select: none;
-        -webkit-touch-callout: none;
       }
 
       #pond {
@@ -30,7 +33,6 @@
         background: linear-gradient(180deg, #5dc4e0 0%, #4fb3ce 100%);
         overflow: hidden;
         cursor: crosshair;
-        -webkit-touch-callout: none;
       }
 
       .lilypad {
