@@ -30,21 +30,9 @@
         position: relative;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(180deg, #5dc4e0 0%, #4fb3ce 100%);
+        /* background: linear-gradient(180deg, #5dc4e0 0%, #4fb3ce 100%); */
         overflow: hidden;
         cursor: crosshair;
-      }
-
-      .lilypad {
-        position: absolute;
-        font-size: 3rem;
-        user-select: none;
-        z-index: 15;
-        transition: transform 0.5s ease-out;
-        pointer-events: none;
-        --base-rot: 0deg;
-        animation: float-lily 6s ease-in-out infinite;
-        filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.1));
       }
 
       .bobber {
@@ -202,27 +190,12 @@
           opacity: 0;
         }
       }
-      @keyframes float-lily {
-        0%,
-        100% {
-          transform: translate(0, 0) rotate(var(--base-rot));
-        }
-        25% {
-          transform: translate(5px, -5px) rotate(calc(var(--base-rot) + 2deg));
-        }
-        50% {
-          transform: translate(0, -10px) rotate(calc(var(--base-rot) - 1deg));
-        }
-        75% {
-          transform: translate(-5px, -5px) rotate(calc(var(--base-rot) + 1deg));
-        }
-      }
 
       .fish-container {
         position: absolute;
         width: 70px;
         height: 70px;
-        z-index: 4;
+        z-index: 1;
         pointer-events: none;
         display: flex;
         align-items: center;
@@ -279,10 +252,209 @@
           transform: rotate(0deg);
         }
       }
+
+      .lotus-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        z-index: 5;
+      }
+
+      .float {
+        animation: float 6s ease-in-out infinite alternate;
+      }
+      .bob {
+        animation: bob 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-5px) rotate(1deg);
+        }
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+      }
+      @keyframes bob {
+        0% {
+          transform: translateY(0px) scale(1);
+        }
+        100% {
+          transform: translateY(-8px) scale(1.02);
+        }
+      }
     </style>
   </head>
   <body>
     <div id="pond">
+      <!-- Lapisan Utama Konten Kolam -->
+      <svg
+        id="lotus-svg"
+        class="lotus-layer"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          <path id="pad-shape" d="M 0 0 L 100 0 A 100 100 0 1 1 70.7 -70.7 Z" />
+
+          <g id="pad-light">
+            <use
+              href="#pad-shape"
+              fill="rgba(0,0,0,0.15)"
+              transform="translate(5, 8)"
+            />
+            <use href="#pad-shape" fill="#75C465" />
+            <g clip-path="url(#pad-clip)">
+              <g
+                fill="none"
+                stroke="rgba(0,0,0,0.05)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              >
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+              </g>
+            </g>
+          </g>
+          <g id="pad-medium">
+            <use
+              href="#pad-shape"
+              fill="rgba(0,0,0,0.15)"
+              transform="translate(5, 8)"
+            />
+            <use href="#pad-shape" fill="#559B46" />
+            <g clip-path="url(#pad-clip)">
+              <g
+                fill="none"
+                stroke="rgba(0,0,0,0.05)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              >
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+              </g>
+            </g>
+          </g>
+          <g id="pad-dark">
+            <use
+              href="#pad-shape"
+              fill="rgba(0,0,0,0.15)"
+              transform="translate(5, 8)"
+            />
+            <use href="#pad-shape" fill="#3C7A31" />
+            <g clip-path="url(#pad-clip)">
+              <g
+                fill="none"
+                stroke="rgba(0,0,0,0.05)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              >
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+              </g>
+            </g>
+          </g>
+
+          <!-- Bunga Teratai Merah Jambu -->
+          <path
+            id="petal-pink-out"
+            d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+            fill="#F37B9D"
+          />
+          <path
+            id="petal-pink-in"
+            d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+            fill="#FFC0D0"
+          />
+
+          <g id="lotus-pink">
+            <circle cx="2" cy="5" r="30" fill="rgba(0,0,0,0.15)" />
+            <g>
+              <use href="#petal-pink-out" />
+              <use href="#petal-pink-out" transform="rotate(45)" />
+              <use href="#petal-pink-out" transform="rotate(90)" />
+              <use href="#petal-pink-out" transform="rotate(135)" />
+              <use href="#petal-pink-out" transform="rotate(180)" />
+              <use href="#petal-pink-out" transform="rotate(225)" />
+              <use href="#petal-pink-out" transform="rotate(270)" />
+              <use href="#petal-pink-out" transform="rotate(315)" />
+            </g>
+            <g transform="scale(0.7)">
+              <use href="#petal-pink-in" transform="rotate(22.5)" />
+              <use href="#petal-pink-in" transform="rotate(67.5)" />
+              <use href="#petal-pink-in" transform="rotate(112.5)" />
+              <use href="#petal-pink-in" transform="rotate(157.5)" />
+              <use href="#petal-pink-in" transform="rotate(202.5)" />
+              <use href="#petal-pink-in" transform="rotate(247.5)" />
+              <use href="#petal-pink-in" transform="rotate(292.5)" />
+              <use href="#petal-pink-in" transform="rotate(337.5)" />
+            </g>
+            <circle cx="0" cy="0" r="12" fill="#FFD13B" />
+          </g>
+
+          <!-- Bunga Teratai Putih -->
+          <path
+            id="petal-white-out"
+            d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+            fill="#FDFCF4"
+          />
+          <path
+            id="petal-white-in"
+            d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+            fill="#FFFFFF"
+          />
+
+          <g id="lotus-white">
+            <circle cx="2" cy="5" r="30" fill="rgba(0,0,0,0.15)" />
+            <g>
+              <use href="#petal-white-out" />
+              <use href="#petal-white-out" transform="rotate(45)" />
+              <use href="#petal-white-out" transform="rotate(90)" />
+              <use href="#petal-white-out" transform="rotate(135)" />
+              <use href="#petal-white-out" transform="rotate(180)" />
+              <use href="#petal-white-out" transform="rotate(225)" />
+              <use href="#petal-white-out" transform="rotate(270)" />
+              <use href="#petal-white-out" transform="rotate(315)" />
+            </g>
+            <g transform="scale(0.7)">
+              <use href="#petal-white-in" transform="rotate(22.5)" />
+              <use href="#petal-white-in" transform="rotate(67.5)" />
+              <use href="#petal-white-in" transform="rotate(112.5)" />
+              <use href="#petal-white-in" transform="rotate(157.5)" />
+              <use href="#petal-white-in" transform="rotate(202.5)" />
+              <use href="#petal-white-in" transform="rotate(247.5)" />
+              <use href="#petal-white-in" transform="rotate(292.5)" />
+              <use href="#petal-white-in" transform="rotate(337.5)" />
+            </g>
+            <circle cx="0" cy="0" r="12" fill="#FFD13B" />
+          </g>
+        </defs>
+
+        <!-- Elemen-elemen akan dimasukkan di sini oleh JavaScript -->
+        <g id="lotus-content"></g>
+      </svg>
       <svg
         id="line-svg"
         style="
@@ -312,6 +484,7 @@
     </div>
 
     <script>
+      const ltsvg = document.getElementById("lotus-svg");
       const pond = document.getElementById("pond");
       const tensionBar = document.getElementById("tension-bar");
       const tensionContainer = document.getElementById("tension-container");
@@ -321,7 +494,7 @@
 
       let intouch = false;
       let score = 0;
-      let gameState = "idle";
+      let fishingState = "idle";
       let bobberPos = { x: 0, y: 0 };
       let tension = 0;
       let caughtFish = null;
@@ -330,7 +503,6 @@
       let isPressing = false;
       let pressDuration = 0;
 
-      const lilypads = ["🍀", "🌿", "🍃", "🍂", "🍁", "🪷"];
       // Konfigurasi Ikan Sesuai Permintaan
       const fishes = [
         {
@@ -341,6 +513,15 @@
           minWeight: 0.5,
           maxWeight: 1.5,
           chance: 90,
+        },
+        {
+          emoji: "🪨",
+          type: "trash",
+          speed: 0.04,
+          pullStrength: -4,
+          minWeight: 0,
+          maxWeight: 0,
+          chance: 80,
         },
         {
           emoji: "👞",
@@ -364,7 +545,7 @@
           emoji: "🐠",
           type: "fish",
           speed: 0.08,
-          pullStrength: 0.8,
+          pullStrength: 0.7,
           minWeight: 0.8,
           maxWeight: 2.2,
           chance: 20,
@@ -373,10 +554,73 @@
           emoji: "🐡",
           type: "fish",
           speed: 0.03,
-          pullStrength: 0.8,
+          pullStrength: 0.7,
+          minWeight: 1.0,
+          maxWeight: 3.0,
+          chance: 10,
+        },
+        {
+          emoji: "🦞",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.7,
           minWeight: 2.5,
+          maxWeight: 3.0,
+          chance: 10,
+        },
+        {
+          emoji: "🐙",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.7,
+          minWeight: 3.0,
+          maxWeight: 6.0,
+          chance: 10,
+        },
+        {
+          emoji: "🦑",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.7,
+          minWeight: 5.0,
           maxWeight: 5.0,
           chance: 10,
+        },
+        {
+          emoji: "🪼",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.7,
+          minWeight: 2.0,
+          maxWeight: 4.0,
+          chance: 10,
+        },
+        {
+          emoji: "🦈",
+          type: "fish",
+          speed: 0.12,
+          pullStrength: 0.7,
+          minWeight: 4,
+          maxWeight: 6,
+          chance: 10,
+        },
+        {
+          emoji: "🐬",
+          type: "fish",
+          speed: 0.3,
+          pullStrength: 0.7,
+          minWeight: 4,
+          maxWeight: 6,
+          chance: 10,
+        },
+        {
+          emoji: "🐋",
+          type: "fish",
+          speed: 0.03,
+          pullStrength: 0.7,
+          minWeight: 5.5,
+          maxWeight: 10.0,
+          chance: 5,
         },
       ];
 
@@ -389,10 +633,109 @@
       });
 
       function initPond() {
-        for (let i = 0; i < 15; i++) createRipple();
-        for (let i = 0; i < 8; i++) createLilypad();
+        generatePond();
+        for (let i = 0; i < 10; i++) createRipple();
         for (let i = 0; i < 6; i++) createFish();
         requestAnimationFrame(updateFish);
+      }
+      function generatePond() {
+        const svg = document.getElementById("lotus-svg");
+        const container = document.getElementById("lotus-content");
+
+        // Dapatkan dimensi layar saat ini
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Atur viewBox sesuai dimensi layar asli agar tidak distorsi
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        container.innerHTML = "";
+
+        // Penyesuaian jumlah elemen berdasarkan luas layar
+        const areaFactor = (width * height) / (1000 * 700);
+        const numPads = Math.floor(4 * areaFactor);
+        const numFlowers = Math.floor(6 * areaFactor);
+
+        const padTypes = ["#pad-light", "#pad-medium", "#pad-dark"];
+        const flowerTypes = ["#lotus-pink", "#lotus-white"];
+
+        // Helper untuk mendapatkan koordinat acak
+        const getRandom = (max) => Math.random() * max;
+
+        // Generate Daun Teratai
+        for (let i = 0; i < Math.max(numPads, 8); i++) {
+          const x = getRandom(width);
+          const y = getRandom(height);
+          // Skala sedikit lebih kecil di mobile
+          const baseScale = width < 600 ? 0.3 : 0.5;
+          const scale = baseScale + Math.random() * 0.5;
+          const rotation = Math.random() * 360;
+          const type = padTypes[Math.floor(Math.random() * padTypes.length)];
+          const delay = (Math.random() * 5).toFixed(1);
+
+          const gOuter = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "g",
+          );
+          gOuter.setAttribute(
+            "transform",
+            `translate(${x}, ${y}) rotate(${rotation}) scale(${scale})`,
+          );
+
+          const gInner = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "g",
+          );
+          gInner.setAttribute("class", "float");
+          gInner.setAttribute("style", `animation-delay: ${delay}s`);
+
+          const use = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "use",
+          );
+          use.setAttributeNS("http://www.w3.org/1999/xlink", "href", type);
+
+          gInner.appendChild(use);
+          gOuter.appendChild(gInner);
+          container.appendChild(gOuter);
+        }
+
+        // Generate Bunga Teratai
+        for (let i = 0; i < Math.max(numFlowers, 3); i++) {
+          const x = getRandom(width);
+          const y = getRandom(height);
+          const baseScale = width < 600 ? 0.5 : 0.6;
+          const scale = baseScale + Math.random() * 0.5;
+          const rotation = Math.random() * 360;
+          const type =
+            flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+          const delay = (Math.random() * 4).toFixed(1);
+
+          const gOuter = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "g",
+          );
+          gOuter.setAttribute(
+            "transform",
+            `translate(${x}, ${y}) rotate(${rotation}) scale(${scale})`,
+          );
+
+          const gInner = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "g",
+          );
+          gInner.setAttribute("class", "bob");
+          gInner.setAttribute("style", `animation-delay: ${delay}s`);
+
+          const use = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "use",
+          );
+          use.setAttributeNS("http://www.w3.org/1999/xlink", "href", type);
+
+          gInner.appendChild(use);
+          gOuter.appendChild(gInner);
+          container.appendChild(gOuter);
+        }
       }
 
       function createFishSVG(id) {
@@ -425,25 +768,6 @@
         r.style.top = Math.random() * 100 + "vh";
         r.style.animationDelay = Math.random() * 5 + "s";
         pond.appendChild(r);
-      }
-
-      function createLilypad() {
-        const l = document.createElement("div");
-        l.className = "lilypad";
-        l.innerText = lilypads[Math.floor(Math.random() * lilypads.length)];
-        l.style.left = Math.random() * 85 + 5 + "vw";
-        l.style.top = Math.random() * 85 + 5 + "vh";
-        // l.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.8 + Math.random() * 0.5})`;
-
-        const baseRot = Math.random() * 360;
-        const duration = 5 + Math.random() * 5;
-        const delay = Math.random() * -10;
-
-        l.style.setProperty("--base-rot", `${baseRot}deg`);
-        l.style.animationDuration = `${duration}s`;
-        l.style.animationDelay = `${delay}s`;
-
-        pond.appendChild(l);
       }
 
       function getChanceFish() {
@@ -525,7 +849,7 @@
 
       function updateFishingLine() {
         const bobber = document.getElementById("active-bobber");
-        if (gameState === "idle" || !bobber) {
+        if (fishingState === "idle" || !bobber) {
           fishingLine.setAttribute("d", "");
           return;
         }
@@ -552,14 +876,14 @@
       window.addEventListener("touchend", handleEnd);
 
       pond.addEventListener("mouseup", () => {
-        if (gameState == "reeling") {
+        if (fishingState == "reeling") {
           isPressing = false;
           return;
         }
       });
 
       pond.addEventListener("touchend", () => {
-        if (gameState == "reeling") {
+        if (fishingState == "reeling") {
           isPressing = false;
           return;
         }
@@ -570,16 +894,16 @@
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        if (gameState === "reeling") {
+        if (fishingState === "reeling") {
           isPressing = true;
-        } else if (gameState === "fishing") {
+        } else if (fishingState === "fishing") {
           // Tarik kail jika tidak ada ikan
           const bobber = document.getElementById("active-bobber");
           bobber.style.transition =
             "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
           bobber.style.top = bobberPos.y - 1 + "vh";
           resetGame("Pull back");
-        } else if (gameState === "idle") {
+        } else if (fishingState === "idle") {
           castTo(clientX, clientY);
         }
       }
@@ -588,7 +912,7 @@
       }
 
       function castTo(clientX, clientY) {
-        gameState = "fishing";
+        fishingState = "fishing";
 
         bobberPos.x = (clientX / window.innerWidth) * 100;
         bobberPos.y = (clientY / window.innerHeight) * 100;
@@ -612,20 +936,20 @@
 
       function checkBite() {
         biteCheckInterval = setInterval(() => {
-          if (gameState !== "fishing") {
+          if (fishingState !== "fishing") {
             clearInterval(biteCheckInterval);
             return;
           }
 
           for (const f of fishArray) {
             const dist = Math.sqrt(
-              Math.pow(f.x - bobberPos.x + 5, 2) +
-                Math.pow(f.y - bobberPos.y + 5, 2),
+              Math.pow(f.x - bobberPos.x + 9, 2) +
+                Math.pow(f.y - bobberPos.y + 6, 2),
             );
             if (dist < 7 && !f.isHooked) {
               f.isHooked = true;
               caughtFish = f;
-              gameState = "reeling";
+              fishingState = "reeling";
 
               fishArray.forEach((otherFish) => {
                 if (otherFish.id !== f.id) {
@@ -661,7 +985,7 @@
         tensionContainer.style.display = "block";
 
         if (bobberPos.y >= 65) {
-          bobberPos.y -= 20;
+          bobberPos.y = 50;
         }
 
         startTensionLogic();
@@ -672,7 +996,7 @@
         pressDuration = 0;
 
         const loop = setInterval(() => {
-          if (gameState !== "reeling") {
+          if (fishingState !== "reeling") {
             clearInterval(loop);
             return;
           }
@@ -689,22 +1013,23 @@
             pressDuration += 0.02;
             const durationMultiplier =
               0.5 + Math.min(struggle, 0.2) + pressDuration * 0.5;
-            tension += 0.85 * durationMultiplier; // Sedikit lebih cepat nariknya
+            tension += 0.75 * durationMultiplier; // Sedikit lebih cepat nariknya
             const dx = targetX - bobberPos.x;
             const dy = targetY - bobberPos.y;
             bobberPos.x += dx * 0.025 * weightResistance;
             bobberPos.y += dy * 0.025 * weightResistance;
           } else {
             // Pengaruh PullStrength Ikan terhadap Tension dan tarikan balik
-            const randomDrop = Math.random() * 0.5 + 0.5;
+            const randomDrop = Math.random() * 0.5 + 0.8;
             pressDuration = Math.max(0, pressDuration - randomDrop);
-            tension -= 0.85;
-            bobberPos.y -= (0.15 + struggle) * caughtFish.pullStrength;
+            tension -= 0.85 + struggle + randomDrop;
             if (caughtFish.pullStrength < 0) {
               const dx = targetX - bobberPos.x;
               bobberPos.x += dx * 0.08;
+              bobberPos.y -= 0.5 * caughtFish.pullStrength;
             } else {
               bobberPos.x += (Math.random() - 0.5) * 1;
+              bobberPos.y -= (0.15 + struggle) * caughtFish.pullStrength;
             }
           }
 
@@ -794,7 +1119,7 @@
       }
 
       function resetGameUI() {
-        gameState = "idle";
+        fishingState = "idle";
         tension = 0;
         pressDuration = 0;
         caughtFish = null;
