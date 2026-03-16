@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="dist/main.css" />
     <link rel="stylesheet" href="dist/decor.css" />
     <link rel="stylesheet" href="dist/livestock.css" />
+    <link rel="stylesheet" href="dist/fishing.css" />
   </head>
 
   <body class="twemoji">
@@ -76,6 +77,7 @@
         </span>
         <span id="kitchen-button">🥘</span>
       </div>
+      <div id="fishing-button"></div>
       <span id="farm-button">🌱</span>
 
       <div id="wrapinventory">
@@ -247,6 +249,189 @@
       </div>
     </div>
 
+    <div id="fishing-container" style="display: none">
+      <div id="pond">
+        <!-- Lotus SVG layer -->
+        <svg
+          id="lotus-svg"
+          class="lotus-layer"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <path
+              id="pad-shape"
+              d="M 0 0 L 100 0 A 100 100 0 1 1 70.7 -70.7 Z"
+            />
+
+            <g id="pad-light">
+              <use
+                href="#pad-shape"
+                fill="rgba(0,0,0,0.15)"
+                transform="translate(5, 8)"
+              />
+              <use href="#pad-shape" fill="#75C465" />
+              <g clip-path="url(#pad-clip)">
+                <g
+                  fill="none"
+                  stroke="rgba(0,0,0,0.05)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+                </g>
+              </g>
+            </g>
+            <g id="pad-medium">
+              <use
+                href="#pad-shape"
+                fill="rgba(0,0,0,0.15)"
+                transform="translate(5, 8)"
+              />
+              <use href="#pad-shape" fill="#559B46" />
+              <g clip-path="url(#pad-clip)">
+                <g
+                  fill="none"
+                  stroke="rgba(0,0,0,0.05)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+                </g>
+              </g>
+            </g>
+            <g id="pad-dark">
+              <use
+                href="#pad-shape"
+                fill="rgba(0,0,0,0.15)"
+                transform="translate(5, 8)"
+              />
+              <use href="#pad-shape" fill="#3C7A31" />
+              <g clip-path="url(#pad-clip)">
+                <g
+                  fill="none"
+                  stroke="rgba(0,0,0,0.05)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(20)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(60)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(100)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(140)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(180)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(300)" />
+                  <line x1="0" y1="0" x2="0" y2="100" transform="rotate(340)" />
+                </g>
+              </g>
+            </g>
+
+            <!-- Bunga Teratai Merah Jambu -->
+            <path
+              id="petal-pink-out"
+              d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+              fill="#F37B9D"
+            />
+            <path
+              id="petal-pink-in"
+              d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+              fill="#FFC0D0"
+            />
+
+            <g id="lotus-pink">
+              <circle cx="2" cy="5" r="30" fill="rgba(0,0,0,0.15)" />
+              <g>
+                <use href="#petal-pink-out" />
+                <use href="#petal-pink-out" transform="rotate(45)" />
+                <use href="#petal-pink-out" transform="rotate(90)" />
+                <use href="#petal-pink-out" transform="rotate(135)" />
+                <use href="#petal-pink-out" transform="rotate(180)" />
+                <use href="#petal-pink-out" transform="rotate(225)" />
+                <use href="#petal-pink-out" transform="rotate(270)" />
+                <use href="#petal-pink-out" transform="rotate(315)" />
+              </g>
+              <g transform="scale(0.7)">
+                <use href="#petal-pink-in" transform="rotate(22.5)" />
+                <use href="#petal-pink-in" transform="rotate(67.5)" />
+                <use href="#petal-pink-in" transform="rotate(112.5)" />
+                <use href="#petal-pink-in" transform="rotate(157.5)" />
+                <use href="#petal-pink-in" transform="rotate(202.5)" />
+                <use href="#petal-pink-in" transform="rotate(247.5)" />
+                <use href="#petal-pink-in" transform="rotate(292.5)" />
+                <use href="#petal-pink-in" transform="rotate(337.5)" />
+              </g>
+              <circle cx="0" cy="0" r="12" fill="#FFD13B" />
+            </g>
+
+            <!-- Bunga Teratai Putih -->
+            <path
+              id="petal-white-out"
+              d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+              fill="#FDFCF4"
+            />
+            <path
+              id="petal-white-in"
+              d="M 0 0 C 15 -20 25 -40 0 -50 C -25 -40 -15 -20 0 0"
+              fill="#FFFFFF"
+            />
+
+            <g id="lotus-white">
+              <circle cx="2" cy="5" r="30" fill="rgba(0,0,0,0.15)" />
+              <g>
+                <use href="#petal-white-out" />
+                <use href="#petal-white-out" transform="rotate(45)" />
+                <use href="#petal-white-out" transform="rotate(90)" />
+                <use href="#petal-white-out" transform="rotate(135)" />
+                <use href="#petal-white-out" transform="rotate(180)" />
+                <use href="#petal-white-out" transform="rotate(225)" />
+                <use href="#petal-white-out" transform="rotate(270)" />
+                <use href="#petal-white-out" transform="rotate(315)" />
+              </g>
+              <g transform="scale(0.7)">
+                <use href="#petal-white-in" transform="rotate(22.5)" />
+                <use href="#petal-white-in" transform="rotate(67.5)" />
+                <use href="#petal-white-in" transform="rotate(112.5)" />
+                <use href="#petal-white-in" transform="rotate(157.5)" />
+                <use href="#petal-white-in" transform="rotate(202.5)" />
+                <use href="#petal-white-in" transform="rotate(247.5)" />
+                <use href="#petal-white-in" transform="rotate(292.5)" />
+                <use href="#petal-white-in" transform="rotate(337.5)" />
+              </g>
+              <circle cx="0" cy="0" r="12" fill="#FFD13B" />
+            </g>
+          </defs>
+
+          <!-- Elemen-elemen akan dimasukkan di sini oleh JavaScript -->
+          <g id="lotus-content"></g>
+        </svg>
+        <!-- Fishing line layer -->
+        <svg id="line-svg">
+          <path id="fishing-line" d="" />
+        </svg>
+      </div>
+
+      <div id="fishing-ui-layer">
+        <div id="fishing-stats">
+          <div id="fishing-buy-hook">
+            🪝 <span id="fishing-hook-count">0</span>
+          </div>
+        </div>
+        <div id="fishing-tension-container">
+          <div id="fishing-tension-bar"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="last-played" id="last-played" style="display: none"></div>
 
     <div class="popup-overlay" id="minigame-popup-overlay">
@@ -340,7 +525,7 @@
                 ➖
               </button>
               <input
-                type="text"
+                type="number"
                 id="transfer-qty"
                 min="1"
                 value="1"
@@ -352,7 +537,6 @@
                   border-radius: 5px;
                   border: 1px solid #ccc;
                 "
-                readonly
               />
               <button
                 type="button"

@@ -869,26 +869,6 @@
         );
       }
 
-      pond.addEventListener("mousedown", handleStart);
-      pond.addEventListener("touchstart", handleStart, { passive: false });
-
-      window.addEventListener("mouseup", handleEnd);
-      window.addEventListener("touchend", handleEnd);
-
-      pond.addEventListener("mouseup", () => {
-        if (fishingState == "reeling") {
-          isPressing = false;
-          return;
-        }
-      });
-
-      pond.addEventListener("touchend", () => {
-        if (fishingState == "reeling") {
-          isPressing = false;
-          return;
-        }
-      });
-
       function handleStart(e) {
         e.preventDefault();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -1136,6 +1116,26 @@
           msgEl.style.display = "none";
         }, 2000);
       }
+
+      pond.addEventListener("mousedown", handleStart);
+      pond.addEventListener("touchstart", handleStart, { passive: false });
+
+      window.addEventListener("mouseup", handleEnd);
+      window.addEventListener("touchend", handleEnd);
+
+      pond.addEventListener("mouseup", () => {
+        if (fishingState == "reeling") {
+          isPressing = false;
+          return;
+        }
+      });
+
+      pond.addEventListener("touchend", () => {
+        if (fishingState == "reeling") {
+          isPressing = false;
+          return;
+        }
+      });
 
       initPond();
     </script>

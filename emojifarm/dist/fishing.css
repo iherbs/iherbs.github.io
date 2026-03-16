@@ -1,0 +1,249 @@
+/* Pond Fishing Styles */
+
+#fishing-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #5fcae7;
+  z-index: 5;
+  display: none;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+#pond {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.bobber {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: #f1c40f;
+  border: 3px solid white;
+  border-radius: 50%;
+  z-index: 20;
+  display: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  will-change: top, left;
+}
+
+#line-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+#fishing-line {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+#fishing-ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+#fishing-tension-container {
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  overflow: hidden;
+  border: 2px solid #000000;
+}
+
+#fishing-tension-bar {
+  position: absolute;
+  bottom: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(to right, #2ecc71, #f1c40f, #e74c3c);
+  transition: width 0.1s linear;
+}
+
+#fishing-hook {
+  position: absolute;
+  display: block;
+  background: rgba(255, 255, 255, 0.8);
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 20px;
+  pointer-events: auto;
+}
+
+#fishing-stats {
+  margin-top: 70px;
+  align-self: flex-start;
+  pointer-events: none;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#fishing-buy-hook {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: transform 0.1s;
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#fishing-buy-hook:active {
+  transform: scale(0.95);
+}
+
+#fishing-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 210;
+  pointer-events: auto;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ripple {
+  position: absolute;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-effect 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes ripple-effect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.fish-container {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity 0.3s,
+    transform 0.1s;
+}
+
+.fish-shadow {
+  filter: brightness(0) opacity(0.15) blur(1px);
+  z-index: 4;
+}
+
+.fish-active {
+  position: absolute;
+  font-size: 2.5rem;
+  transition: transform 0.3s ease-out;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fish-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.fish-tail {
+  transform-origin: center;
+  animation: tail-wag 0.6s ease-in-out infinite;
+}
+
+@keyframes tail-wag {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
+}
+
+.lotus-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.float {
+  animation: float 6s ease-in-out infinite alternate;
+}
+.bob {
+  animation: bob 4s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes bob {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  100% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}

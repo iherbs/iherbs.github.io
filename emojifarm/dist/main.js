@@ -256,6 +256,15 @@
       cost: 600,
     },
     {
+      id: "sushi",
+      emoji: "🍣",
+      name: "Sushi",
+      ingredients: { "🐟": 1, "🌾": 1 },
+      time: 28,
+      value: 20,
+      cost: 800,
+    },
+    {
       id: "bread",
       emoji: "🍞",
       name: "Bread",
@@ -280,7 +289,7 @@
       ingredients: { "🥛": 1, "🍓": 1 },
       time: 33,
       value: 45,
-      cost: 500,
+      cost: 700,
     },
     {
       id: "pancake",
@@ -1130,7 +1139,7 @@
           showPopup(`
                         Sell ${plantName} (${emoji}) for 🪙${sellPrice} each?<br>
                         <button type="button" id="qtysellmin" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➖</button>
-                        <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:right;outline:none;">
+                        <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:center;outline:none;">
                         <button type="button" id="qtyselladd" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➕</button>
                         <div>Total: 🪙<span id="sell-total">${count * sellPrice}</span></div>
                     `).then((confirmed) => {
@@ -1247,7 +1256,9 @@
     if (livestockItem) return livestockItem.name;
     const recipe = recipes.find((r) => r.emoji === emoji);
     if (recipe) return recipe.name;
-    return "Unknown Plant";
+    const fish = fishingTypes.find((f) => f.emoji === emoji);
+    if (fish) return fish.type === "trash" ? "Trash" : "Fish";
+    return "Unknown Item";
   };
 
   const getSellPrice = (emoji) => {
@@ -1257,8 +1268,12 @@
     if (livestockItem) return livestockItem.value;
     const recipe = recipes.find((r) => r.emoji === emoji);
     if (recipe) return recipe.value;
+    const fish = fishingTypes.find((f) => f.emoji === emoji);
+    if (fish) return fish.value;
+    if (emoji === "🪝") return hookPrice;
     return 0;
   };
+
   const calculateChecksum = (data) => {
     const str = JSON.stringify({
       money: data.money,
@@ -2698,6 +2713,680 @@
     if (!reset) {
       saveGame();
     }
+  });
+
+  // ======================================================================================
+  // ================================== FISHING FEATURE ===================================
+  // ======================================================================================
+
+  const hookPrice = 5;
+  let fishingState = "idle";
+  let fishingBobberPos = { x: 0, y: 0 };
+  let fishingTension = 0;
+  let fishingCaughtFish = null;
+  let fishingFishArray = [];
+  let fishingBiteCheckInterval = null;
+  let fishingIsPressing = false;
+  let fishingPressDuration = 0;
+
+  const fishingTypes = [
+    {
+      emoji: "🐟",
+      type: "fish",
+      speed: 0.2,
+      pullStrength: 0.6,
+      minWeight: 0.5,
+      maxWeight: 1.5,
+      chance: 90,
+      value: 8,
+    },
+    {
+      emoji: "🪨",
+      type: "trash",
+      speed: 0.16,
+      pullStrength: -4,
+      minWeight: 0,
+      maxWeight: 0,
+      chance: 80,
+      value: 2,
+    },
+    {
+      emoji: "👞",
+      type: "trash",
+      speed: 0.88,
+      pullStrength: -4,
+      minWeight: 0,
+      maxWeight: 0,
+      chance: 80,
+      value: 3,
+    },
+    {
+      emoji: "🦐",
+      type: "fish",
+      speed: 0.48,
+      pullStrength: 0.4,
+      minWeight: 0.1,
+      maxWeight: 0.4,
+      chance: 70,
+      value: 6,
+    },
+    {
+      emoji: "🐠",
+      type: "fish",
+      speed: 0.32,
+      pullStrength: 0.8,
+      minWeight: 0.8,
+      maxWeight: 2.2,
+      chance: 20,
+      value: 10,
+    },
+    {
+      emoji: "🐡",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 0.8,
+      minWeight: 1.0,
+      maxWeight: 3.0,
+      chance: 15,
+      value: 12,
+    },
+    {
+      emoji: "🦞",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 0.8,
+      minWeight: 2.5,
+      maxWeight: 3.0,
+      chance: 15,
+      value: 15,
+    },
+    {
+      emoji: "🐙",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 0.8,
+      minWeight: 3.0,
+      maxWeight: 6.0,
+      chance: 10,
+      value: 18,
+    },
+    {
+      emoji: "🦑",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 0.8,
+      minWeight: 5.0,
+      maxWeight: 7.0,
+      chance: 10,
+      value: 20,
+    },
+    {
+      emoji: "🪼",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 0.8,
+      minWeight: 2.0,
+      maxWeight: 4.0,
+      chance: 10,
+      value: 16,
+    },
+    {
+      emoji: "🦈",
+      type: "fish",
+      speed: 0.48,
+      pullStrength: 1.2,
+      minWeight: 4.0,
+      maxWeight: 7.0,
+      chance: 10,
+      value: 18,
+    },
+    {
+      emoji: "🐬",
+      type: "fish",
+      speed: 1.2,
+      pullStrength: 1.5,
+      minWeight: 4.0,
+      maxWeight: 8.0,
+      chance: 5,
+      value: 20,
+    },
+    {
+      emoji: "🐋",
+      type: "fish",
+      speed: 0.12,
+      pullStrength: 2.0,
+      minWeight: 10.0,
+      maxWeight: 20.0,
+      chance: 2,
+      value: 25,
+    },
+  ];
+
+  const pond = document.getElementById("pond");
+  const fishingFishSizePercentX = (70 / window.innerWidth) * 100;
+  const fishingFishSizePercentY = (70 / window.innerHeight) * 100;
+
+  function initFishingPond() {
+    generateFishingPond();
+    for (let i = 0; i < 10; i++) createFishingRipple();
+    for (let i = 0; i < 6; i++) createFishingFish();
+    requestAnimationFrame(updateFishingLoop);
+  }
+
+  function generateFishingPond() {
+    const svg = document.getElementById("lotus-svg");
+    const container = document.getElementById("lotus-content");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    container.innerHTML = "";
+
+    const areaFactor = (width * height) / (1000 * 700);
+    const numPads = Math.max(Math.floor(8 * areaFactor), 8);
+    const numFlowers = Math.max(Math.floor(4 * areaFactor), 3);
+
+    const padTypes = ["#pad-light", "#pad-medium", "#pad-dark"];
+    const flowerTypes = ["#lotus-pink", "#lotus-white"];
+
+    for (let i = 0; i < numPads; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const scale = 0.4 + Math.random() * 0.6;
+      const rotation = Math.random() * 360;
+      const type = padTypes[Math.floor(Math.random() * padTypes.length)];
+      const delay = (Math.random() * 5).toFixed(1);
+
+      const gOuter = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g",
+      );
+      gOuter.setAttribute(
+        "transform",
+        `translate(${x}, ${y}) rotate(${rotation}) scale(${scale})`,
+      );
+      const gInner = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g",
+      );
+      gInner.setAttribute("class", "float");
+      gInner.setAttribute("style", `animation-delay: ${delay}s`);
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttributeNS("http://www.w3.org/1999/xlink", "href", type);
+      gInner.appendChild(use);
+      gOuter.appendChild(gInner);
+      container.appendChild(gOuter);
+    }
+
+    for (let i = 0; i < numFlowers; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const scale = 0.6 + Math.random() * 0.4;
+      const rotation = Math.random() * 360;
+      const type = flowerTypes[Math.floor(Math.random() * flowerTypes.length)];
+      const delay = (Math.random() * 4).toFixed(1);
+
+      const gOuter = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g",
+      );
+      gOuter.setAttribute(
+        "transform",
+        `translate(${x}, ${y}) rotate(${rotation}) scale(${scale})`,
+      );
+      const gInner = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g",
+      );
+      gInner.setAttribute("class", "bob");
+      gInner.setAttribute("style", `animation-delay: ${delay}s`);
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttributeNS("http://www.w3.org/1999/xlink", "href", type);
+      gInner.appendChild(use);
+      gOuter.appendChild(gInner);
+      container.appendChild(gOuter);
+    }
+  }
+
+  function createFishingFishSVG(color = "#3498db") {
+    return `
+      <svg class="fish-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path class="fin-l" d="m 38.37,40 q -20,0 -10,10" fill="${color}" opacity="0.6" />
+        <path class="fish-tail" d="M 50 75 L 35 100 Q 50 95 65 100 Z" fill="${color}" opacity="0.9" />
+        <path d="m 50,15 c -12,0 -15.9,21.5 -15.9,38.5 0,15 10.9,26.4 15.9,36.4 5,-10 15.9,-21.4 15.9,-36.4 0,-17 -3.9,-38.5 -15.9,-38.5 z" fill="${color}" />
+        <path class="fin-r" d="m 61.6,40 q 20,0 10,10" fill="${color}" opacity="0.6" />
+      </svg>
+    `;
+  }
+
+  function createFishingRipple() {
+    const r = document.createElement("div");
+    r.className = "ripple";
+    const size = Math.random() * 100 + 50;
+    r.style.width = size + "px";
+    r.style.height = size + "px";
+    r.style.left = Math.random() * 100 + "vw";
+    r.style.top = Math.random() * 100 + "vh";
+    r.style.animationDelay = Math.random() * 5 + "s";
+    pond.appendChild(r);
+  }
+
+  function getChanceFishingFish() {
+    const totalChance = fishingTypes.reduce((sum, f) => sum + f.chance, 0);
+    let rand = Math.random() * totalChance;
+    for (const fish of fishingTypes) {
+      if (rand < fish.chance) return fish;
+      rand -= fish.chance;
+    }
+    return fishingTypes[0];
+  }
+
+  function getNewFishingFishData() {
+    const fish = getChanceFishingFish();
+    const limitX = 100 - fishingFishSizePercentX;
+    const limitY = 100 - fishingFishSizePercentY;
+    const weight = (
+      Math.random() * (fish.maxWeight - fish.minWeight) +
+      fish.minWeight
+    ).toFixed(2);
+
+    return {
+      id: "fish_" + Math.random().toString(36).substr(2, 9),
+      x: Math.random() * limitX,
+      y: Math.random() * limitY,
+      targetX: Math.random() * limitX,
+      targetY: Math.random() * limitY,
+      emoji: fish.emoji,
+      type: fish.type,
+      speed: fish.speed * 2,
+      weight: parseFloat(weight),
+      pullStrength: fish.pullStrength,
+      isHooked: false,
+    };
+  }
+
+  function createFishingFish() {
+    const f = getNewFishingFishData();
+    const el = document.createElement("div");
+    el.className = "fish-container fish-shadow";
+    el.id = f.id;
+    el.innerHTML = createFishingFishSVG();
+    el.style.left = f.x + "vw";
+    el.style.top = f.y + "vh";
+    pond.appendChild(el);
+    f.element = el;
+    fishingFishArray.push(f);
+  }
+
+  function updateFishingLoop() {
+    if (document.getElementById("fishing-container").style.display === "none")
+      return;
+
+    const limitX = 100 - fishingFishSizePercentX;
+    const limitY = 100 - fishingFishSizePercentY;
+
+    fishingFishArray.forEach((f) => {
+      if (f.isHooked) return;
+
+      if (Math.abs(f.x - f.targetX) < 2 && Math.abs(f.y - f.targetY) < 2) {
+        f.targetX = Math.random() * limitX + 2;
+        f.targetY = Math.random() * limitY + 2;
+      }
+
+      const dx = f.targetX - f.x;
+      const dy = f.targetY - f.y;
+      const angle = Math.atan2(dy, dx);
+
+      f.x += Math.cos(angle) * f.speed * 0.25;
+      f.y += Math.sin(angle) * f.speed * 0.25;
+
+      f.element.style.left = f.x + "vw";
+      f.element.style.top = f.y + "vh";
+      f.element.style.transform = `rotate(${(angle * 180) / Math.PI + 90}deg)`;
+    });
+
+    updateFishingLine();
+    requestAnimationFrame(updateFishingLoop);
+  }
+
+  function updateFishingLine() {
+    const bobber = document.getElementById("fishing-bobber");
+    const line = document.getElementById("fishing-line");
+    if (fishingState === "idle" || !bobber) {
+      line.setAttribute("d", "");
+      return;
+    }
+    const rect = bobber.getBoundingClientRect();
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight;
+    const endX = rect.left + rect.width / 2;
+    const endY = rect.top + rect.height / 2;
+    const controlY = (startY + endY) / 2;
+    line.setAttribute(
+      "d",
+      `M ${startX} ${startY} Q ${startX} ${controlY} ${endX} ${endY}`,
+    );
+  }
+
+  function handleFishingStart(e) {
+    e.preventDefault();
+    const touch = e.type.includes("touch") ? e.touches[0] : e;
+    const x = touch.clientX;
+    const y = touch.clientY;
+
+    if (fishingState === "reeling") {
+      fishingIsPressing = true;
+    } else if (fishingState === "fishing") {
+      const bobber = document.getElementById("fishing-bobber");
+      bobber.style.transition =
+        "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
+      bobber.style.top = fishingBobberPos.y - 1 + "vh";
+      resetFishingGame("Pulling back...");
+    } else if (fishingState === "idle") {
+      castLine(x, y);
+    }
+  }
+
+  function castLine(clientX, clientY) {
+    // Check for hook requirement
+    if (!gameState.inventory["🪝"] || gameState.inventory["🪝"] <= 0) {
+      showNotification("Need 🪝");
+      return;
+    }
+
+    fishingState = "fishing";
+    fishingBobberPos.x = (clientX / window.innerWidth) * 100;
+    fishingBobberPos.y = (clientY / window.innerHeight) * 100;
+
+    const bobber = document.createElement("div");
+    bobber.className = "bobber";
+    bobber.id = "fishing-bobber";
+    bobber.style.left = fishingBobberPos.x + "vw";
+    bobber.style.top = "-50px";
+    bobber.style.display = "block";
+    document.getElementById("pond").appendChild(bobber);
+
+    bobber.style.top = fishingBobberPos.y - 3 + "vh";
+    requestAnimationFrame(() => {
+      bobber.style.transition =
+        "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.15)";
+      bobber.style.top = fishingBobberPos.y + "vh";
+      setTimeout(checkFishingBite, 700);
+    });
+  }
+
+  function checkFishingBite() {
+    fishingBiteCheckInterval = setInterval(() => {
+      if (fishingState !== "fishing") {
+        clearInterval(fishingBiteCheckInterval);
+        return;
+      }
+
+      for (const f of fishingFishArray) {
+        const dist = Math.sqrt(
+          Math.pow(f.x - fishingBobberPos.x + 9, 2) +
+            Math.pow(f.y - fishingBobberPos.y + 6, 2),
+        );
+        if (dist < 7 && !f.isHooked) {
+          f.isHooked = true;
+          fishingCaughtFish = f;
+          fishingState = "reeling";
+          // Consume hook
+          gameState.inventory["🪝"]--;
+          if (gameState.inventory["🪝"] <= 0) {
+            delete gameState.inventory["🪝"];
+          }
+          clearInterval(fishingBiteCheckInterval);
+          startFishingReeling();
+          updateFishingHookUI();
+          break;
+        }
+      }
+    }, 200);
+  }
+
+  function startFishingReeling() {
+    const bobber = document.getElementById("fishing-bobber");
+    if (bobber) {
+      bobber.style.transition = "none";
+      bobber.style.backgroundColor = "#2ecc71";
+    }
+    fishingCaughtFish.element.classList.remove("fish-shadow");
+    fishingCaughtFish.element.classList.add("fish-active");
+    fishingCaughtFish.element.innerHTML = fishingCaughtFish.emoji;
+
+    if (fishingCaughtFish.type !== "trash") {
+      showNotification("BITE! 🎣 REEL IT IN!");
+    }
+    document.getElementById("fishing-tension-container").style.display =
+      "block";
+
+    // Safety clamp for initial position
+    if (fishingBobberPos.y > 65) fishingBobberPos.y = 50;
+
+    startFishingTensionLogic();
+  }
+
+  function startFishingTensionLogic() {
+    let struggleTimer = 0;
+    fishingPressDuration = 0;
+    const loop = setInterval(() => {
+      if (fishingState !== "reeling") {
+        clearInterval(loop);
+        return;
+      }
+
+      const targetX = 50;
+      const targetY = 100;
+      struggleTimer += 0.1;
+      const struggle = Math.max(0, Math.sin(struggleTimer)) * 0.5;
+      const resistance = 1 / (1 + fishingCaughtFish.weight * 0.4);
+
+      if (fishingIsPressing) {
+        fishingPressDuration += 0.02;
+        const multiplier =
+          0.5 + Math.min(struggle, 0.2) + fishingPressDuration * 0.5;
+        fishingTension += 0.8 * multiplier;
+        fishingBobberPos.x +=
+          (targetX - fishingBobberPos.x) * 0.03 * resistance;
+        fishingBobberPos.y +=
+          (targetY - fishingBobberPos.y) * 0.03 * resistance;
+      } else {
+        const randomDrop = Math.random() * 0.5 + 0.8;
+        fishingTension -= 1.2 + randomDrop;
+        fishingPressDuration = Math.max(0, fishingPressDuration - randomDrop);
+        if (fishingCaughtFish.pullStrength < 0) {
+          const dx = targetX - fishingBobberPos.x;
+          fishingBobberPos.x += dx * 0.08;
+          fishingBobberPos.y -= 0.5 * fishingCaughtFish.pullStrength;
+        } else {
+          fishingBobberPos.y -=
+            (0.2 + struggle) * fishingCaughtFish.pullStrength;
+          fishingBobberPos.x += (Math.random() - 0.5) * 2;
+        }
+      }
+
+      fishingTension = Math.max(0, fishingTension);
+      document.getElementById("fishing-tension-bar").style.width =
+        fishingTension + "%";
+
+      const bobber = document.getElementById("fishing-bobber");
+      if (bobber) {
+        bobber.style.top = fishingBobberPos.y + "vh";
+        bobber.style.left = fishingBobberPos.x + "vw";
+      }
+
+      fishingCaughtFish.element.style.left = fishingBobberPos.x + "vw";
+      fishingCaughtFish.element.style.top = fishingBobberPos.y + "vh";
+      const angle = Math.atan2(
+        targetY - fishingBobberPos.y,
+        targetX - fishingBobberPos.x,
+      );
+      fishingCaughtFish.element.style.transform = `translate(-57%, -95%) rotate(${angle / Math.PI + 270}deg)`;
+
+      if (fishingTension >= 100) {
+        clearInterval(loop);
+        resetFishingGame("Line snapped! 😫");
+      } else if (fishingBobberPos.y >= 92) {
+        clearInterval(loop);
+        winFishingGame();
+      } else if (fishingBobberPos.y <= 5) {
+        clearInterval(loop);
+        resetFishingGame("Escaped! 🏃‍♂️");
+      }
+    }, 30);
+  }
+
+  function winFishingGame() {
+    const f = fishingCaughtFish;
+
+    if (f.type === "trash") {
+      showNotification(`Caught a ${f.emoji}!`);
+    } else {
+      showNotification(`GREAT! ${f.emoji} caught! ✨`);
+
+      // Add to inventory
+      if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
+      gameState.inventory[f.emoji]++;
+
+      // Level up progress or minor reward
+      // gameState.points += Math.ceil(f.weight * 2);
+      // checkLevelUp();
+      updateUI();
+      saveGame();
+    }
+
+    f.element.style.transform += " scale(0)";
+    f.element.style.opacity = "0";
+    f.element.innerHTML = createFishingFishSVG(f.id);
+
+    setTimeout(() => {
+      const idx = fishingFishArray.indexOf(f);
+      if (idx > -1) {
+        f.element.remove();
+        fishingFishArray.splice(idx, 1);
+      }
+      createFishingFish();
+      resetFishingUI();
+    }, 600);
+  }
+
+  function resetFishingGame(msg) {
+    fishingState = "back";
+    showNotification(msg);
+    if (fishingCaughtFish) {
+      const f = fishingCaughtFish;
+      f.isHooked = false;
+      f.element.classList.add("fish-shadow");
+      f.element.classList.remove("fish-active");
+      f.element.innerHTML = createFishingFishSVG(f.id);
+    }
+    if (fishingBiteCheckInterval) clearInterval(fishingBiteCheckInterval);
+    setTimeout(resetFishingUI, 600);
+  }
+
+  function resetFishingUI() {
+    fishingState = "idle";
+    fishingTension = 0;
+    fishingCaughtFish = null;
+    fishingIsPressing = false;
+    document.getElementById("fishing-tension-container").style.display = "none";
+    const b = document.getElementById("fishing-bobber");
+    if (b) b.remove();
+  }
+
+  function openFishingPage() {
+    _("#fishing-container").style.display = "block";
+    _("#farm-button").style.display = "block";
+    updateFishingHookUI();
+    if (fishingFishArray.length === 0) initFishingPond();
+    else generateFishingPond();
+    requestAnimationFrame(updateFishingLoop);
+  }
+
+  function updateFishingHookUI() {
+    const hookCount = gameState.inventory["🪝"] || 0;
+    const hookCountEl = document.getElementById("fishing-hook-count");
+    if (hookCountEl) hookCountEl.innerText = hookCount;
+  }
+
+  function buyFishingHook(qty) {
+    const cost = hookPrice * qty;
+    if (gameState.money >= cost) {
+      if (gameState.money - cost >= 50) {
+        gameState.money -= cost;
+        if (!gameState.inventory["🪝"]) gameState.inventory["🪝"] = 0;
+        gameState.inventory["🪝"] += qty;
+        updateFishingHookUI();
+        updateUI();
+        saveGame();
+        showNotification(`Bought 🪝${qty} for 🪙${cost}!`);
+      } else {
+        showNotification(`can't buy, not good for your 🪙 health`);
+      }
+    } else {
+      showNotification("Not enough 🪙!");
+    }
+  }
+
+  // Event Listeners for Fishing
+  _("#fishing-button").addEventListener("click", openFishingPage);
+  _("#fishing-buy-hook").addEventListener("click", async (e) => {
+    e.stopPropagation();
+    showPopup(
+      `Buy Fishing Hook for 🪙${hookPrice}?<br>
+      <div id="buy-hook-section" style="display: block;">
+          <br>
+          <button type="button" class="popup-button" id="buy-hook-min" style="padding: 5px 10px">
+            ➖
+          </button>
+          <input type="number" id="buy-hook-qty" min="1" value="1" style="
+              width: 60px;
+              margin: 10px;
+              padding: 5px;
+              text-align: center;
+              border-radius: 5px;
+              border: 1px solid #ccc;
+            ">
+          <button type="button" class="popup-button" id="buy-hook-plus" style="padding: 5px 10px">
+            ➕
+          </button>
+          <br>
+          Cost: 🪙<span id="buy-hook-cost" style="margin-top: 10px"></span>
+          <br>
+          <button class="popup-button" id="buy-hook-btn" style="margin-top: 10px">
+            Buy Hook
+          </button>
+      </div>`,
+      "🪝",
+      false,
+    );
+
+    _("#buy-hook-min").addEventListener("click", () => {
+      let qty = parseInt(_("#buy-hook-qty").value) - 1;
+      _("#buy-hook-qty").value = Math.max(1, qty);
+      _("#buy-hook-cost").innerText = qty * hookPrice;
+    });
+
+    _("#buy-hook-plus").addEventListener("click", () => {
+      let qty = parseInt(_("#buy-hook-qty").value) + 1;
+      _("#buy-hook-qty").value = qty;
+      _("#buy-hook-cost").innerText = qty * hookPrice;
+    });
+    _("#buy-hook-btn").addEventListener("click", () => {
+      const qty = parseInt(_("#buy-hook-qty").value);
+      buyFishingHook(qty);
+      _("#popup-cancel").click();
+    });
+  });
+
+  pond.addEventListener("mousedown", handleFishingStart);
+  pond.addEventListener("touchstart", handleFishingStart, { passive: false });
+  window.addEventListener("mouseup", () => {
+    fishingIsPressing = false;
+  });
+  window.addEventListener("touchend", () => {
+    fishingIsPressing = false;
   });
 
   // ==========================================================================
@@ -4171,6 +4860,9 @@
     _("#livestock-container").style.display = "none";
     _("#farm-button").style.display = "none";
     _("#kitchen-container").style.display = "none";
+    _("#fishing-container").style.display = "none";
+
+    _("#fishing-container").style.display = "none";
     clearSelectedEmoji();
   });
 
@@ -4198,7 +4890,7 @@
       showPopup(`
                 Sell ${emoji} for 🪙${cost} each?<br>
                 <button type="button" id="qtysellmin" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➖</button>
-                <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:right;outline:none;">
+                <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:center;outline:none;">
                 <button type="button" id="qtyselladd" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➕</button>
                 <div>Total: 🪙<span id="sell-total">${count * cost}</span></div>
             `).then((confirmed) => {
