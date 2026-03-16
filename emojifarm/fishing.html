@@ -114,6 +114,7 @@
 
       .notification {
         position: absolute;
+        line-height: 1;
         top: 20%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -521,14 +522,19 @@
       }
 
       function updateFishingLine() {
-        if (gameState === "idle") {
+        const bobber = document.getElementById("active-bobber");
+        if (gameState === "idle" || !bobber) {
           fishingLine.setAttribute("d", "");
           return;
         }
+        // Gunakan getBoundingClientRect untuk akurasi piksel di semua layar
+        const bobberRect = bobber.getBoundingClientRect();
         const startX = window.innerWidth / 2;
         const startY = window.innerHeight;
-        const endX = (bobberPos.x / 100) * window.innerWidth;
-        const endY = (bobberPos.y / 100) * window.innerHeight;
+
+        // Posisi tengah bobber
+        const endX = bobberRect.left + bobberRect.width / 2;
+        const endY = bobberRect.top + bobberRect.height / 2;
 
         const controlY = (startY + endY) / 2;
         fishingLine.setAttribute(
@@ -570,7 +576,7 @@
           bobber.style.transition =
             "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
           bobber.style.top = bobberPos.y - 1 + "vh";
-          resetGame("Bait is gone.");
+          resetGame("Pull back");
         } else if (gameState === "idle") {
           castTo(clientX, clientY);
         }
