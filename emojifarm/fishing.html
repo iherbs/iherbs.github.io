@@ -248,7 +248,7 @@
       .fish-shadow {
         position: absolute;
         font-size: 2.5rem;
-        filter: brightness(0) opacity(0.15) blur(1px);
+        filter: brightness(0) opacity(0.15) blur(0.5px);
         z-index: 4;
         pointer-events: none;
         transition: opacity 0.5s;
@@ -788,7 +788,7 @@
           f.isHooked = false;
           f.element.classList.add("fish-shadow");
           f.element.classList.remove("fish");
-          f.element.style.filter = "brightness(0) opacity(0.15) blur(2px)";
+          f.element.style.filter = "brightness(0) opacity(0.15) blur(0.5px)";
           f.element.innerHTML = createFishSVG(f.id);
         });
 
