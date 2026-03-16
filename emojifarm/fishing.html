@@ -537,42 +537,11 @@
         );
       }
 
-      pond.addEventListener("mousedown", (e) => {
-        if (intouch) return;
-        if (gameState == "reeling") {
-          isPressing = true;
-          return;
-        }
-        if (gameState == "fishing") {
-          const bobber = document.getElementById("active-bobber");
-          bobber.style.transition =
-            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
-          bobber.style.top = bobberPos.y - 1 + "vh";
-          if (gameState === "fishing") resetGame("Bait is gone.");
-          return;
-        }
-        if (gameState !== "idle") return;
-        castTo(e.clientX, e.clientY);
-      });
+      pond.addEventListener("mousedown", handleStart);
+      pond.addEventListener("touchstart", handleStart, { passive: false });
 
-      pond.addEventListener("touchstart", (e) => {
-        intouch = true;
-        if (gameState == "reeling") {
-          isPressing = true;
-          return;
-        }
-        if (gameState == "fishing") {
-          const bobber = document.getElementById("active-bobber");
-          bobber.style.transition =
-            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
-          bobber.style.top = bobberPos.y - 1 + "vh";
-          if (gameState === "fishing") resetGame("Bait is gone.");
-          return;
-        }
-        if (gameState !== "idle") return;
-        const touch = e.touches[0];
-        castTo(touch.clientX, touch.clientY);
-      });
+      window.addEventListener("mouseup", handleEnd);
+      window.addEventListener("touchend", handleEnd);
 
       pond.addEventListener("mouseup", () => {
         if (gameState == "reeling") {
@@ -587,6 +556,28 @@
           return;
         }
       });
+
+      function handleStart(e) {
+        e.preventDefault();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        if (gameState === "reeling") {
+          isPressing = true;
+        } else if (gameState === "fishing") {
+          // Tarik kail jika tidak ada ikan
+          const bobber = document.getElementById("active-bobber");
+          bobber.style.transition =
+            "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
+          bobber.style.top = bobberPos.y - 1 + "vh";
+          resetGame("Bait is gone.");
+        } else if (gameState === "idle") {
+          castTo(clientX, clientY);
+        }
+      }
+      function handleEnd() {
+        isPressing = false;
+      }
 
       function castTo(clientX, clientY) {
         gameState = "fishing";
@@ -666,9 +657,6 @@
 
         startTensionLogic();
       }
-
-      window.addEventListener("mouseup", () => (isPressing = false));
-      window.addEventListener("touchend", () => (isPressing = false));
 
       function startTensionLogic() {
         let struggleTimer = 0;
