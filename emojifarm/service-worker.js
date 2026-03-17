@@ -2,8 +2,6 @@ const CACHE_NAME = "EF-EMOJIFARM";
 const toCache = [
   "./",
   "./icon.png",
-  "./music/",
-  "./font/",
   "./assets/js/web.webmanifest",
   "./assets/js/register.js",
   "./assets/img/icon.png",
@@ -15,14 +13,22 @@ const toCache = [
   "./dist/main.js",
   "./dist/main.css",
   "./dist/decor.css",
+  "./dist/livestock.css",
+  "./dist/fishing.css",
   "./font/Delius.ttf",
   "./font/twemoji.ttf",
   "./font/NotoColorEmoji.ttf",
+  "./font/openmoji.woff2",
   "./music/tap.wav",
   "./music/levelup.wav",
   "./music/match.wav",
   "./music/done.wav",
   "./music/growth.wav",
+  "./music/chicken.wav",
+  "./music/cook.wav",
+  "./music/cow.wav",
+  "./music/rodreel.wav",
+  "./music/rodwosh.wav",
   "./music/CozyGardenSerenity.mp3",
 ];
 
@@ -38,10 +44,42 @@ self.addEventListener("install", function (event) {
 });
 
 self.addEventListener("fetch", function (event) {
+  const url = new URL(event.request.url);
+
+  // Network First strategy for root and index.html
+  if (url.pathname === "/" || url.pathname.endsWith("index.html")) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const resClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, resClone);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request)),
+    );
+    return;
+  }
+
+  // Cache First strategy for other assets
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== "basic") {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return response;
       });
     }),
   );

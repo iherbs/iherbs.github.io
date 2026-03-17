@@ -71,9 +71,9 @@
     { emoji: "🟫", name: "Land", growthTime: 0, value: 0, cost: 300 },
   ];
   const growthItems = [
-    { emoji: "💧", name: "Water", growthBoost: 2, cost: 20 },
-    { emoji: "🧴", name: "Fertilizer", growthBoost: 5, cost: 50 },
-    { emoji: "🧪", name: "Potion", growthBoost: 10, cost: 100 },
+    { emoji: "💧", name: "Water", growthBoost: 5, cost: 20 },
+    { emoji: "🧴", name: "Fertilizer", growthBoost: 15, cost: 50 },
+    { emoji: "🧪", name: "Potion", growthBoost: 30, cost: 100 },
   ];
   const npcs = [
     "🧔🏻‍♂️",
@@ -514,9 +514,11 @@
 
   // Play sound effect
   const sfx = _("#sfx");
-  const playSound = (soundFile) => {
+  let audio = null;
+  const playSound = (soundFile, loop = false) => {
     if (gameState.sfx) {
-      const audio = new Audio(`music/${soundFile}`);
+      audio = new Audio(`music/${soundFile}`);
+      audio.loop = loop;
       audio.play();
     }
   };
@@ -825,7 +827,7 @@
           if (gameState.money - item.cost >= 50) {
             playSound("growth.wav");
             gameState.money -= item.cost;
-            plot.growth += item.growthBoost;
+            plot.growth += item.growthBoost * (gameState.realTimeScale || 60);
             if (plot.growth > getGrowthTime(plot.plant)) {
               plot.growth = getGrowthTime(plot.plant); // Batasi pertumbuhan maksimum
             }
@@ -2833,7 +2835,7 @@
     {
       emoji: "🦈",
       type: "fish",
-      speed: 0.48,
+      speed: 0.78,
       pullStrength: 3.3,
       minWeight: 2,
       maxWeight: 3,
@@ -3075,14 +3077,17 @@
     const y = touch.clientY;
 
     if (fishingState === "reeling") {
+      playSound("rodreel.wav", true);
       fishingIsPressing = true;
     } else if (fishingState === "fishing") {
       const bobber = document.getElementById("fishing-bobber");
       bobber.style.transition =
         "top 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1)";
       bobber.style.top = fishingBobberPos.y - 1 + "vh";
+      playSound("tap.wav");
       resetFishingGame("Pulling back...");
     } else if (fishingState === "idle") {
+      playSound("rodwosh.wav");
       castLine(x, y);
     }
   }
@@ -3240,12 +3245,7 @@
   function winFishingGame() {
     const f = fishingCaughtFish;
 
-    if (f.type === "trash") {
-      showNotification(`Caught a ${f.emoji}!`);
-    } else {
-      showNotification(`GREAT! ${f.emoji} caught! ✨`);
-    }
-
+    audio.pause();
     // Add to inventory
     if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
     gameState.inventory[f.emoji]++;
@@ -3268,6 +3268,13 @@
       }
       createFishingFish();
       resetFishingUI();
+
+      if (f.type === "trash") {
+        showNotification(`Caught a ${f.emoji}!`);
+      } else {
+        playSound("done.wav");
+        showNotification(`GREAT! ${f.emoji} caught! ✨`);
+      }
     }, 600);
   }
 
@@ -3286,6 +3293,7 @@
   }
 
   function resetFishingUI() {
+    audio.pause();
     fishingState = "idle";
     fishingTension = 0;
     fishingCaughtFish = null;
@@ -3383,9 +3391,15 @@
   pond.addEventListener("mousedown", handleFishingStart);
   pond.addEventListener("touchstart", handleFishingStart, { passive: false });
   window.addEventListener("mouseup", () => {
+    if (fishingState === "reeling") {
+      audio.pause();
+    }
     fishingIsPressing = false;
   });
   window.addEventListener("touchend", () => {
+    if (fishingState === "reeling") {
+      audio.pause();
+    }
     fishingIsPressing = false;
   });
 
