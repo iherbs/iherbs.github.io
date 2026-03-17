@@ -202,6 +202,15 @@
       cost: 100,
     },
     {
+      id: "tempura",
+      emoji: "🍤",
+      name: "Tempura",
+      ingredients: { "🦐": 1 },
+      time: 10,
+      value: 8,
+      cost: 100,
+    },
+    {
       id: "french_fries",
       emoji: "🍟",
       name: "French Fries",
@@ -229,21 +238,30 @@
       cost: 500,
     },
     {
+      id: "omelet",
+      emoji: "🍳",
+      name: "Omelet",
+      ingredients: { "🥚": 1 },
+      time: 10,
+      value: 12,
+      cost: 600,
+    },
+    {
+      id: "oden",
+      emoji: "🍢",
+      name: "Oden",
+      ingredients: { "🌾": 1, "🥚": 1, "🐟": 1 },
+      time: 17,
+      value: 25,
+      cost: 700,
+    },
+    {
       id: "salad",
       emoji: "🥗",
       name: "Salad",
       ingredients: { "🥬": 1, "🍅": 1, "🥒": 1 },
       time: 17,
       value: 59,
-      cost: 700,
-    },
-    {
-      id: "omelet",
-      emoji: "🍳",
-      name: "Omelet",
-      ingredients: { "🥚": 1 },
-      time: 20,
-      value: 12,
       cost: 700,
     },
     {
@@ -1912,7 +1930,7 @@
       unlockedRecipes[Math.floor(Math.random() * unlockedRecipes.length)];
     const recipe = recipes.find((r) => r.id === recipeId);
     const recipeEmoji = recipe ? recipe.emoji : "❓";
-    const quantity = Math.floor(Math.random() * 7) + 1; // 1 to 7
+    const quantity = Math.floor(Math.random() * 4) + 1; // 1 to 4
 
     const usedNPCs = [
       ...gameState.quests.map((q) => q.npc),
