@@ -902,12 +902,13 @@ button {
   align-items: center;
   gap: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-width: 70px;
+  min-width: 80px;
   text-align: center;
 }
 
 .inventory-count {
-  overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.9rem;
   color: #555;
 }
