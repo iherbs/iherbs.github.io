@@ -481,6 +481,7 @@ button {
 
 #fishing-button {
   position: absolute;
+  cursor:pointer;
   left: -85px;
   margin-top: 75px;
   width: 150px;
