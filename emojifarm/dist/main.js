@@ -5845,24 +5845,20 @@
       if (index >= gameState.kitchen.unlockedCount) {
         const stoveCost = (index + 1) * 500; // 500, 1000, 1500, 2000
 
-        if (stationDiv.className !== "kitchen-station locked") {
-          stationDiv.className = "kitchen-station locked";
-          stationDiv.innerHTML = `<div class="station-locked-icon">🔒</div>`;
+        stationDiv.className = "kitchen-station locked";
+        stationDiv.innerHTML = `<div class="station-locked-icon">🔒</div>`;
 
-          // Only show Buy button if it's the NEXT stove in sequence
-          if (index === gameState.kitchen.unlockedCount) {
-            stationDiv.innerHTML += `
+        // Only show Buy button if it's the NEXT stove in sequence;
+        if (index === gameState.kitchen.unlockedCount) {
+          stationDiv.innerHTML += `
               <button class="recipe-button buy" style="font-size: 0.7rem !important; padding: 5px;">
                 Buy Stove<br>🪙${stoveCost}
               </button>
             `;
-            stationDiv
-              .querySelector("button")
-              .addEventListener("click", (e) => {
-                e.stopPropagation();
-                buyStove(index, stoveCost);
-              });
-          }
+          stationDiv.querySelector("button").addEventListener("click", (e) => {
+            e.stopPropagation();
+            buyStove(index, stoveCost);
+          });
         }
         return;
       }
@@ -5973,8 +5969,8 @@
       if (confirmed) {
         gameState.money -= cost;
         gameState.kitchen.unlockedCount++;
-        updateUI();
         updateKitchenStations();
+        updateUI();
         saveGame();
         showNotification(`Unlocked Stove #${index + 1}!`);
         playSound("tap.wav");
