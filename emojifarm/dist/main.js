@@ -2737,8 +2737,8 @@
       pullStrength: 2,
       minWeight: 1,
       maxWeight: 1.5,
-      chance: 90,
-      value: 8,
+      chance: 70,
+      value: 7,
     },
     {
       emoji: "🪨",
@@ -2747,7 +2747,7 @@
       pullStrength: -4,
       minWeight: 1,
       maxWeight: 1,
-      chance: 80,
+      chance: 100,
       value: 2,
     },
     {
@@ -2757,7 +2757,7 @@
       pullStrength: -4,
       minWeight: 1,
       maxWeight: 1,
-      chance: 80,
+      chance: 100,
       value: 3,
     },
     {
@@ -2767,7 +2767,7 @@
       pullStrength: 1,
       minWeight: 1,
       maxWeight: 1.2,
-      chance: 70,
+      chance: 90,
       value: 6,
     },
     {
@@ -2777,8 +2777,8 @@
       pullStrength: 2.2,
       minWeight: 1,
       maxWeight: 1.5,
-      chance: 15,
-      value: 10,
+      chance: 30,
+      value: 8,
     },
     {
       emoji: "🐠",
@@ -2788,7 +2788,7 @@
       minWeight: 1,
       maxWeight: 1.8,
       chance: 20,
-      value: 12,
+      value: 9,
     },
     {
       emoji: "🦞",
@@ -2797,8 +2797,8 @@
       pullStrength: 2.6,
       minWeight: 1,
       maxWeight: 1.5,
-      chance: 15,
-      value: 15,
+      chance: 10,
+      value: 10,
     },
     {
       emoji: "🐙",
@@ -2808,7 +2808,7 @@
       minWeight: 1.5,
       maxWeight: 2.5,
       chance: 10,
-      value: 18,
+      value: 11,
     },
     {
       emoji: "🦑",
@@ -2818,7 +2818,7 @@
       minWeight: 1.5,
       maxWeight: 2.5,
       chance: 10,
-      value: 20,
+      value: 12,
     },
     {
       emoji: "🪼",
@@ -2828,7 +2828,7 @@
       minWeight: 1.5,
       maxWeight: 2.5,
       chance: 10,
-      value: 16,
+      value: 14,
     },
     {
       emoji: "🦈",
@@ -2838,7 +2838,7 @@
       minWeight: 2,
       maxWeight: 3,
       chance: 5,
-      value: 18,
+      value: 15,
     },
     {
       emoji: "🐬",
@@ -2848,7 +2848,7 @@
       minWeight: 2,
       maxWeight: 3,
       chance: 5,
-      value: 20,
+      value: 16,
     },
     {
       emoji: "🐋",
@@ -2858,7 +2858,7 @@
       minWeight: 3,
       maxWeight: 4,
       chance: 2,
-      value: 25,
+      value: 18,
     },
   ];
 
