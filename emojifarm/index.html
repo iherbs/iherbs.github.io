@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="dist/decor.css" />
     <link rel="stylesheet" href="dist/livestock.css" />
     <link rel="stylesheet" href="dist/fishing.css" />
+    <link rel="stylesheet" href="dist/slasher.css" />
   </head>
 
   <body class="twemoji">
@@ -63,22 +64,124 @@
           </span>
         </div>
       </div>
+      <span
+        style="
+          position: absolute;
+          text-align: center;
+          font-size: 1.5rem;
+          top: 80px;
+          right: 5px;
+          z-index: 3;
+        "
+      >
+        <span id="more-button" class="buttonaddition">🧭</span>
+      </span>
       <div id="menu">
         <span id="menu-inventory">📦</span>
         <span id="menu-pet">🐾</span>
-        <span id="play-minigame">🌿</span>
-        <span id="play-dropcrops">🥗</span>
-        <span id="garden">⛲</span>
+        <span id="kitchen-button">🥘</span>
       </div>
       <div id="menu-right">
         <span id="livestock-button">
-          <b>🐔</b>
-          <b>🐮</b>
+          <b id="milk-button">🥛</b>
+          <b id="egg-button">🥚</b>
         </span>
-        <span id="kitchen-button">🥘</span>
       </div>
       <div id="fishing-button"></div>
       <span id="farm-button">🌱</span>
+      <div
+        id="fence"
+        style="
+          position: absolute;
+          right: -160px;
+          top: 80px;
+          transform: scale(0.8);
+        "
+      >
+        <svg
+          width="300"
+          height="200"
+          viewBox="50 70 300 90"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Definisi Warna & Komponen -->
+          <defs>
+            <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color: #f3b05a"></stop>
+              <stop offset="100%" style="stop-color: #d98e32"></stop>
+            </linearGradient>
+
+            <!-- Definisi Satu Sisi Pagar (Bilah & Papan) -->
+            <symbol id="fence-side-unit">
+              <!-- Papan Horisontal -->
+              <rect x="0" y="35" width="120" height="5" fill="#d98e32"></rect>
+              <rect x="0" y="15" width="120" height="5" fill="#d98e32"></rect>
+              <!-- Bilah Vertikal (Pickets) -->
+              <rect
+                x="35"
+                y="0"
+                width="8"
+                height="50"
+                rx="1"
+                fill="url(#woodGrad)"
+              ></rect>
+              <rect
+                x="75"
+                y="0"
+                width="8"
+                height="50"
+                rx="1"
+                fill="url(#woodGrad)"
+              ></rect>
+            </symbol>
+
+            <!-- Definisi Tiang Utama -->
+            <symbol id="main-post">
+              <rect x="0" y="0" width="12" height="50" fill="#f3b05a"></rect>
+              <rect x="0" y="0" width="3" height="50" fill="#fcd58e"></rect>
+              <!-- Highlight -->
+              <rect x="9" y="0" width="3" height="50" fill="#d98e32"></rect>
+              <!-- Shadow -->
+            </symbol>
+          </defs>
+
+          <!-- Dasar Rumput -->
+          <path d="M200 80 L320 150 L200 220 L80 150 Z" fill="#dcfce7"></path>
+
+          <!-- SUSUNAN PAGAR (Grup Isometrik) -->
+
+          <!-- Sisi Belakang Kiri -->
+          <g transform="translate(80, 170) skewY(-30)">
+            <use href="#fence-side-unit" x="0" y="-70"></use>
+          </g>
+
+          <!-- Sisi Belakang Kanan -->
+          <g transform="translate(200, 30) skewY(30)">
+            <use href="#fence-side-unit" x="0" y="0"></use>
+          </g>
+
+          <!-- Tiang-Tiang Sudut -->
+          <use href="#main-post" x="194" y="15"></use>
+          <!-- Belakang -->
+          <use href="#main-post" x="74" y="95"></use>
+          <!-- Kiri -->
+          <use href="#main-post" x="314" y="80"></use>
+          <!-- Kanan -->
+
+          <!-- Sisi Depan Kiri -->
+          <g transform="translate(80, 100) skewY(30)">
+            <use href="#fence-side-unit" x="0" y="0"></use>
+          </g>
+
+          <!-- Sisi Depan Kanan -->
+          <g transform="translate(200, 240) skewY(-30)">
+            <use href="#fence-side-unit" x="0" y="-70"></use>
+          </g>
+
+          <!-- Tiang Depan (Paling Atas/Z-index tertinggi) -->
+          <use href="#main-post" x="194" y="150"></use>
+        </svg>
+      </div>
 
       <div id="wrapinventory">
         <div class="inventory">
@@ -430,6 +533,31 @@
           <div id="fishing-tension-bar"></div>
         </div>
       </div>
+    </div>
+
+    <div id="slasher-container" style="display: none">
+      <div class="ui-layer">
+        <div id="score-display">Skor: 0</div>
+        <div id="lives-display" class="lives"></div>
+      </div>
+
+      <!-- Menu Utama -->
+      <div id="menu-slasher">
+        <h1 class="text-4xl mb-4 font-black">FRUIT SLASHER</h1>
+        <p class="mb-6">Slice fruit, avoid bomb! 🍎💣</p>
+        <button class="btn-slasher" id="startGameSlash">START</button>
+      </div>
+
+      <!-- Game Over -->
+      <div id="game-over-slasher" class="hidden">
+        <h1 class="text-4xl mb-4 font-black text-red-500">GAME OVER</h1>
+        <p id="final-score-slasher" class="text-2xl mb-6">Final Score: 0</p>
+        <button class="btn-slasher" id="resetGameSlash">RETRY</button>
+        <br />
+        <button class="btn-slasher" id="closeGameSlash">CLOSE</button>
+      </div>
+
+      <canvas id="gameCanvasSlash"></canvas>
     </div>
 
     <div class="last-played" id="last-played" style="display: none"></div>

@@ -1595,6 +1595,57 @@
       _("#livestock-market-items").style.display = "flex";
     }
   });
+  _("#more-button").addEventListener("click", async () => {
+    showPopup(
+      `<div style="margin-top:10px;justify-content:center;display: grid;grid-template-columns: repeat(2, auto);grid-auto-flow: row;grid-gap: 10px;">
+            <div id="play-minigame" class="other-button">
+              <div class="other-button-emoji">🌿</div>
+              <div>Plant Match</div>
+            </div>
+            <span id="play-dropcrops" class="other-button">
+              <div class="other-button-emoji">🥗</div>
+              <div>Drop Crops</div>
+            </span>
+            <span id="slasher" class="other-button">
+              <div class="other-button-emoji">🗡️</div>
+              <div>Slash</div>
+            </span>
+            <span id="garden" class="other-button">
+              <div class="other-button-emoji">⛲</div>
+              <div>Garden</div>
+            </span>
+        </div>`,
+      "<b>More</b>",
+      false,
+    );
+
+    _("#play-minigame").addEventListener("click", openMinigame);
+    _("#play-dropcrops").addEventListener("click", openDropCrops);
+    _("#garden").addEventListener("click", function () {
+      _("#popup-cancel").click();
+      _("#garden-container").style.display = "flex";
+      _("#farm-button").style.display = "block";
+      loadinventory();
+    });
+    _("#slasher").addEventListener("click", async function () {
+      _("#popup-cancel").click();
+      const confirmed = await showPopup(`Play Fruit Slash for 🪙100?`);
+      if (confirmed) {
+        if (gameState.money >= 100) {
+          if (gameState.money - 100 >= 50) {
+            gameState.money -= 100;
+            updateUI();
+            saveGame();
+            _("#slasher-container").style.display = "flex";
+          } else {
+            showNotification(`Can't play, not good for your 🪙 health`);
+          }
+        } else {
+          showNotification(`Not enough 🪙<br>to play!`);
+        }
+      }
+    });
+  });
   // End Menu ==================================================
 
   _("#inventory-close").addEventListener("click", () => {
@@ -3824,6 +3875,7 @@
 
   // Open minigame
   const openMinigame = async () => {
+    _("#popup-cancel").click();
     const levelrequire = 5;
     if (gameState.level >= levelrequire) {
       lvpln =
@@ -3863,7 +3915,6 @@
   };
 
   // Event listeners for minigame
-  _("#play-minigame").addEventListener("click", openMinigame);
   _("#minigame-close").addEventListener("click", async () => {
     const confirmed = await showPopup(
       `Close Plant Match without finishing it will not return your 🪙.<br>Are you sure to close it?`,
@@ -4302,7 +4353,7 @@
     requestAnimationFrame(gameLoop);
   };
 
-  const startGame = () => {
+  const startGameDropCrop = () => {
     const dropcropsgrid = document.getElementById("dropcrops-container");
     const gameOverDiv = document.createElement("div");
     gameOverDiv.className = "game-over";
@@ -4392,10 +4443,11 @@
     updateNextEmoji();
     createPreviewElement(); // Buat preview saat inisialisasi
     requestAnimationFrame(gameLoop);
-    startGame();
+    startGameDropCrop();
   };
 
   const openDropCrops = async () => {
+    _("#popup-cancel").click();
     const levelrequire = 10,
       maxlvl = 9;
     if (gameState.level >= levelrequire) {
@@ -4445,7 +4497,6 @@
   };
 
   // Event listeners for dropcrops
-  _("#play-dropcrops").addEventListener("click", openDropCrops);
   _("#dropcrops-close").addEventListener("click", async () => {
     const confirmed = await showPopup(
       `Close Drop Crops without finishing it will not return your 🪙.<br>Are you sure to close it?`,
@@ -4635,13 +4686,369 @@
   });
 
   // ======================================================================================
+  // ================================== FRUIT SLASHER =======================================
+  // ======================================================================================
+
+  const fsCanvas = document.getElementById("gameCanvasSlash");
+  const fsCtx = fsCanvas.getContext("2d");
+  const fsScoreEl = document.getElementById("score-display");
+  const fsLivesEl = document.getElementById("lives-display");
+  const fsMenu = document.getElementById("menu-slasher");
+  const fsGameOverScreen = document.getElementById("game-over-slasher");
+  const fsFinalScoreEl = document.getElementById("final-score-slasher");
+  const fsContainer = document.getElementById("slasher-container");
+
+  // Konfigurasi Permainan
+  let fsScore = 0;
+  let fsLives = 3;
+  const FS_MAX_LIVES = 3;
+  let fsGameActive = false;
+  let fsFruits = [];
+  let fsParticles = [];
+  let fsTrail = [];
+  let fsLastTime = 0;
+  let fsSpawnTimer = 0;
+  let fsSpawnRate = 1500; // ms
+
+  const FS_EMOJIS = ["🍎", "🍊", "🍋", "🍉", "🍇", "🍓", "🍍", "🥥"];
+  const FS_BOMB_EMOJI = "💣";
+  const FS_LIFE_HEART_EMOJI = "❤️";
+
+  class FSFruit {
+    constructor() {
+      const rand = Math.random();
+      this.isBomb = false;
+      this.isLife = false;
+
+      if (rand < 0.05 && fsScore > 50) {
+        this.isLife = true;
+        this.emoji = FS_LIFE_HEART_EMOJI;
+      } else if (rand < 0.2) {
+        this.isBomb = true;
+        this.emoji = FS_BOMB_EMOJI;
+      } else {
+        this.emoji = FS_EMOJIS[Math.floor(Math.random() * FS_EMOJIS.length)];
+      }
+
+      this.radius = 35;
+      this.x = Math.random() * (fsCanvas.width - 200) + 100;
+      this.y = fsCanvas.height + this.radius;
+
+      const side = this.x < fsCanvas.width / 2 ? "left" : "right";
+      this.vx =
+        side === "left" ? Math.random() * 3 + 2 : -(Math.random() * 3 + 2);
+      this.vy = -(Math.random() * 6 + 13);
+      this.gravity = 0.25;
+      this.rotation = 0;
+      this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+      this.sliced = false;
+    }
+
+    update() {
+      this.vy += this.gravity;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.rotation += this.rotationSpeed;
+
+      if (
+        (this.x - this.radius < 0 && this.vx < 0) ||
+        (this.x + this.radius > fsCanvas.width && this.vx > 0)
+      ) {
+        this.vx *= -1;
+      }
+    }
+
+    draw() {
+      fsCtx.save();
+      fsCtx.translate(this.x, this.y);
+      fsCtx.rotate(this.rotation);
+      fsCtx.font = `${this.radius * 2}px Arial`;
+      fsCtx.textAlign = "center";
+      fsCtx.textBaseline = "middle";
+      fsCtx.shadowBlur = 10;
+      fsCtx.shadowColor = "rgba(0,0,0,0.5)";
+      fsCtx.fillText(this.emoji, 0, 0);
+      fsCtx.restore();
+    }
+  }
+
+  class FSParticle {
+    constructor(x, y, color, text = null) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 8;
+      this.vy = (Math.random() - 0.5) * 8;
+      this.alpha = 1;
+      this.color = color;
+      this.text = text;
+      this.initialSize = this.text ? 20 : Math.random() * 6 + 3;
+      this.size = this.initialSize;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= 0.025;
+      if (!this.text) {
+        this.size = this.initialSize * Math.max(0, this.alpha);
+      }
+    }
+
+    draw() {
+      fsCtx.save();
+      fsCtx.globalAlpha = this.alpha;
+      fsCtx.fillStyle = this.color;
+      if (this.text) {
+        fsCtx.font = `${this.size}px Arial`;
+        fsCtx.fillText(this.text, this.x, this.y);
+      } else {
+        fsCtx.beginPath();
+        fsCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        fsCtx.fill();
+      }
+      fsCtx.restore();
+    }
+  }
+
+  function fsTriggerDamageEffect() {
+    if (!fsContainer) return;
+    fsContainer.classList.add("damage-flash");
+    setTimeout(() => fsContainer.classList.remove("damage-flash"), 300);
+  }
+
+  function fsResize() {
+    fsCanvas.width = fsContainer
+      ? fsContainer.offsetWidth || window.innerWidth
+      : window.innerWidth;
+    fsCanvas.height = fsContainer
+      ? fsContainer.offsetHeight || window.innerHeight
+      : window.innerHeight;
+  }
+
+  function fsAddTrail(e) {
+    const rect = fsCanvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    fsTrail.push({ x, y, time: Date.now() });
+  }
+
+  function fsCheckSlice(e) {
+    if (!fsGameActive) return;
+    const rect = fsCanvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    fsFruits.forEach((fruit) => {
+      const dist = Math.hypot(fruit.x - x, fruit.y - y);
+      if (dist < fruit.radius) {
+        fsSliceFruit(fruit);
+      }
+    });
+  }
+
+  function fsSliceFruit(fruit) {
+    if (fruit.sliced) return;
+    fruit.sliced = true;
+
+    if (fruit.isLife) {
+      if (fsLives < FS_MAX_LIVES) {
+        fsLives++;
+        fsParticles.push(new FSParticle(fruit.x, fruit.y, "#FFFFFF", "+1 ❤️"));
+      } else {
+        fsScore += 50;
+      }
+      fsCreateExplosion(fruit.x, fruit.y, "#ff80ed");
+    } else if (fruit.isBomb) {
+      fsTriggerDamageEffect();
+      fsCreateExplosion(fruit.x, fruit.y, "#ff4757");
+      fsParticles.push(new FSParticle(fruit.x, fruit.y, "#FFFFFF", "BOMB!"));
+      fsLives--;
+      if (fsLives <= 0) fsEndGame();
+    } else {
+      fsScore += 2;
+      fsSpawnRate = Math.max(600, 1500 - fsScore / 2);
+      fsCreateExplosion(fruit.x, fruit.y, "#f1c40f");
+    }
+
+    fsUpdateUI();
+
+    setTimeout(() => {
+      const idx = fsFruits.indexOf(fruit);
+      if (idx > -1) fsFruits.splice(idx, 1);
+    }, 100);
+  }
+
+  function fsCreateExplosion(x, y, color) {
+    for (let i = 0; i < 15; i++) {
+      fsParticles.push(new FSParticle(x, y, color));
+    }
+  }
+
+  function fsUpdateUI() {
+    if (fsScoreEl) fsScoreEl.innerText = `Score: ${fsScore}`;
+    if (fsLivesEl) {
+      let hearts = "";
+      for (let i = 0; i < fsLives; i++) hearts += "❤️";
+      for (let i = fsLives; i < FS_MAX_LIVES; i++) hearts += "🖤";
+      fsLivesEl.innerHTML = `Life: ${hearts}`;
+    }
+  }
+
+  const startGameSlash = () => {
+    fsScore = 0;
+    fsLives = 3;
+    fsFruits = [];
+    fsParticles = [];
+    fsGameActive = true;
+    fsSpawnRate = 1500;
+    if (fsMenu) fsMenu.classList.add("hidden");
+    if (fsGameOverScreen) fsGameOverScreen.classList.add("hidden");
+    fsResize();
+    fsUpdateUI();
+    requestAnimationFrame(fsGameLoop);
+  };
+
+  function fsEndGame() {
+    fsGameActive = false;
+    if (fsFinalScoreEl) fsFinalScoreEl.innerText = `Final Score: ${fsScore}`;
+    if (fsGameOverScreen) fsGameOverScreen.classList.remove("hidden");
+    gameState.money += fsScore;
+    showNotification(`You got 🪙${fsScore} from playing Fruit Slash!`);
+    updateUI();
+    saveGame();
+  }
+
+  const resetGameSlash = async () => {
+    const confirmed = await showPopup(`Play Fruit Slash for 🪙100?`);
+    if (confirmed) {
+      if (gameState.money >= 100) {
+        if (gameState.money - 100 >= 50) {
+          gameState.money -= 100;
+          updateUI();
+          saveGame();
+          startGameSlash();
+        } else {
+          showNotification(`Can't play, not good for your 🪙 health`);
+        }
+      } else {
+        showNotification(`Not enough 🪙<br>to play!`);
+      }
+    }
+  };
+
+  function fsDrawTrail() {
+    if (fsTrail.length < 2) return;
+    fsCtx.beginPath();
+    fsCtx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+    fsCtx.lineWidth = 5;
+    fsCtx.lineCap = "round";
+    fsCtx.lineJoin = "round";
+
+    const now = Date.now();
+    fsTrail = fsTrail.filter((p) => now - p.time < 150);
+    if (fsTrail.length < 2) return;
+    fsCtx.moveTo(fsTrail[0].x, fsTrail[0].y);
+    for (let i = 1; i < fsTrail.length; i++) {
+      fsCtx.lineTo(fsTrail[i].x, fsTrail[i].y);
+    }
+    fsCtx.stroke();
+  }
+
+  let fsIsDrawing = false;
+  const fsHandleStart = (e) => {
+    fsIsDrawing = true;
+    fsAddTrail(e);
+  };
+  const fsHandleMove = (e) => {
+    if (fsIsDrawing) {
+      fsAddTrail(e);
+      fsCheckSlice(e);
+    }
+  };
+  const fsHandleEnd = () => {
+    fsIsDrawing = false;
+  };
+
+  function fsGameLoop(timestamp) {
+    if (!fsGameActive) return;
+
+    const deltaTime = timestamp - fsLastTime;
+    fsLastTime = timestamp;
+
+    fsCtx.clearRect(0, 0, fsCanvas.width, fsCanvas.height);
+
+    fsSpawnTimer += deltaTime;
+    if (fsSpawnTimer > fsSpawnRate) {
+      fsFruits.push(new FSFruit());
+      if (fsScore > 100 && Math.random() > 0.7) fsFruits.push(new FSFruit());
+      fsSpawnTimer = 0;
+    }
+
+    for (let i = fsFruits.length - 1; i >= 0; i--) {
+      const fruit = fsFruits[i];
+      fruit.update();
+      fruit.draw();
+
+      if (fruit.y > fsCanvas.height + 100) {
+        if (!fruit.isBomb && !fruit.isLife && !fruit.sliced) {
+          fsTriggerDamageEffect();
+          fsLives--;
+          fsParticles.push(
+            new FSParticle(fruit.x, fsCanvas.height - 20, "#ff4757", "MISS!"),
+          );
+          fsUpdateUI();
+          if (fsLives <= 0) fsEndGame();
+        }
+        fsFruits.splice(i, 1);
+      }
+    }
+
+    for (let i = fsParticles.length - 1; i >= 0; i--) {
+      fsParticles[i].update();
+      fsParticles[i].draw();
+      if (fsParticles[i].alpha <= 0) fsParticles.splice(i, 1);
+    }
+
+    fsDrawTrail();
+    requestAnimationFrame(fsGameLoop);
+  }
+
+  // Event listeners
+  fsCanvas.addEventListener("mousedown", fsHandleStart);
+  fsCanvas.addEventListener("mousemove", fsHandleMove);
+  fsCanvas.addEventListener("mouseup", fsHandleEnd);
+  fsCanvas.addEventListener(
+    "touchstart",
+    (e) => {
+      e.preventDefault();
+      fsHandleStart(e);
+    },
+    { passive: false },
+  );
+  fsCanvas.addEventListener(
+    "touchmove",
+    (e) => {
+      if (fsIsDrawing) {
+        e.preventDefault();
+        fsHandleMove(e);
+      }
+    },
+    { passive: false },
+  );
+  fsCanvas.addEventListener("touchend", fsHandleEnd);
+
+  // Resize saat ukuran window berubah
+  fsCanvas.addEventListener("resize", fsResize);
+
+  _("#startGameSlash").addEventListener("click", startGameSlash);
+  _("#resetGameSlash").addEventListener("click", resetGameSlash);
+  _("#closeGameSlash").addEventListener("click", () => {
+    _("#slasher-container").style.display = "none";
+  });
+
+  // ======================================================================================
   // ================================== GARDEN GRID =======================================
   // ======================================================================================
-  _("#garden").addEventListener("click", function () {
-    _("#garden-container").style.display = "flex";
-    _("#farm-button").style.display = "block";
-    loadinventory();
-  });
   const rows = 15; // Jumlah baris
   const cols = 11; // 11 kolom
   const gardenGrid = document.getElementById("gardenGrid");
