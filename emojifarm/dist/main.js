@@ -2623,6 +2623,11 @@
       collectLivestockYield(index);
       return;
     }
+    let canput = false;
+    const currentYields = ls.yieldCount || 0;
+    if (currentYields >= lsInfo.minYieldsToSlaughter) {
+      canput = true;
+    }
 
     const lvstck = showPopup(
       `<button class="popup-button" id="feedls" style="margin-right:20px;">
@@ -2630,7 +2635,7 @@
         <br>Feed
     </button>
 
-    <button class="popup-button" id="putls">
+    <button class="popup-button" id="putls" style="${canput ? "" : "background:#ddd; cursor:not-allowed;"}">
         <span style="font-size:25px;">${lsInfo.meat}</span>
         <br>Put
     </button>`,
