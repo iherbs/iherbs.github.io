@@ -1606,13 +1606,13 @@
               <div class="other-button-emoji">🥗</div>
               <div>Drop Crops</div>
             </span>
-            <span id="slasher" class="other-button">
-              <div class="other-button-emoji">🗡️</div>
-              <div>Slash</div>
-            </span>
             <span id="garden" class="other-button">
               <div class="other-button-emoji">⛲</div>
               <div>Garden</div>
+            </span>
+            <span id="slasher" class="other-button">
+              <div class="other-button-emoji">🗡️</div>
+              <div>Slash</div>
             </span>
         </div>`,
       "<b>More</b>",
@@ -4855,7 +4855,7 @@
         fsLives++;
         fsParticles.push(new FSParticle(fruit.x, fruit.y, "#FFFFFF", "+1 ❤️"));
       } else {
-        fsScore += 50;
+        fsScore += 1;
       }
       fsCreateExplosion(fruit.x, fruit.y, "#ff80ed");
     } else if (fruit.isBomb) {
@@ -4865,7 +4865,7 @@
       fsLives--;
       if (fsLives <= 0) fsEndGame();
     } else {
-      fsScore += 2;
+      fsScore += 1;
       fsSpawnRate = Math.max(600, 1500 - fsScore / 2);
       fsCreateExplosion(fruit.x, fruit.y, "#f1c40f");
     }
