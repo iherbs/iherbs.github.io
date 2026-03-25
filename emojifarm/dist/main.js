@@ -2036,8 +2036,8 @@
 
       checkLevelUp();
       gameState.kitchenQuests.splice(index, 1);
-      generateKitchenQuests();
       updateUI();
+      generateKitchenQuests();
       updateKitchenStations();
     } else {
       showNotification(
@@ -6353,6 +6353,7 @@
     gameState.kitchen.stations[index] = null; // Free the stove
     playSound("tap.wav");
     updateUI();
+    populateRecipes();
     updateKitchenStations();
     saveGame();
   };
