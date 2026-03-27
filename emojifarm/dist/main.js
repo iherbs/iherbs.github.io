@@ -541,6 +541,12 @@
     }
   };
 
+  const stopSound = () => {
+    if (audio != null) {
+      audio.pause();
+    }
+  };
+
   const toggleMarket = () => {
     if (_("#market").style.transform == "translate(-50%, 0px)") {
       _("#market").style.transform = "translate(-50%, 170px)";
@@ -3319,7 +3325,7 @@
   function winFishingGame() {
     const f = fishingCaughtFish;
 
-    audio.pause();
+    stopSound();
     // Add to inventory
     if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
     gameState.inventory[f.emoji]++;
@@ -3367,7 +3373,7 @@
   }
 
   function resetFishingUI() {
-    audio.pause();
+    stopSound();
     fishingState = "idle";
     fishingTension = 0;
     fishingCaughtFish = null;
@@ -3466,13 +3472,13 @@
   pond.addEventListener("touchstart", handleFishingStart, { passive: false });
   window.addEventListener("mouseup", () => {
     if (fishingState === "reeling") {
-      audio.pause();
+      stopSound();
     }
     fishingIsPressing = false;
   });
   window.addEventListener("touchend", () => {
     if (fishingState === "reeling") {
-      audio.pause();
+      stopSound();
     }
     fishingIsPressing = false;
   });
