@@ -565,6 +565,7 @@
   });
 
   _("#livestock-button").addEventListener("click", () => {
+    window.location.hash = "#livestock";
     openLivestockPage();
   });
 
@@ -1996,9 +1997,9 @@
     while (
       gameState.kitchenQuests.length < 3 &&
       npcs.length >
-      gameState.quests.length +
-      gameState.livestockQuests.length +
-      gameState.kitchenQuests.length
+        gameState.quests.length +
+          gameState.livestockQuests.length +
+          gameState.kitchenQuests.length
     ) {
       const quest = generateSingleKitchenQuest();
       if (quest) gameState.kitchenQuests.push(quest);
@@ -2210,15 +2211,15 @@
         Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options
-        .map(
-          (opt) => `
+              .map(
+                (opt) => `
                 <div class="feeditem">
                     <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
                     <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === "buy" ? `🪙${opt.cost}` : "From Inventory"})</label>
                 </div>
             `,
-        )
-        .join("")}
+              )
+              .join("")}
             </div>
         `;
 
@@ -2802,6 +2803,13 @@
     }
   });
 
+  window.onhashchange = function () {
+    if (window.location.hash === "") {
+      history.replaceState(null, null, " ");
+      homepage();
+    }
+  };
+
   // ======================================================================================
   // ================================== FISHING FEATURE ===================================
   // ======================================================================================
@@ -3215,7 +3223,7 @@
       for (const f of fishingFishArray) {
         const dist = Math.sqrt(
           Math.pow(f.x - fishingBobberPos.x + 9, 2) +
-          Math.pow(f.y - fishingBobberPos.y + 7, 2),
+            Math.pow(f.y - fishingBobberPos.y + 7, 2),
         );
         if (dist < 7 && !f.isHooked) {
           f.isHooked = true;
@@ -3389,6 +3397,7 @@
   }
 
   function openFishingPage() {
+    window.location.hash = "#fishing";
     _("#fishing-container").style.display = "block";
     _("#farm-button").style.display = "block";
     updateFishingHookUI();
@@ -3897,8 +3906,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-          ) + 10
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -4470,8 +4479,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-          ) + 10
+              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+            ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -5309,7 +5318,7 @@
     gardenMarketTabs();
   };
 
-  _("#farm-button").addEventListener("click", function () {
+  const homepage = () => {
     _("#garden-container").style.display = "none";
     _("#livestock-container").style.display = "none";
     _("#farm-button").style.display = "none";
@@ -5318,6 +5327,11 @@
 
     _("#fishing-container").style.display = "none";
     clearSelectedEmoji();
+  };
+
+  _("#farm-button").addEventListener("click", function () {
+    window.location.hash = "";
+    homepage();
   });
 
   _("#closegardeninventory").addEventListener("click", function () {
@@ -6164,6 +6178,7 @@
   };
 
   const openKitchenPage = () => {
+    window.location.hash = "#kitchen";
     _("#kitchen-container").style.display = "flex";
     _("#farm-button").style.display = "block";
     populateRecipes();
