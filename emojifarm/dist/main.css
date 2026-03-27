@@ -15,17 +15,19 @@
   src: url("../font/Delius.ttf") format("truetype");
 }
 
-@font-face {
-  font-family: "twemoji";
-  font-style: "normal";
-  src: url("../font/twemoji.ttf") format("truetype");
-}
 
 @font-face {
   font-family: "notoemoji";
   font-style: "normal";
   src: url("../font/NotoColorEmoji.ttf") format("truetype");
 }
+
+@font-face {
+  font-family: "twemoji";
+  font-style: "normal";
+  src: url("../font/twemoji.ttf") format("truetype");
+}
+
 @font-face {
   font-family: "openmoji";
   font-style: "normal";
@@ -66,12 +68,12 @@ body {
   font-family: "Delius", sans-serif;
 }
 
-.twemoji {
-  font-family: "Delius", "twemoji", sans-serif;
-}
-
 .notoemoji {
   font-family: "Delius", "notoemoji", sans-serif;
+}
+
+.twemoji {
+  font-family: "Delius", "twemoji", sans-serif;
 }
 
 .openmoji {
@@ -498,6 +500,7 @@ button {
   border-radius: 20px;
   -webkit-tap-highlight-color: transparent;
 }
+
 #fishing-button::before {
   content: "";
   position: absolute;
@@ -526,12 +529,15 @@ button {
   0% {
     transform: scaleX(-1) translateX(0px);
   }
+
   50% {
     transform: scaleX(-1) translateX(-30px);
   }
+
   80% {
     transform: scaleX(-1) translateX(0px);
   }
+
   100% {
     transform: scaleX(-1) translateX(0px);
   }
@@ -629,24 +635,22 @@ button {
   z-index: 0;
 }
 
-#kitchen-quests-container > #street::before {
+#kitchen-quests-container>#street::before {
   left: -40px;
   width: 130%;
   background-color: #4b4b4b;
   box-shadow: inset 0px 0px 3px 1px #000000;
 }
 
-#kitchen-quests-container > #street::after {
+#kitchen-quests-container>#street::after {
   content: "";
   position: absolute;
   top: 80px;
   left: -40px;
   width: 130%;
-  background-image: linear-gradient(
-    to right,
-    #ffffff 50%,
-    rgba(255, 255, 255, 0) 0%
-  );
+  background-image: linear-gradient(to right,
+      #ffffff 50%,
+      rgba(255, 255, 255, 0) 0%);
   background-position: bottom;
   background-size: 17px 3px;
   background-repeat: repeat-x;
@@ -1050,7 +1054,7 @@ button {
   opacity: 0;
 }
 
-.feeditem input[type="radio"]:checked ~ label {
+.feeditem input[type="radio"]:checked~label {
   border: 3px solid #4caf50;
 }
 
@@ -1435,11 +1439,11 @@ button {
   border-radius: 34px;
 }
 
-.switch input:checked + .slider {
+.switch input:checked+.slider {
   background-color: var(--button-bg);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   -webkit-transform: translateX(20px);
   -ms-transform: translateX(20px);
   transform: translateX(20px);
@@ -1523,6 +1527,7 @@ input:checked + .slider:before {
   font-size: 1.2rem;
   cursor: pointer;
 }
+
 .btntransfer {
   width: 100px;
 }
@@ -1542,7 +1547,8 @@ input:checked + .slider:before {
 }
 
 .kitchen-station {
-  background: #e0e0e0; /* Metal stove look */
+  background: #e0e0e0;
+  /* Metal stove look */
   border-radius: 12px;
   padding: 15px;
   box-shadow:
@@ -1567,7 +1573,8 @@ input:checked + .slider:before {
 }
 
 .kitchen-station.idle::after {
-  content: "🫕"; /* Empty stove icon */
+  content: "🫕";
+  /* Empty stove icon */
   font-size: 3rem;
   opacity: 0.3;
 }
@@ -1584,7 +1591,8 @@ input:checked + .slider:before {
 }
 
 .kitchen-station.cooking {
-  background: #ffd54f; /* Warm glowing stove */
+  background: #ffd54f;
+  /* Warm glowing stove */
   animation: cookPulse 0.5s infinite alternate;
 }
 
@@ -1594,6 +1602,7 @@ input:checked + .slider:before {
       inset 0 -4px 0px rgba(0, 0, 0, 0.1),
       0 0px 10px rgba(255, 165, 0, 0.5);
   }
+
   100% {
     box-shadow:
       inset 0 -4px 0px rgba(0, 0, 0, 0.1),
@@ -1612,7 +1621,8 @@ input:checked + .slider:before {
 }
 
 .kitchen-station.ready {
-  background: #a5d6a7; /* Ready to serve */
+  background: #a5d6a7;
+  /* Ready to serve */
   cursor: pointer;
   animation: bounceReady 1s infinite alternate;
   box-shadow:
@@ -1624,6 +1634,7 @@ input:checked + .slider:before {
   0% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(-5px);
   }
@@ -1770,6 +1781,7 @@ input:checked + .slider:before {
   border-top-right-radius: 7px;
   z-index: 3;
 }
+
 #kitchen-recipes {
   display: flex;
   overflow-x: auto;
