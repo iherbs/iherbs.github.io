@@ -2186,6 +2186,11 @@
       return;
     }
 
+    if (gameState.pet[0].hunger >= 100) {
+      showNotification("Pet is full!");
+      return;
+    }
+
     const options = [
       ...petFoods.map((food) => ({
         type: "buy",
@@ -3311,13 +3316,13 @@
 
       if (fishingTension >= 100) {
         clearInterval(loop);
-        resetFishingGame("Line snapped! 😫");
+        resetFishingGame("Line snapped!");
       } else if (fishingBobberPos.y >= 92) {
         clearInterval(loop);
         winFishingGame();
       } else if (fishingBobberPos.y <= 5) {
         clearInterval(loop);
-        resetFishingGame("Escaped! 🏃‍♂️");
+        resetFishingGame("Escaped!");
       }
     }, 30);
   }
