@@ -1,5 +1,6 @@
 (function () {
   // Game state
+  let isSaving = false;
   const gameState = {
     money: 100,
     time: 0,
@@ -1324,10 +1325,19 @@
 
   // Save game to localStorage
   const saveGame = () => {
-    gameState.lastPlayed = new Date().toISOString();
-    gameState.checksum = calculateChecksum(gameState);
-    localStorage.setItem("emojiFarm", JSON.stringify(gameState));
-    updateLastPlayedDisplay();
+    if (isSaving) return; // Prevent concurrent saves
+    isSaving = true;
+
+    try {
+      gameState.lastPlayed = new Date().toISOString();
+      gameState.checksum = calculateChecksum(gameState);
+      localStorage.setItem("emojiFarm", JSON.stringify(gameState));
+      updateLastPlayedDisplay();
+    } catch (e) {
+      console.error("Save failed:", e);
+    } finally {
+      isSaving = false;
+    }
   };
 
   // Load game from localStorage
@@ -1339,31 +1349,11 @@
         const expectedChecksum = calculateChecksum(parsed);
         let isValid = parsed.checksum === expectedChecksum;
 
-        // Fallback for older saves where 'kitchen' was not part of the checksum
         if (!isValid) {
-          const oldStr = JSON.stringify({
-            money: parsed.money,
-            level: parsed.level,
-            points: parsed.points,
-            inventory: parsed.inventory,
-            plots: parsed.plots,
-            plotCount: parsed.plotCount,
-            pet: parsed.pet,
-            livestock: parsed.livestock,
-            livestockQuests: parsed.livestockQuests,
-            kitchenQuests: parsed.kitchenQuests,
-          });
-          let oldHash = 0;
-          for (let i = 0; i < oldStr.length; i++) {
-            oldHash = ((oldHash << 5) - oldHash + oldStr.charCodeAt(i)) | 0;
-          }
-          if (parsed.checksum === oldHash) {
-            isValid = true;
-          }
-        }
-
-        if (!isValid) {
-          throw new Error("Data tampered");
+          console.warn("Data error.");
+          parsed.checksum = expectedChecksum;
+          localStorage.setItem("emojiFarm", JSON.stringify(parsed));
+          // throw new Error("Data tampered");
         }
 
         // Migrate old save format if needed
@@ -2006,9 +1996,9 @@
     while (
       gameState.kitchenQuests.length < 3 &&
       npcs.length >
-        gameState.quests.length +
-          gameState.livestockQuests.length +
-          gameState.kitchenQuests.length
+      gameState.quests.length +
+      gameState.livestockQuests.length +
+      gameState.kitchenQuests.length
     ) {
       const quest = generateSingleKitchenQuest();
       if (quest) gameState.kitchenQuests.push(quest);
@@ -2220,15 +2210,15 @@
         Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options
-              .map(
-                (opt) => `
+        .map(
+          (opt) => `
                 <div class="feeditem">
                     <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
                     <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === "buy" ? `🪙${opt.cost}` : "From Inventory"})</label>
                 </div>
             `,
-              )
-              .join("")}
+        )
+        .join("")}
             </div>
         `;
 
@@ -2796,8 +2786,18 @@
   _("#feed-pet").addEventListener("click", feedPet);
 
   // Save game when page is closed
-  window.addEventListener("beforeunload", () => {
-    if (!reset) {
+  window.addEventListener("beforeunload", (e) => {
+    if (isSaving) {
+      e.preventDefault();
+      e.returnValue = "Game saving...";
+    }
+    // if (!reset) {
+    //   saveGame();
+    // }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && !isSaving) {
       saveGame();
     }
   });
@@ -3215,7 +3215,7 @@
       for (const f of fishingFishArray) {
         const dist = Math.sqrt(
           Math.pow(f.x - fishingBobberPos.x + 9, 2) +
-            Math.pow(f.y - fishingBobberPos.y + 7, 2),
+          Math.pow(f.y - fishingBobberPos.y + 7, 2),
         );
         if (dist < 7 && !f.isHooked) {
           f.isHooked = true;
@@ -3897,8 +3897,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -4470,8 +4470,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
