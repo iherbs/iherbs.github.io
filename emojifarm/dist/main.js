@@ -2832,7 +2832,7 @@
       pullStrength: 2,
       minWeight: 1,
       maxWeight: 1.5,
-      chance: 70,
+      chance: 80,
       value: 7,
     },
     {
@@ -3180,7 +3180,6 @@
       playSound("tap.wav");
       resetFishingGame("Pulling back...");
     } else if (fishingState === "idle") {
-      playSound("rodwosh.wav");
       castLine(x, y);
     }
   }
@@ -3192,6 +3191,7 @@
       return;
     }
 
+    playSound("rodwosh.wav");
     fishingState = "fishing";
     fishingBobberPos.x = (clientX / window.innerWidth) * 100;
     fishingBobberPos.y = (clientY / window.innerHeight) * 100;
@@ -3464,12 +3464,15 @@
       false,
     );
 
+    _("#buy-hook-qty").addEventListener("input", () => {
+      const qty = parseInt(_("#buy-hook-qty").value);
+      _("#buy-hook-cost").innerText = qty * hookPrice;
+    });
     _("#buy-hook-min").addEventListener("click", () => {
       let qty = parseInt(_("#buy-hook-qty").value) - 1;
       _("#buy-hook-qty").value = Math.max(1, qty);
       _("#buy-hook-cost").innerText = qty * hookPrice;
     });
-
     _("#buy-hook-plus").addEventListener("click", () => {
       let qty = parseInt(_("#buy-hook-qty").value) + 1;
       _("#buy-hook-qty").value = qty;
