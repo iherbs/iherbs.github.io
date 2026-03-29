@@ -426,7 +426,7 @@ button {
 
 #menu {
   position: relative;
-  display: flex;
+  display: inline-flex;
   padding: 0px 5px;
   z-index: 2;
 }
@@ -750,6 +750,7 @@ button {
 }
 
 #market-close {
+  cursor: pointer;
   float: right;
   font-size: 1rem;
   padding: 10px;
@@ -845,6 +846,15 @@ button {
   color: #555;
 }
 
+#kitchen-button {
+  cursor: pointer;
+  position: absolute;
+  top: 110px;
+  right: 85px;
+  width: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
 #wrapinventory,
 #wrappets {
   display: none;
@@ -857,9 +867,11 @@ button {
 
 #inventory-close,
 #pet-close {
+  cursor: pointer;
   float: right;
   font-size: 0.8rem;
   padding: 5px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .inventory {

@@ -1164,8 +1164,8 @@
           const sellPrice = getSellPrice(emoji);
           if (sellPrice === 0) return; // Prevent selling items with no value
 
-          showPopup(`
-                        Sell ${plantName} (${emoji}) for 🪙${sellPrice} each?<br>
+          showPopup(`<div style="font-size: 3rem; text-align: center;">${emoji}</div>
+                        Sell ${plantName} for 🪙${sellPrice} each?<br>
                         <button type="button" id="qtysellmin" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➖</button>
                         <input type="number" id="sell-quantity" min="1" max="${count}" value="${count}" style="width:100px;margin:10px;padding:5px 8px;border-radius: 5px;border:2px solid #2E8B57;text-align:center;outline:none;">
                         <button type="button" id="qtyselladd" style="position:relative;top:2px;padding:5px;background:#ffffff;color:#000000;">➕</button>
@@ -2641,7 +2641,10 @@
         <span style="font-size:25px;">${lsInfo.meat}</span>
         <br>Put
     </button>`,
-      "Livestock " + ls.emoji,
+      "<div style='font-size:3rem;text-align:center;'>" +
+        ls.emoji +
+        "</div>" +
+        lsInfo.name,
       false,
     );
 
