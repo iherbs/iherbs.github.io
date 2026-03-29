@@ -15,7 +15,6 @@
   src: url("../font/Delius.ttf") format("truetype");
 }
 
-
 @font-face {
   font-family: "notoemoji";
   font-style: "normal";
@@ -32,12 +31,6 @@
   font-family: "openmoji";
   font-style: "normal";
   src: url("../font/openmoji.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "fluentemoji";
-  font-style: "normal";
-  src: url("../font/FluentEmojiColor.ttf") format("truetype");
 }
 
 @media (prefers-color-scheme: dark) {
@@ -78,10 +71,6 @@ body {
 
 .openmoji {
   font-family: "Delius", "openmoji", sans-serif;
-}
-
-.fluentemoji {
-  font-family: "Delius", "fluentemoji", sans-serif;
 }
 
 .hidden {
@@ -635,22 +624,24 @@ button {
   z-index: 0;
 }
 
-#kitchen-quests-container>#street::before {
+#kitchen-quests-container > #street::before {
   left: -40px;
   width: 130%;
   background-color: #4b4b4b;
   box-shadow: inset 0px 0px 3px 1px #000000;
 }
 
-#kitchen-quests-container>#street::after {
+#kitchen-quests-container > #street::after {
   content: "";
   position: absolute;
   top: 80px;
   left: -40px;
   width: 130%;
-  background-image: linear-gradient(to right,
-      #ffffff 50%,
-      rgba(255, 255, 255, 0) 0%);
+  background-image: linear-gradient(
+    to right,
+    #ffffff 50%,
+    rgba(255, 255, 255, 0) 0%
+  );
   background-position: bottom;
   background-size: 17px 3px;
   background-repeat: repeat-x;
@@ -1054,7 +1045,7 @@ button {
   opacity: 0;
 }
 
-.feeditem input[type="radio"]:checked~label {
+.feeditem input[type="radio"]:checked ~ label {
   border: 3px solid #4caf50;
 }
 
@@ -1439,11 +1430,11 @@ button {
   border-radius: 34px;
 }
 
-.switch input:checked+.slider {
+.switch input:checked + .slider {
   background-color: var(--button-bg);
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   -webkit-transform: translateX(20px);
   -ms-transform: translateX(20px);
   transform: translateX(20px);
