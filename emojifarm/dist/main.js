@@ -23,6 +23,8 @@
       unlockedRecipes: [], // Default unlocked recipes
       unlockedCount: 0, // Number of unlocked stoves
     },
+    stats: { harvests: {}, fishCatches: {} },
+    achievements: {},
     checksum: "",
     music: true,
     sfx: true,
@@ -446,7 +448,161 @@
     generateKitchenQuests();
     initLivestock();
     initKitchen();
+    initAchievements();
+    renderAchievements();
   };
+
+  let achievementsList = [];
+
+  const initAchievements = () => {
+    achievementsList = [];
+    const tiers = [
+      { required: 25, name: "Bronze", emoji: "🥉" },
+      { required: 50, name: "Silver", emoji: "🥈" },
+      { required: 100, name: "Gold", emoji: "🥇" },
+    ];
+
+    // Harvest achievements
+    plantTypes.forEach((p) => {
+      if (p.emoji === "🟫") return;
+      tiers.forEach((t) => {
+        achievementsList.push({
+          id: `harvest_${p.emoji}_${t.required}`,
+          title: `${p.name} ${t.name}`,
+          desc: `Harvest ${t.required} ${p.name}`,
+          icon: p.emoji,
+          badge: t.emoji,
+          tier: t.name.toLowerCase(),
+          type: "harvest",
+          targetId: p.emoji,
+          targetCount: t.required,
+          reward: 100,
+        });
+      });
+    });
+
+    // Fish achievements
+    fishingTypes.forEach((f) => {
+      if (f.type === "trash") return;
+      tiers.forEach((t) => {
+        achievementsList.push({
+          id: `fish_${f.emoji}_${t.required}`,
+          title: `${f.name} ${t.name}`,
+          desc: `Catch ${t.required} ${f.name}`,
+          icon: f.emoji,
+          badge: t.emoji,
+          tier: t.name.toLowerCase(),
+          type: "fish",
+          targetId: f.emoji,
+          targetCount: t.required,
+          reward: 100,
+        });
+      });
+    });
+  };
+
+  const checkAchievements = () => {
+    let unlockedAny = false;
+    achievementsList.forEach((ach) => {
+      if (!gameState.achievements[ach.id]) {
+        let current = 0;
+        if (ach.type === "harvest")
+          current = gameState.stats.harvests[ach.targetId] || 0;
+        if (ach.type === "fish")
+          current = gameState.stats.fishCatches[ach.targetId] || 0;
+
+        if (current >= ach.targetCount) {
+          gameState.achievements[ach.id] = true;
+          gameState.money += ach.reward;
+          unlockedAny = true;
+          showAchievementUnlocked(ach);
+        }
+      }
+    });
+
+    if (unlockedAny) {
+      updateUI();
+      saveGame();
+      if (
+        _("#wrapachievements") &&
+        _("#wrapachievements").style.display === "flex"
+      ) {
+        renderAchievements();
+      }
+    }
+  };
+
+  const showAchievementUnlocked = (ach) => {
+    const notif = document.createElement("div");
+    notif.className = "achievement-notification";
+    notif.innerHTML = `
+      <div class="achievement-notification-icon ${ach.tier}-filter">
+        ${ach.icon}<span class="tier-badge" style="position: absolute; right: -5px; bottom:-5px; font-size: 15px;">${ach.badge}</span>
+      </div>
+      <div class="achievement-notification-content">
+        <div class="achievement-notification-title">Achievement Unlocked!</div>
+        <div class="achievement-notification-name">${ach.title}</div>
+        <div style="font-size: 0.8rem; color: #2e8b57; font-weight: bold;">+🪙${ach.reward}</div>
+      </div>
+    `;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.classList.add("show"), 100);
+    setTimeout(() => {
+      notif.classList.remove("show");
+      setTimeout(() => notif.remove(), 500);
+    }, 4000);
+  };
+
+  const renderAchievements = () => {
+    const list = _("#achievement-list");
+    if (!list) return;
+    list.innerHTML = "";
+    achievementsList.forEach((ach) => {
+      let current = 0;
+      if (ach.type === "harvest")
+        current = gameState.stats.harvests[ach.targetId] || 0;
+      if (ach.type === "fish")
+        current = gameState.stats.fishCatches[ach.targetId] || 0;
+      let isUnlocked = !!gameState.achievements[ach.id];
+      let progress = Math.min(100, (current / ach.targetCount) * 100);
+
+      const item = document.createElement("div");
+      item.className = `achievement-item`;
+      item.innerHTML = `
+        <div class="achievement-icon ${isUnlocked ? ach.tier + "-filter" : "achievement-locked"}">
+          ${ach.icon}
+        </div>
+        <div class="achievement-details">
+          <div class="achievement-title ${isUnlocked ? "" : "achievement-locked"}"><span class="tier-badge">${ach.badge}</span> ${ach.title}</div>
+          <div class="achievement-desc">${ach.desc} (${Math.floor(current)}/${ach.targetCount})</div>
+          ${
+            !isUnlocked
+              ? `
+          <div class="achievement-progress-bar">
+             <div class="achievement-progress-fill" style="width: ${progress}%"></div>
+          </div>
+          `
+              : ""
+          }
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  };
+
+  // Event listener for achievement button
+  if (_("#achievement")) {
+    _("#achievement").addEventListener("click", () => {
+      _("#wrapachievements").style.display = "flex";
+      renderAchievements();
+    });
+  }
+
+  if (_("#achievement-close")) {
+    _("#achievement-close").addEventListener("click", () => {
+      _("#wrapachievements").style.display = "none";
+    });
+  }
 
   // Show tutorial popup
   const showTutorial = () => {
@@ -900,6 +1056,20 @@
         gameState.inventory[plantEmoji] = 0;
       }
       gameState.inventory[plantEmoji]++;
+
+      // Update harvest stats for achievements
+      if (!gameState.stats) gameState.stats = { harvests: {}, fishCatches: {} };
+      if (!gameState.stats.harvests) gameState.stats.harvests = {};
+
+      if (!gameState.stats.harvests[plantEmoji]) {
+        gameState.stats.harvests[plantEmoji] = 0;
+      }
+      gameState.stats.harvests[plantEmoji]++;
+
+      if (typeof checkAchievements === "function") {
+        checkAchievements();
+      }
+
       // Add money
       // gameState.money += plantValue;
     }
@@ -1470,6 +1640,11 @@
         if (!parsed.hasOwnProperty("sfx")) {
           parsed.sfx = true;
         }
+
+        if (!parsed.stats) parsed.stats = { harvests: {}, fishCatches: {} };
+        if (!parsed.stats.harvests) parsed.stats.harvests = {};
+        if (!parsed.stats.fishCatches) parsed.stats.fishCatches = {};
+        if (!parsed.achievements) parsed.achievements = {};
 
         // Ensure each plot has plantedAt property
         parsed.plots.forEach((plot) => {
@@ -2831,6 +3006,7 @@
   const fishingTypes = [
     {
       emoji: "🐟",
+      name: "Fish",
       type: "fish",
       speed: 0.2,
       pullStrength: 2,
@@ -2841,6 +3017,7 @@
     },
     {
       emoji: "🪨",
+      name: "Rock",
       type: "trash",
       speed: 0.16,
       pullStrength: -4,
@@ -2851,6 +3028,7 @@
     },
     {
       emoji: "👞",
+      name: "Shoe",
       type: "trash",
       speed: 0.88,
       pullStrength: -4,
@@ -2861,6 +3039,7 @@
     },
     {
       emoji: "🦐",
+      name: "Shrimp",
       type: "fish",
       speed: 0.48,
       pullStrength: 1,
@@ -2871,6 +3050,7 @@
     },
     {
       emoji: "🐡",
+      name: "Pufferfish",
       type: "fish",
       speed: 0.12,
       pullStrength: 2.2,
@@ -2881,6 +3061,7 @@
     },
     {
       emoji: "🐠",
+      name: "Tropical Fish",
       type: "fish",
       speed: 0.32,
       pullStrength: 2.4,
@@ -2891,6 +3072,7 @@
     },
     {
       emoji: "🦞",
+      name: "Lobster",
       type: "fish",
       speed: 0.12,
       pullStrength: 2.6,
@@ -2901,6 +3083,7 @@
     },
     {
       emoji: "🐙",
+      name: "Octopus",
       type: "fish",
       speed: 0.12,
       pullStrength: 2.8,
@@ -2911,6 +3094,7 @@
     },
     {
       emoji: "🦑",
+      name: "Squid",
       type: "fish",
       speed: 0.12,
       pullStrength: 2.8,
@@ -2921,6 +3105,7 @@
     },
     {
       emoji: "🪼",
+      name: "Jellyfish",
       type: "fish",
       speed: 0.12,
       pullStrength: 2.8,
@@ -2931,6 +3116,7 @@
     },
     {
       emoji: "🦈",
+      name: "Shark",
       type: "fish",
       speed: 0.78,
       pullStrength: 3.3,
@@ -2941,6 +3127,7 @@
     },
     {
       emoji: "🐬",
+      name: "Dolphin",
       type: "fish",
       speed: 1.2,
       pullStrength: 3.3,
@@ -2951,6 +3138,7 @@
     },
     {
       emoji: "🐋",
+      name: "Whale",
       type: "fish",
       speed: 0.12,
       pullStrength: 4.0,
@@ -3346,6 +3534,19 @@
     // Add to inventory
     if (!gameState.inventory[f.emoji]) gameState.inventory[f.emoji] = 0;
     gameState.inventory[f.emoji]++;
+
+    // Update fish stats for achievements
+    if (f.type !== "trash") {
+      if (!gameState.stats) gameState.stats = { harvests: {}, fishCatches: {} };
+      if (!gameState.stats.fishCatches) gameState.stats.fishCatches = {};
+      if (!gameState.stats.fishCatches[f.emoji])
+        gameState.stats.fishCatches[f.emoji] = 0;
+      gameState.stats.fishCatches[f.emoji]++;
+
+      if (typeof checkAchievements === "function") {
+        checkAchievements();
+      }
+    }
 
     // Level up progress or minor reward
     // gameState.points += Math.ceil(f.weight * 2);
