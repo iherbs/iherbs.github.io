@@ -23,7 +23,7 @@
       unlockedRecipes: [], // Default unlocked recipes
       unlockedCount: 0, // Number of unlocked stoves
     },
-    stats: { harvests: {}, fishCatches: {} },
+    stats: { harvests: {}, fishCatches: {}, cooks: {} },
     achievements: {},
     checksum: "",
     music: true,
@@ -499,6 +499,24 @@
         });
       });
     });
+
+    // Cooking achievements
+    recipes.forEach((r) => {
+      tiers.forEach((t) => {
+        achievementsList.push({
+          id: `cook_${r.emoji}_${t.required}`,
+          title: `${r.name} ${t.name}`,
+          desc: `Cook ${t.required} ${r.name}`,
+          icon: r.emoji,
+          badge: t.emoji,
+          tier: t.name.toLowerCase(),
+          type: "cook",
+          targetId: r.emoji,
+          targetCount: t.required,
+          reward: 100,
+        });
+      });
+    });
   };
 
   const checkAchievements = () => {
@@ -508,8 +526,10 @@
         let current = 0;
         if (ach.type === "harvest")
           current = gameState.stats.harvests[ach.targetId] || 0;
-        if (ach.type === "fish")
+        else if (ach.type === "fish")
           current = gameState.stats.fishCatches[ach.targetId] || 0;
+        else if (ach.type === "cook")
+          current = gameState.stats.cooks[ach.targetId] || 0;
 
         if (current >= ach.targetCount) {
           gameState.achievements[ach.id] = true;
@@ -561,8 +581,10 @@
       let current = 0;
       if (ach.type === "harvest")
         current = gameState.stats.harvests[ach.targetId] || 0;
-      if (ach.type === "fish")
+      else if (ach.type === "fish")
         current = gameState.stats.fishCatches[ach.targetId] || 0;
+      else if (ach.type === "cook")
+        current = gameState.stats.cooks[ach.targetId] || 0;
       let isUnlocked = !!gameState.achievements[ach.id];
       let progress = Math.min(100, (current / ach.targetCount) * 100);
 
@@ -1641,9 +1663,11 @@
           parsed.sfx = true;
         }
 
-        if (!parsed.stats) parsed.stats = { harvests: {}, fishCatches: {} };
+        if (!parsed.stats)
+          parsed.stats = { harvests: {}, fishCatches: {}, cooks: {} };
         if (!parsed.stats.harvests) parsed.stats.harvests = {};
         if (!parsed.stats.fishCatches) parsed.stats.fishCatches = {};
+        if (!parsed.stats.cooks) parsed.stats.cooks = {};
         if (!parsed.achievements) parsed.achievements = {};
 
         // Ensure each plot has plantedAt property
@@ -6582,6 +6606,19 @@
     // Add to inventory
     gameState.inventory[recipe.emoji] =
       (gameState.inventory[recipe.emoji] || 0) + 1;
+
+    // Update cook stats for achievements
+    if (!gameState.stats)
+      gameState.stats = { harvests: {}, fishCatches: {}, cooks: {} };
+    if (!gameState.stats.cooks) gameState.stats.cooks = {};
+    if (!gameState.stats.cooks[recipe.emoji])
+      gameState.stats.cooks[recipe.emoji] = 0;
+    gameState.stats.cooks[recipe.emoji]++;
+
+    if (typeof checkAchievements === "function") {
+      checkAchievements();
+    }
+
     // showNotification(`Cooked ${recipe.emoji} ${recipe.name}!`);
 
     gameState.kitchen.stations[index] = null; // Free the stove
