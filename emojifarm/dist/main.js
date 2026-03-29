@@ -2118,11 +2118,11 @@
       item.addEventListener("click", async () => {
         let message = "";
         if (gameState.pet.length < 2) {
-          message = `Buy ${pet.name} ${pet.emoji} for 🪙${pet.cost}?`;
+          message = `<div style="font-size:2rem;">${pet.emoji}</div><br>Adopt ${pet.name} for 🪙${pet.cost}?`;
         } else {
           let emofont = document.body.className;
           message =
-            `Replace a pet with ${pet.name} ${pet.emoji} for 🪙${pet.cost}?<br>` +
+            `<div style="font-size:2rem;">${pet.emoji}</div><br>Replace a pet with ${pet.name} for 🪙${pet.cost}?<br>` +
             `Choose pet to replace:<br>` +
             `<select id="pet-to-replace" class="${emofont}" style="margin-top:15px;padding:7px 10px;outline:none;border:none;font-size:1.2rem;">
                                  ${gameState.pet.map((p, idx) => `<option value="${idx}">${p.emoji} ${p.id}</option>`).join("")}
@@ -2174,6 +2174,7 @@
   const feedPet = async () => {
     if (gameState.pet.length === 0) {
       showNotification("No pet to feed!");
+      _("#menu-pet").click();
       return;
     }
 
