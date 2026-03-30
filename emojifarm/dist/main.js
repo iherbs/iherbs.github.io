@@ -23,7 +23,7 @@
       unlockedRecipes: [], // Default unlocked recipes
       unlockedCount: 0, // Number of unlocked stoves
     },
-    stats: { harvests: {}, fishCatches: {}, cooks: {} },
+    stats: { harvests: {}, livestock: {}, fishCatches: {}, cooks: {} },
     achievements: {},
     checksum: "",
     music: true,
@@ -175,7 +175,9 @@
       cost: 300,
       max: 7,
       food: "🌽",
+      yieldName: "Egg",
       yield: "🥚",
+      meatName: "Chicken",
       meat: "🍗",
       growthTime: 80,
       minYieldsToSlaughter: 3,
@@ -187,7 +189,9 @@
       cost: 800,
       max: 5,
       food: "🌾",
+      yieldName: "Milk",
       yield: "🥛",
+      meatName: "Beef",
       meat: "🥩",
       growthTime: 190,
       minYieldsToSlaughter: 5,
@@ -481,9 +485,42 @@
       });
     });
 
+    // Livestock achievements (Yields and Meats)
+    livestockTypes.forEach((l) => {
+      // Achievement for yield (Egg/Milk)
+      tiers.forEach((t) => {
+        achievementsList.push({
+          id: `livestock_${l.yield}_${t.required}`,
+          title: `${l.yieldName} ${t.name}`,
+          desc: `Collect ${t.required} ${l.yieldName}`,
+          icon: l.yield,
+          badge: t.emoji,
+          tier: t.name.toLowerCase(),
+          type: "livestock",
+          targetId: l.yield,
+          targetCount: t.required,
+          reward: 100,
+        });
+      });
+      // Achievement for meat (Chicken/Beef)
+      tiers.forEach((t) => {
+        achievementsList.push({
+          id: `livestock_${l.meat}_${t.required}`,
+          title: `${l.meatName} ${t.name}`,
+          desc: `Produce ${t.required} ${l.meatName}`,
+          icon: l.meat,
+          badge: t.emoji,
+          tier: t.name.toLowerCase(),
+          type: "livestock",
+          targetId: l.meat,
+          targetCount: t.required,
+          reward: 100,
+        });
+      });
+    });
+
     // Fish achievements
     fishingTypes.forEach((f) => {
-      if (f.type === "trash") return;
       tiers.forEach((t) => {
         achievementsList.push({
           id: `fish_${f.emoji}_${t.required}`,
@@ -526,6 +563,8 @@
         let current = 0;
         if (ach.type === "harvest")
           current = gameState.stats.harvests[ach.targetId] || 0;
+        else if (ach.type === "livestock")
+          current = gameState.stats.livestock[ach.targetId] || 0;
         else if (ach.type === "fish")
           current = gameState.stats.fishCatches[ach.targetId] || 0;
         else if (ach.type === "cook")
@@ -581,6 +620,8 @@
       let current = 0;
       if (ach.type === "harvest")
         current = gameState.stats.harvests[ach.targetId] || 0;
+      else if (ach.type === "livestock")
+        current = gameState.stats.livestock[ach.targetId] || 0;
       else if (ach.type === "fish")
         current = gameState.stats.fishCatches[ach.targetId] || 0;
       else if (ach.type === "cook")
@@ -1080,7 +1121,13 @@
       gameState.inventory[plantEmoji]++;
 
       // Update harvest stats for achievements
-      if (!gameState.stats) gameState.stats = { harvests: {}, fishCatches: {} };
+      if (!gameState.stats)
+        gameState.stats = {
+          harvests: {},
+          livestock: {},
+          fishCatches: {},
+          cooks: {},
+        };
       if (!gameState.stats.harvests) gameState.stats.harvests = {};
 
       if (!gameState.stats.harvests[plantEmoji]) {
@@ -1664,8 +1711,14 @@
         }
 
         if (!parsed.stats)
-          parsed.stats = { harvests: {}, fishCatches: {}, cooks: {} };
+          parsed.stats = {
+            harvests: {},
+            livestock: {},
+            fishCatches: {},
+            cooks: {},
+          };
         if (!parsed.stats.harvests) parsed.stats.harvests = {};
+        if (!parsed.stats.livestock) parsed.stats.livestock = {};
         if (!parsed.stats.fishCatches) parsed.stats.fishCatches = {};
         if (!parsed.stats.cooks) parsed.stats.cooks = {};
         if (!parsed.achievements) parsed.achievements = {};
@@ -2596,7 +2649,7 @@
     }
 
     const confirmed = await showPopup(
-      `Buy ${lsInfo.name} ${lsInfo.emoji} for 🪙${lsInfo.cost}?`,
+      `<span style="font-size:2rem">${lsInfo.emoji}</span><br>Buy ${lsInfo.name} for 🪙${lsInfo.cost}?`,
     );
     if (confirmed) {
       if (gameState.money >= lsInfo.cost) {
@@ -2945,6 +2998,14 @@
     updateUI();
     updateLivestockUI();
     updateLivestockQuestUI();
+
+    // Achievement check
+    if (!gameState.stats.livestock) gameState.stats.livestock = {};
+    if (!gameState.stats.livestock[lsInfo.yield])
+      gameState.stats.livestock[lsInfo.yield] = 0;
+    gameState.stats.livestock[lsInfo.yield]++;
+    if (typeof checkAchievements === "function") checkAchievements();
+
     saveGame();
     showNotification(`Got ${lsInfo.yield}`);
   };
@@ -2965,6 +3026,15 @@
     updateUI();
     updateLivestockUI();
     updateLivestockQuestUI();
+
+    // Achievement check
+    if (!gameState.stats.livestock) gameState.stats.livestock = {};
+    const meatAdded = lsInfo.type === "cow" ? 5 : 3;
+    if (!gameState.stats.livestock[lsInfo.meat])
+      gameState.stats.livestock[lsInfo.meat] = 0;
+    gameState.stats.livestock[lsInfo.meat] += meatAdded;
+    if (typeof checkAchievements === "function") checkAchievements();
+
     saveGame();
     showNotification(`Put ${ls.emoji} for ${lsInfo.meat}!`);
   };
@@ -3560,16 +3630,20 @@
     gameState.inventory[f.emoji]++;
 
     // Update fish stats for achievements
-    if (f.type !== "trash") {
-      if (!gameState.stats) gameState.stats = { harvests: {}, fishCatches: {} };
-      if (!gameState.stats.fishCatches) gameState.stats.fishCatches = {};
-      if (!gameState.stats.fishCatches[f.emoji])
-        gameState.stats.fishCatches[f.emoji] = 0;
-      gameState.stats.fishCatches[f.emoji]++;
+    if (!gameState.stats)
+      gameState.stats = {
+        harvests: {},
+        livestock: {},
+        fishCatches: {},
+        cooks: {},
+      };
+    if (!gameState.stats.fishCatches) gameState.stats.fishCatches = {};
+    if (!gameState.stats.fishCatches[f.emoji])
+      gameState.stats.fishCatches[f.emoji] = 0;
+    gameState.stats.fishCatches[f.emoji]++;
 
-      if (typeof checkAchievements === "function") {
-        checkAchievements();
-      }
+    if (typeof checkAchievements === "function") {
+      checkAchievements();
     }
 
     // Level up progress or minor reward
@@ -6609,7 +6683,12 @@
 
     // Update cook stats for achievements
     if (!gameState.stats)
-      gameState.stats = { harvests: {}, fishCatches: {}, cooks: {} };
+      gameState.stats = {
+        harvests: {},
+        livestock: {},
+        fishCatches: {},
+        cooks: {},
+      };
     if (!gameState.stats.cooks) gameState.stats.cooks = {};
     if (!gameState.stats.cooks[recipe.emoji])
       gameState.stats.cooks[recipe.emoji] = 0;
