@@ -542,6 +542,7 @@
       tiers.forEach((t) => {
         achievementsList.push({
           id: `cook_${r.emoji}_${t.required}`,
+          itemName: r.name,
           title: `${r.name} ${t.name}`,
           desc: `Cook ${t.required} ${r.name}`,
           icon: r.emoji,
@@ -554,6 +555,24 @@
         });
       });
     });
+  };
+
+  const getAchievementGroups = () => {
+    const groups = {};
+    achievementsList.forEach((ach) => {
+      const gId = `${ach.type}_${ach.targetId}`;
+      if (!groups[gId]) {
+        groups[gId] = {
+          type: ach.type,
+          targetId: ach.targetId,
+          itemName: ach.itemName || ach.title.split(" ").slice(0, -1).join(" "),
+          icon: ach.icon,
+          tiers: [],
+        };
+      }
+      groups[gId].tiers.push(ach);
+    });
+    return Object.values(groups);
   };
 
   const checkAchievements = () => {
@@ -608,7 +627,15 @@
     setTimeout(() => notif.classList.add("show"), 100);
     setTimeout(() => {
       notif.classList.remove("show");
-      setTimeout(() => notif.remove(), 500);
+      setTimeout(() => {
+        notif.remove();
+        if (
+          _("#wrapachievements") &&
+          _("#wrapachievements").style.display === "flex"
+        ) {
+          renderAchievements();
+        }
+      }, 500);
     }, 4000);
   };
 
@@ -616,40 +643,51 @@
     const list = _("#achievement-list");
     if (!list) return;
     list.innerHTML = "";
-    achievementsList.forEach((ach) => {
-      let current = 0;
-      if (ach.type === "harvest")
-        current = gameState.stats.harvests[ach.targetId] || 0;
-      else if (ach.type === "livestock")
-        current = gameState.stats.livestock[ach.targetId] || 0;
-      else if (ach.type === "fish")
-        current = gameState.stats.fishCatches[ach.targetId] || 0;
-      else if (ach.type === "cook")
-        current = gameState.stats.cooks[ach.targetId] || 0;
-      let isUnlocked = !!gameState.achievements[ach.id];
-      let progress = Math.min(100, (current / ach.targetCount) * 100);
 
-      const item = document.createElement("div");
-      item.className = `achievement-item`;
-      item.innerHTML = `
-        <div class="achievement-icon ${isUnlocked ? ach.tier + "-filter" : "achievement-locked"}">
-          ${ach.icon}
-        </div>
+    const groups = getAchievementGroups();
+
+    groups.forEach((group) => {
+      let currentCount = 0;
+      if (group.type === "harvest")
+        currentCount = gameState.stats.harvests[group.targetId] || 0;
+      else if (group.type === "livestock")
+        currentCount = gameState.stats.livestock[group.targetId] || 0;
+      else if (group.type === "fish")
+        currentCount = gameState.stats.fishCatches[group.targetId] || 0;
+      else if (group.type === "cook")
+        currentCount = gameState.stats.cooks[group.targetId] || 0;
+
+      const maxRequired = Math.max(...group.tiers.map((t) => t.targetCount));
+      const progress = Math.min(100, (currentCount / maxRequired) * 100);
+
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "achievement-item grouped";
+
+      let tiersHtml = "";
+      group.tiers.forEach((ach) => {
+        const isUnlocked = !!gameState.achievements[ach.id];
+        tiersHtml += `
+          <div class="medal-slot ${isUnlocked ? ach.tier + "-filter" : "locked"}" title="${ach.desc}">
+            ${group.icon}
+          </div>
+        `;
+      });
+
+      groupDiv.innerHTML = `
         <div class="achievement-details">
-          <div class="achievement-title ${isUnlocked ? "" : "achievement-locked"}"><span class="tier-badge">${ach.badge}</span> ${ach.title}</div>
-          <div class="achievement-desc">${ach.desc} (${Math.floor(current)}/${ach.targetCount})</div>
-          ${
-            !isUnlocked
-              ? `
+          <div class="achievement-medals-row">
+            ${tiersHtml}
+          </div>
+          <div class="achievement-title-row">
+            <span class="achievement-itemName">${group.itemName}</span>
+            <span class="achievement-count-label">${Math.floor(currentCount)}/${maxRequired}</span>
+          </div>
           <div class="achievement-progress-bar">
              <div class="achievement-progress-fill" style="width: ${progress}%"></div>
           </div>
-          `
-              : ""
-          }
         </div>
       `;
-      list.appendChild(item);
+      list.appendChild(groupDiv);
     });
   };
 
