@@ -80,11 +80,21 @@
 
 #fishing-tension-bar {
   position: absolute;
-  bottom: 0;
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(to right, #2ecc71, #f1c40f, #e74c3c);
-  transition: width 0.1s linear;
+  width: 100%;
+  inset: 0;
+  background: linear-gradient(to right,
+      #22c55e 0%,
+      #ea9708 50%,
+      #ef4444 80%,
+      #ff0000 100%);
+  -webkit-mask-image: linear-gradient(to right, black var(--bartension, 0%), transparent var(--bartension, 0%));
+  mask-image: linear-gradient(to right, black var(--bartension, 0%), transparent var(--bartension, 0%));
+  transition: --bartension 0.5s ease-out;
+}
+
+@property --bartension {
+  syntax: '<percentage>';
+  initial-value: 0%;
 }
 
 #fishing-hook {
@@ -198,13 +208,16 @@
 }
 
 @keyframes tail-wag {
+
   0%,
   100% {
     transform: rotate(0deg);
   }
+
   25% {
     transform: rotate(8deg);
   }
+
   75% {
     transform: rotate(-8deg);
   }
@@ -223,6 +236,7 @@
 .float {
   animation: float 6s ease-in-out infinite alternate;
 }
+
 .bob {
   animation: bob 4s ease-in-out infinite alternate;
 }
@@ -231,9 +245,11 @@
   0% {
     transform: translateY(0px) rotate(0deg);
   }
+
   50% {
     transform: translateY(-5px) rotate(1.5deg);
   }
+
   100% {
     transform: translateY(0px) rotate(0deg);
   }
@@ -243,6 +259,7 @@
   0% {
     transform: translateY(0px) scale(1);
   }
+
   100% {
     transform: translateY(-8px) scale(1.05);
   }

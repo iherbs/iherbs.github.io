@@ -790,18 +790,44 @@
 
   // Play sound effect
   const sfx = _("#sfx");
-  let audio = null;
+  let currentLoopAudio = null;
+
   const playSound = (soundFile, loop = false) => {
-    if (gameState.sfx) {
-      audio = new Audio(`music/${soundFile}`);
-      audio.loop = loop;
-      audio.play();
+    if (!gameState.sfx) return;
+
+    const url = `music/${soundFile}`;
+
+    if (loop) {
+      if (currentLoopAudio && currentLoopAudio.src === new URL(url, window.location.href).href) {
+        // Already playing this looping sound.
+        return;
+      }
+
+      if (currentLoopAudio) {
+        currentLoopAudio.pause();
+        currentLoopAudio.currentTime = 0;
+        currentLoopAudio = null;
+      }
+
+      currentLoopAudio = new Audio(url);
+      currentLoopAudio.loop = true;
+      currentLoopAudio.play().catch((e) => {
+        console.warn("Failed to play looping sound", e);
+      });
+    } else {
+      const oneShot = new Audio(url);
+      oneShot.loop = false;
+      oneShot.play().catch((e) => {
+        console.warn("Failed to play sound", e);
+      });
     }
   };
 
   const stopSound = () => {
-    if (audio != null) {
-      audio.pause();
+    if (currentLoopAudio) {
+      currentLoopAudio.pause();
+      currentLoopAudio.currentTime = 0;
+      currentLoopAudio = null;
     }
   };
 
@@ -2287,9 +2313,9 @@
     while (
       gameState.kitchenQuests.length < 3 &&
       npcs.length >
-        gameState.quests.length +
-          gameState.livestockQuests.length +
-          gameState.kitchenQuests.length
+      gameState.quests.length +
+      gameState.livestockQuests.length +
+      gameState.kitchenQuests.length
     ) {
       const quest = generateSingleKitchenQuest();
       if (quest) gameState.kitchenQuests.push(quest);
@@ -2502,15 +2528,15 @@
         Feed pet with:<br>
             <div style="text-align:left;margin-top:10px;">
             ${options
-              .map(
-                (opt) => `
+        .map(
+          (opt) => `
                 <div class="feeditem">
                     <input type="radio" name="feed-option" value="${opt.emoji}" id="${opt.emoji}">
                     <label for="${opt.emoji}">${opt.name} ${opt.emoji} (${opt.type === "buy" ? `🪙${opt.cost}` : "From Inventory"})</label>
                 </div>
             `,
-              )
-              .join("")}
+        )
+        .join("")}
             </div>
         `;
 
@@ -2933,9 +2959,9 @@
         <br>Put
     </button>`,
       "<div style='font-size:3rem;text-align:center;'>" +
-        ls.emoji +
-        "</div>" +
-        lsInfo.name,
+      ls.emoji +
+      "</div>" +
+      lsInfo.name,
       false,
     );
 
@@ -3547,7 +3573,7 @@
       for (const f of fishingFishArray) {
         const dist = Math.sqrt(
           Math.pow(f.x - fishingBobberPos.x + 9, 2) +
-            Math.pow(f.y - fishingBobberPos.y + 7, 2),
+          Math.pow(f.y - fishingBobberPos.y + 7, 2),
         );
         if (dist < 7 && !f.isHooked) {
           f.isHooked = true;
@@ -3629,8 +3655,7 @@
       }
 
       fishingTension = Math.max(0, fishingTension);
-      document.getElementById("fishing-tension-bar").style.width =
-        fishingTension + "%";
+      document.getElementById("fishing-tension-bar").style.setProperty("--bartension", fishingTension + "%");
 
       const bobber = document.getElementById("fishing-bobber");
       if (bobber) {
@@ -3733,6 +3758,7 @@
     fishingCaughtFish = null;
     fishingIsPressing = false;
     document.getElementById("fishing-tension-container").style.display = "none";
+    document.getElementById("fishing-tension-bar").style.setProperty("--bartension", "0%");
     const b = document.getElementById("fishing-bobber");
     if (b) b.remove();
   }
@@ -4250,8 +4276,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
@@ -4823,8 +4849,8 @@
       lvpln =
         gameState.level >= 25
           ? Math.floor(
-              Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
-            ) + 10
+            Math.random() * (Math.min(gameState.level, maxplant) - 10 + 1),
+          ) + 10
           : gameState.level;
       const availablePlants = getAvailablePlants(lvpln).filter(
         (p) => p.emoji !== "🟫",
