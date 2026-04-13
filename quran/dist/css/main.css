@@ -12,7 +12,7 @@
   --color-separator: #eeeeee;
   --color-arabic: #000000;
   --color-text: #000000;
-  --color-mint: #82CFD0;
+  --color-mint: #82cfd0;
   --color-shadow-rgb: 0, 50, 50;
   --color-shadow-rgb-ayah: 238, 238, 238;
 }
@@ -31,7 +31,7 @@
   --color-separator: #464b50;
   --color-arabic: #ffffff;
   --color-text: #ffffff;
-  --color-mint: #82CFD0;
+  --color-mint: #82cfd0;
   --color-shadow-rgb: 0, 0, 0;
   --color-shadow-rgb-ayah: 0, 0, 0;
 }
@@ -63,7 +63,6 @@
   font-style: "normal";
   src: url("../../dist/font/sura_names.woff2") format("woff2");
 }
-
 
 * {
   padding: 0px;
@@ -159,8 +158,6 @@ a {
   mix-blend-mode: overlay;
 }
 
-
-
 .ghunnah {
   color: #8036cf;
 }
@@ -170,7 +167,7 @@ a {
 }
 
 .iqlab {
-  color: #26BFFD;
+  color: #26bffd;
 }
 
 .ikhfa {
@@ -186,13 +183,12 @@ a {
 }
 
 .idhghammimi {
-  color: #58B800;
+  color: #58b800;
 }
 
 .idhghamnoghunnah {
   color: #169200;
 }
-
 
 .madda {
   color: #7b027e;
@@ -246,7 +242,13 @@ a {
   left: 0px;
   top: -5px;
   height: 7px;
-  background: linear-gradient(to right, var(--color-mint) 0%, var(--color-mint) 0%, #ddd 0%, #ddd 100%);
+  background: linear-gradient(
+    to right,
+    var(--color-mint) 0%,
+    var(--color-mint) 0%,
+    #ddd 0%,
+    #ddd 100%
+  );
 }
 
 #seekbar::-webkit-slider-thumb {
@@ -331,7 +333,6 @@ a {
   background: var(--color-even-ayah);
 }
 
-
 /* btnrepeat ========= */
 .btnrepeat {
   display: inline-block;
@@ -352,7 +353,7 @@ a {
   width: 100%;
 }
 
-.lblmop input:checked~.btnrepeat {
+.lblmop input:checked ~ .btnrepeat {
   background: var(--color-title-text);
   color: #ffffff;
 }
@@ -364,7 +365,11 @@ a {
   cursor: pointer;
   width: 25px;
   height: 14px;
-  background-image: radial-gradient(circle, var(--color-title-text) 2.2px, transparent 2px);
+  background-image: radial-gradient(
+    circle,
+    var(--color-title-text) 2.2px,
+    transparent 2px
+  );
   background-size: 8px 18px;
 }
 
@@ -411,7 +416,7 @@ a {
   display: none;
 }
 
-.contentmark input:checked~.checkmark:after {
+.contentmark input:checked ~ .checkmark:after {
   display: block;
 }
 
@@ -442,7 +447,7 @@ a {
   width: 100%;
 }
 
-.markoa input:checked~.checklbl {
+.markoa input:checked ~ .checklbl {
   color: #ffffff;
   background-color: var(--color-title-text);
 }
@@ -455,23 +460,27 @@ a {
 }
 
 #vmline:before {
-  content: '';
+  content: "";
   position: absolute;
   left: 45%;
   top: 8px;
   width: 15px;
   border-radius: 5px;
   border: 2px solid var(--color-title-text);
-  box-shadow: 0px 7px var(--color-title-text), 0px 14px var(--color-title-text);
+  box-shadow:
+    0px 7px var(--color-title-text),
+    0px 14px var(--color-title-text);
 }
 
-.markoa input:checked~#vmline:before {
+.markoa input:checked ~ #vmline:before {
   border: 2px solid #ffffff;
-  box-shadow: 0px 7px #ffffff, 0px 14px #ffffff;
+  box-shadow:
+    0px 7px #ffffff,
+    0px 14px #ffffff;
 }
 
 #vmbook:before {
-  content: '';
+  content: "";
   position: absolute;
   left: 45%;
   top: 6px;
@@ -482,7 +491,7 @@ a {
 }
 
 #vmbook:after {
-  content: '';
+  content: "";
   position: absolute;
   left: 45%;
   top: 11px;
@@ -490,18 +499,21 @@ a {
   margin-left: 5px;
   border-radius: 5px;
   border: 1px solid var(--color-title-text);
-  box-shadow: 0px 4px var(--color-title-text), 0px 8px var(--color-title-text);
+  box-shadow:
+    0px 4px var(--color-title-text),
+    0px 8px var(--color-title-text);
 }
 
-.markoa input:checked~#vmbook:before {
+.markoa input:checked ~ #vmbook:before {
   border: 2px solid #ffffff;
 }
 
-.markoa input:checked~#vmbook:after {
+.markoa input:checked ~ #vmbook:after {
   border: 1px solid #ffffff;
-  box-shadow: 0px 4px #ffffff, 0px 8px #ffffff;
+  box-shadow:
+    0px 4px #ffffff,
+    0px 8px #ffffff;
 }
-
 
 /* End Checkmark ===== */
 
@@ -585,7 +597,6 @@ a {
   border-style: double;
   border-width: 0px 0 0px 14px;
 }
-
 
 .play-next-button {
   cursor: pointer;
@@ -695,10 +706,15 @@ a {
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
-  -webkit-transition: border-color ease-in-out 0.15s,
+  -webkit-transition:
+    border-color ease-in-out 0.15s,
     -webkit-box-shadow ease-in-out 0.15s;
-  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  -o-transition:
+    border-color ease-in-out 0.15s,
+    box-shadow ease-in-out 0.15s;
+  transition:
+    border-color ease-in-out 0.15s,
+    box-shadow ease-in-out 0.15s;
 }
 
 .txtfind {
@@ -708,7 +724,7 @@ a {
   padding-top: 6px;
   padding-bottom: 6px;
   padding-left: 26px;
-  padding-right: 26px;
+  padding-right: 55px;
 }
 
 .fndclear {
@@ -716,7 +732,7 @@ a {
   user-select: none;
   float: right;
   top: 23%;
-  right: 7px;
+  right: 35px;
   width: 16px;
   height: 18px;
   border-radius: 6px;
@@ -728,6 +744,39 @@ a {
   font-size: 1em;
   line-height: 1.2;
   display: none;
+}
+
+.fndvoice {
+  position: absolute;
+  float: right;
+  top: 23%;
+  right: 12px;
+  width: 14px;
+  height: 16.7px;
+  border: 4px solid #a2a2a2;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+  cursor: pointer;
+}
+
+.fndvoice.listening {
+  border-color: var(--color-title-text);
+  animation: pulse 1s infinite linear;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .btn {
@@ -1012,7 +1061,7 @@ a {
 .navright {
   right: -75px;
   text-align: left;
-  padding-left: 10px
+  padding-left: 10px;
 }
 
 .navpage .arrow {
@@ -1088,7 +1137,9 @@ a {
   border-left: 8px solid #dfdfdf;
   border-right: 8px solid #dfdfdf;
   background-image: linear-gradient(0deg, #dfdfdf, #dfdfdf);
-  background-position: -10px -8px, 0px 0px;
+  background-position:
+    -10px -8px,
+    0px 0px;
   background-size: 18px 26px;
   background-repeat: no-repeat;
 }
@@ -1106,7 +1157,9 @@ a {
   border-left: 8px solid #ffbc00;
   border-right: 8px solid #ffbc00;
   background-image: linear-gradient(0deg, #ffbc00, #ffbc00);
-  background-position: -10px -8px, 0px 0px;
+  background-position:
+    -10px -8px,
+    0px 0px;
   background-size: 18px 26px;
   background-repeat: no-repeat;
 }
@@ -1261,8 +1314,12 @@ a {
 /* Show the toast when clicking on a button (class added with JavaScript) */
 #toast.show {
   visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  -webkit-animation:
+    fadein 0.5s,
+    fadeout 0.5s 2.5s;
+  animation:
+    fadein 0.5s,
+    fadeout 0.5s 2.5s;
 }
 
 /* Animations to fade the toast in and out */
@@ -1333,7 +1390,9 @@ a {
   width: 8px;
   border-radius: 5px;
   border: 2px solid var(--color-secondary);
-  box-shadow: 0px 7px var(--color-secondary), 0px 14px var(--color-secondary);
+  box-shadow:
+    0px 7px var(--color-secondary),
+    0px 14px var(--color-secondary);
 }
 
 .btnst {
@@ -1515,19 +1574,19 @@ a {
   transition: 0.4s;
 }
 
-input:checked+.slider {
+input:checked + .slider {
   background-color: var(--color-title-text);
 }
 
-input:checked+.slider-theme {
+input:checked + .slider-theme {
   background-color: #000000;
 }
 
-input:focus+.slider {
+input:focus + .slider {
   box-shadow: 0 0 1px var(--color-title-text);
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   -webkit-transform: translateX(20px);
   -ms-transform: translateX(20px);
   transform: translateX(20px);
@@ -1627,7 +1686,8 @@ input:checked+.slider:before {
   display: inline-block;
   height: 10px;
   aspect-ratio: 2.5;
-  --_g: no-repeat radial-gradient(farthest-side, var(--color-title-text) 90%, #0000);
+  --_g: no-repeat
+    radial-gradient(farthest-side, var(--color-title-text) 90%, #0000);
   background: var(--_g), var(--_g), var(--_g), var(--_g);
   background-size: 20% 50%;
   animation: dotwave 1s infinite linear;
@@ -1635,30 +1695,58 @@ input:checked+.slider:before {
 
 @keyframes dotwave {
   0% {
-    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+    background-position:
+      calc(0 * 100% / 3) 50%,
+      calc(1 * 100% / 3) 50%,
+      calc(2 * 100% / 3) 50%,
+      calc(3 * 100% / 3) 50%;
   }
 
   16.67% {
-    background-position: calc(0*100%/3) 0, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+    background-position:
+      calc(0 * 100% / 3) 0,
+      calc(1 * 100% / 3) 50%,
+      calc(2 * 100% / 3) 50%,
+      calc(3 * 100% / 3) 50%;
   }
 
   33.33% {
-    background-position: calc(0*100%/3) 100%, calc(1*100%/3) 0, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+    background-position:
+      calc(0 * 100% / 3) 100%,
+      calc(1 * 100% / 3) 0,
+      calc(2 * 100% / 3) 50%,
+      calc(3 * 100% / 3) 50%;
   }
 
   50% {
-    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 100%, calc(2*100%/3) 0, calc(3*100%/3) 50%
+    background-position:
+      calc(0 * 100% / 3) 50%,
+      calc(1 * 100% / 3) 100%,
+      calc(2 * 100% / 3) 0,
+      calc(3 * 100% / 3) 50%;
   }
 
   66.67% {
-    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 100%, calc(3*100%/3) 0
+    background-position:
+      calc(0 * 100% / 3) 50%,
+      calc(1 * 100% / 3) 50%,
+      calc(2 * 100% / 3) 100%,
+      calc(3 * 100% / 3) 0;
   }
 
   83.33% {
-    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 100%
+    background-position:
+      calc(0 * 100% / 3) 50%,
+      calc(1 * 100% / 3) 50%,
+      calc(2 * 100% / 3) 50%,
+      calc(3 * 100% / 3) 100%;
   }
 
   100% {
-    background-position: calc(0*100%/3) 50%, calc(1*100%/3) 50%, calc(2*100%/3) 50%, calc(3*100%/3) 50%
+    background-position:
+      calc(0 * 100% / 3) 50%,
+      calc(1 * 100% / 3) 50%,
+      calc(2 * 100% / 3) 50%,
+      calc(3 * 100% / 3) 50%;
   }
 }
