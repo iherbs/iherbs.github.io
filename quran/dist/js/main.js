@@ -2143,36 +2143,54 @@ async function startVoiceLookup() {
     return;
   }
 
+  let lastTranscript = "";
+  let isSearching = false;
+
   _("#btnvoicelookup").classList.add("listening");
   _("#wload").innerHTML =
     `<div style="text-align:center;padding:10px;">Mendengarkan...</div>`;
 
   recognition.continuous = false;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.lang = "ar-SA";
 
   recognition.onresult = async (event) => {
-    const transcript = event.results[event.results.length - 1][0].transcript;
-    console.log("Voice lookup transcript:", transcript);
-    _("#cari").value = transcript;
-    _("#btnvoicelookup").classList.remove("listening");
+    let transcript = "";
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      transcript += event.results[i][0].transcript;
+    }
+    lastTranscript = transcript;
+    _("#cari").value = lastTranscript;
 
-    await performVoiceLookup(transcript);
+    if (event.results[event.results.length - 1].isFinal) {
+      isSearching = true;
+      _("#btnvoicelookup").classList.remove("listening");
+      StopSpeech();
+      await performVoiceLookup(lastTranscript);
+    }
   };
 
   recognition.onerror = (event) => {
     console.error("Speech recognition error:", event.error);
     _("#btnvoicelookup").classList.remove("listening");
-    _("#wload").innerHTML =
-      `<div style="text-align:center;padding:10px;color:red;">Error: ${event.error}</div>`;
+    if (!isSearching) {
+      _("#wload").innerHTML =
+        `<div style="text-align:center;padding:10px;color:red;">Error: ${event.error}</div>`;
+    }
   };
 
-  recognition.onend = () => {
+  recognition.onend = async () => {
     _("#btnvoicelookup").classList.remove("listening");
-    _("#wload").innerHTML = "";
-    _("#clearsrc").style.display = "none";
-    makeqlist();
     StopSpeech();
+
+    // Jika berhenti tapi ada teks yang tertangkap dan belum mulai mencari
+    if (!isSearching && lastTranscript.trim().length > 0) {
+      isSearching = true;
+      await performVoiceLookup(lastTranscript);
+    } else if (!isSearching) {
+      _("#wload").innerHTML = "";
+      makeqlist();
+    }
   };
 
   StartSpeech();
@@ -2181,23 +2199,23 @@ async function startVoiceLookup() {
 async function performVoiceLookup(transcript) {
   _("#wload").innerHTML =
     `<div style="text-align:center;padding:10px;"><div class="loader"></div><br>Mencari ayat...</div>`;
-  const normSearch = normDiacritic(transcript).replaceAll(" ", "");
 
-  if (normSearch.length < 3) {
+  const cleanTranscript = normDiacritic(transcript);
+  const searchWords = cleanTranscript.split(" ").filter((w) => w.length > 0);
+  const normSearchFull = cleanTranscript.replaceAll(" ", "");
+
+  if (normSearchFull.length < 3) {
     _("#wload").innerHTML =
       `<div style="text-align:center;padding:10px;">Suara terlalu pendek. Percobaan: <i>${transcript}</i></div>`;
     return;
   }
 
   let matches = [];
-
-  // Ensure surah_list is loaded for names
   if (Object.keys(surah_list).length === 0) {
     const resl = await get(url + "surah_list.json");
     surah_list = JSON.parse(resl);
   }
 
-  // Iterate all surahs
   for (let s = 1; s <= 114; s++) {
     let data = await quranDB.getSurah(s);
     if (!data) {
@@ -2207,8 +2225,23 @@ async function performVoiceLookup(transcript) {
     }
 
     for (let a = 0; a < data.length; a++) {
-      const normAyah = normDiacritic(data[a].text_ayah).replaceAll(" ", "");
-      if (normAyah.includes(normSearch)) {
+      const normAyahText = normDiacritic(data[a].text_ayah);
+      const normAyahFull = normAyahText.replaceAll(" ", "");
+
+      // Strategi 1: Match persis (tanpa spasi)
+      let isMatch = normAyahFull.includes(normSearchFull);
+
+      // Strategi 2: Jika ayat panjang, cek apakah mayoritas kata kunci ada
+      if (!isMatch && searchWords.length >= 3) {
+        let matchCount = 0;
+        searchWords.forEach((word) => {
+          if (normAyahText.includes(word)) matchCount++;
+        });
+        // Jika 80% kata cocok, kita anggap itu ayatnya
+        if (matchCount / searchWords.length >= 0.8) isMatch = true;
+      }
+
+      if (isMatch) {
         matches.push({
           surah: s,
           ayah: a + 1,
@@ -2223,20 +2256,21 @@ async function performVoiceLookup(transcript) {
 
   if (matches.length > 0) {
     let html = "";
+    // list ayah
     matches.forEach((m) => {
-      html += `<div class="listitem" onclick="getayah(${m.surah}, ${m.ayah})" style="cursor:pointer;padding:15px;border-bottom: 1px solid var(--color-separator);">
+      html += `<div class="listitem" onclick="getsurah(${m.surah}, ${m.ayah})" style="cursor:pointer;padding:15px;border-bottom: 1px solid var(--color-separator);">
               <div style="font-weight:bold;color:var(--color-title-text);">${m.name} : ${m.ayah}</div>
               <div class="arabic" style="font-size:22px;text-align:right;margin-top:10px;line-height:1.8;">${m.text}</div>
           </div>`;
     });
     _("#list").innerHTML = html;
     _("#wload").innerHTML = "";
-    _("#clearsrc").style.display = "block";
   } else {
     _("#wload").innerHTML =
-      `<div style="text-align:center;padding:10px;">Ayat tidak ditemukan</div>`;
+      `<div style="text-align:center;padding:10px;">Ayat tidak ditemukan untuk: <i>${transcript}</i></div>`;
     _("#list").innerHTML = "";
   }
+  _("#clearsrc").style.display = "block";
 }
 
 let tcstartX = 0;
@@ -2492,16 +2526,17 @@ let recognition,
 function normDiacritic(text = "") {
   if (!text) return "";
 
-  // 1. Definisikan karakter yang ingin dihilangkan (Harakat, Tanda Waqaf, Sajdah, dll)
-  // Range: \u0610-\u061A, \u064B-\u065F, \u0670, \u06D6-\u06ED
-  const diacriticsRegex = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+  // 1. Bersihkan Harakat, Tanda Waqaf, dan karakter kontrol Unicode
+  const diacriticsRegex =
+    /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u200C\u200D\u200E\u200F\uFEFF]/g;
 
   return text
     .replace(diacriticsRegex, "")
-    .replace(/\u0671/g, "\u0627") // Normalisasi Alif Wasla (ٱ) ke Alif biasa (ا)
-    .replace(/[\u0622\u0623\u0625]/g, "\u0627") // Semua jenis Alif Hamza ke Alif biasa
-    .replace(/\u0649/g, "\u064A") // Alif Maksura (ى) ke Yeh (ي)
-    .replace(/\u0629/g, "\u0647") // Teh Marbuta (ة) ke Heh (ه)
+    .replace(/[\u0671\u0622\u0623\u0625]/g, "\u0627") // Normalisasi Alif (Wasla, Madda, Hamza) ke Alif biasa
+    .replace(/[\u0649\u0626]/g, "\u064A") // Alif Maksura & Ya Hamza ke Ya
+    .replace(/\u0624/g, "\u0648") // Waw Hamza ke Waw
+    .replace(/\u0629/g, "\u0647") // Teh Marbuta ke Heh
+    .replace(/\s+/g, " ") // Satukan semua jenis spasi/whitespace
     .trim();
 }
 
@@ -2613,7 +2648,7 @@ const GetSpeech = (ayat = 0) => {
       txtrecogn = final_transcript;
     }
 
-    console.log(txtrecogn);
+    // console.log(txtrecogn);
     if (recognizing) {
       diffme(ayat);
     }
