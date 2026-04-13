@@ -2169,7 +2169,6 @@ async function startVoiceLookup() {
 
   recognition.onend = () => {
     _("#btnvoicelookup").classList.remove("listening");
-    _("#cari").value = "";
     _("#wload").innerHTML = "";
     _("#clearsrc").style.display = "none";
     makeqlist();
