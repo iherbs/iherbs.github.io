@@ -92,34 +92,6 @@
           box-shadow: inset 0 0 0 0 rgba(255, 0, 0, 0);
         }
       }
-
-      /* Hand Tracking Styles */
-      #video-container {
-        display: none;
-      }
-      #webcam {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      #hand-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-      }
-      #status-indicator {
-        position: absolute;
-        bottom: 10px;
-        background: rgba(0, 0, 0, 0.7);
-        color: #f1c40f;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        z-index: 51;
-      }
     </style>
   </head>
   <body>
@@ -144,21 +116,9 @@
       </div>
 
       <canvas id="gameCanvas"></canvas>
-
-      <!-- Hand Tracking UI -->
-      <div id="status-indicator">Inisialisasi Kamera...</div>
-      <div id="video-container">
-        <video id="webcam" autoplay playsinline></video>
-        <canvas id="hand-canvas"></canvas>
-      </div>
     </div>
 
-    <script type="module">
-      import {
-        HandLandmarker,
-        FilesetResolver,
-      } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
-
+    <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
       const scoreElement = document.getElementById("score-display");
@@ -167,23 +127,6 @@
       const gameOverScreen = document.getElementById("game-over");
       const finalScoreElement = document.getElementById("final-score");
       const gameContainer = document.getElementById("game-container");
-      const video = document.getElementById("webcam");
-      const handCanvas = document.getElementById("hand-canvas");
-      const handCtx = handCanvas.getContext("2d");
-      const statusIndicator = document.getElementById("status-indicator");
-
-      // MediaPipe Setup
-      let handLandmarker = undefined;
-      let runningMode = "VIDEO";
-      let lastVideoTime = -1;
-      let frameCount = 0; // Untuk frame skipping
-
-      // Navigation Setup
-      let hoverTarget = null;
-      let hoverStartTime = 0;
-      const HOVER_DURATION = 1000; // ms
-
-      // Konfigurasi Permainan
 
       // Konfigurasi Permainan
       let score = 0;
@@ -309,29 +252,17 @@
       window.addEventListener("resize", resize);
 
       function addTrail(e) {
-        let x, y;
-        if (e.isHand) {
-          x = e.x;
-          y = e.y;
-        } else {
-          const rect = canvas.getBoundingClientRect();
-          x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-          y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-        }
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
         trail.push({ x, y, time: Date.now() });
       }
 
       function checkSlice(e) {
         if (!gameActive) return;
-        let x, y;
-        if (e.isHand) {
-          x = e.x;
-          y = e.y;
-        } else {
-          const rect = canvas.getBoundingClientRect();
-          x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-          y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-        }
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
         fruits.forEach((fruit) => {
           const dist = Math.hypot(fruit.x - x, fruit.y - y);
@@ -399,7 +330,7 @@
         gameOverScreen.classList.add("hidden");
         resize(); // Initial resize
         updateUI();
-        // gameLoop is now persistent
+        requestAnimationFrame(gameLoop);
       }
 
       function endGame() {
@@ -410,174 +341,6 @@
 
       function resetGame() {
         startGame();
-      }
-
-      // Hand Tracking Logic
-      async function setupHandTracking() {
-        try {
-          const vision = await FilesetResolver.forVisionTasks(
-            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm",
-          );
-          handLandmarker = await HandLandmarker.createFromOptions(vision, {
-            baseOptions: {
-              modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-              delegate: "GPU",
-            },
-            runningMode: runningMode,
-            numHands: 1,
-          });
-          statusIndicator.innerText = "Camera Ready!";
-          startCamera();
-        } catch (error) {
-          console.error("Gagal inisialisasi hand tracking:", error);
-          statusIndicator.innerText = "Failed to load AI Hand Tracking";
-        }
-      }
-
-      function startCamera() {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          navigator.mediaDevices
-            .getUserMedia({ video: { width: 320, height: 240 } })
-            .then((stream) => {
-              video.srcObject = stream;
-              video.addEventListener("loadeddata", predictWebcam);
-            })
-            .catch((err) => {
-              console.error("Gagal akses kamera:", err);
-              statusIndicator.innerText = "Failed to access camera";
-            });
-        }
-      }
-
-      async function predictWebcam() {
-        if (!handLandmarker) return;
-
-        // Skip frame: Hanya proses deteksi setiap 2 frame sekali
-        // untuk menghemat CPU/GPU (mengurangi lag)
-        frameCount++;
-        if (frameCount % 2 === 0 && video.currentTime !== lastVideoTime) {
-          lastVideoTime = video.currentTime;
-          const results = handLandmarker.detectForVideo(
-            video,
-            performance.now(),
-          );
-
-          handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
-          if (results.landmarks && results.landmarks.length > 0) {
-            statusIndicator.innerText = "Hand Detected!";
-            const landmarks = results.landmarks[0];
-
-            // Deteksi Jari Telunjuk (Landmark 8)
-            const indexFinger = landmarks[8];
-
-            // Kalibrasi Koordinat dengan Safe Margin (0.1 - 0.9)
-            // Ini membantu menjangkau pojok layar (terutama bawah) tanpa harus
-            // menggerakkan tangan secara ekstrem ke pinggir jangkauan kamera.
-            const margin = 0.15; // 15% margin di setiap sisi
-            const scale = 1 / (1 - 2 * margin);
-
-            // Hitung Raw X & Y dengan margin dan scaling
-            let rawX = (indexFinger.x - margin) * scale;
-            let rawY = (indexFinger.y - margin) * scale;
-
-            // Mirroring X (karena kamera kita mirrored)
-            // Dan konversi ke koordinat layar (Canvas)
-            let x = (1 - rawX) * canvas.width;
-            let y = rawY * canvas.height;
-
-            // Clamp: Pastikan kursor tetap berada di dalam area game
-            x = Math.max(0, Math.min(canvas.width, x));
-            y = Math.max(0, Math.min(canvas.height, y));
-
-            // Trigger slicing
-            const mockEvent = { isHand: true, x, y };
-            addTrail(mockEvent); // Always add trail for persistent visual
-
-            if (gameActive) {
-              checkSlice(mockEvent);
-            } else {
-              handleButtonHover(x, y);
-            }
-
-            // Draw pointer in preview (even if hidden container, used internally for drawing to hidden canvas if needed)
-            drawHandPreview(landmarks);
-          } else {
-            statusIndicator.innerText = "Move your hand towards the camera";
-          }
-        }
-        window.requestAnimationFrame(predictWebcam);
-      }
-
-      function drawHandPreview(landmarks) {
-        handCanvas.width = video.videoWidth;
-        handCanvas.height = video.videoHeight;
-        handCtx.fillStyle = "#f1c40f";
-        // Draw index finger only in preview
-        const indexFinger = landmarks[8];
-        handCtx.beginPath();
-        handCtx.arc(
-          indexFinger.x * handCanvas.width,
-          indexFinger.y * handCanvas.height,
-          8,
-          0,
-          Math.PI * 2,
-        );
-        handCtx.fill();
-      }
-
-      // Initialize Tracking
-      resize(); // Pastikan ukuran canvas benar sejak awal
-      setupHandTracking();
-      // Start persistent game loop
-      requestAnimationFrame(gameLoop);
-
-      // Expose to window for HTML buttons
-      window.startGame = startGame;
-      window.resetGame = resetGame;
-
-      function handleButtonHover(x, y) {
-        const activeScreen = [menu, gameOverScreen].find(
-          (s) => !s.classList.contains("hidden"),
-        );
-        if (!activeScreen) return;
-
-        const btn = activeScreen.querySelector(".btn");
-        if (!btn) return;
-
-        const rect = btn.getBoundingClientRect();
-        const padding = 20; // Tolerance
-
-        if (
-          x >= rect.left - padding &&
-          x <= rect.right + padding &&
-          y >= rect.top - padding &&
-          y <= rect.bottom + padding
-        ) {
-          if (hoverTarget !== btn) {
-            hoverTarget = btn;
-            hoverStartTime = Date.now();
-          }
-
-          const progress = Math.min(
-            1,
-            (Date.now() - hoverStartTime) / HOVER_DURATION,
-          );
-          btn.style.transform = `scale(${1 + progress * 0.2})`;
-          btn.style.background = `linear-gradient(90deg, #f39c12 ${progress * 100}%, #f1c40f ${progress * 100}%)`;
-
-          if (progress >= 1) {
-            btn.click();
-            hoverTarget = null;
-            btn.style.transform = "";
-            btn.style.background = "";
-          }
-        } else {
-          if (hoverTarget === btn) {
-            hoverTarget = null;
-            btn.style.transform = "";
-            btn.style.background = "";
-          }
-        }
       }
 
       function drawTrail() {
@@ -614,44 +377,43 @@
       };
 
       function gameLoop(timestamp) {
+        if (!gameActive) return;
+
         const deltaTime = timestamp - lastTime;
         lastTime = timestamp;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (gameActive) {
-          spawnTimer += deltaTime;
-          if (spawnTimer > spawnRate) {
-            fruits.push(new Fruit());
-            if (score > 100 && Math.random() > 0.7) fruits.push(new Fruit());
-            spawnTimer = 0;
-          }
+        spawnTimer += deltaTime;
+        if (spawnTimer > spawnRate) {
+          fruits.push(new Fruit());
+          if (score > 100 && Math.random() > 0.7) fruits.push(new Fruit());
+          spawnTimer = 0;
+        }
 
-          for (let i = fruits.length - 1; i >= 0; i--) {
-            const fruit = fruits[i];
-            fruit.update();
-            fruit.draw();
+        for (let i = fruits.length - 1; i >= 0; i--) {
+          const fruit = fruits[i];
+          fruit.update();
+          fruit.draw();
 
-            if (fruit.y > canvas.height + 100) {
-              if (!fruit.isBomb && !fruit.isLife && !fruit.sliced) {
-                triggerDamageEffect();
-                lives--;
-                particles.push(
-                  new Particle(fruit.x, canvas.height - 20, "#ff4757", "MISS!"),
-                );
-                updateUI();
-                if (lives <= 0) endGame();
-              }
-              fruits.splice(i, 1);
+          if (fruit.y > canvas.height + 100) {
+            if (!fruit.isBomb && !fruit.isLife && !fruit.sliced) {
+              triggerDamageEffect();
+              lives--;
+              particles.push(
+                new Particle(fruit.x, canvas.height - 20, "#ff4757", "MISS!"),
+              );
+              updateUI();
+              if (lives <= 0) endGame();
             }
+            fruits.splice(i, 1);
           }
         }
 
         for (let i = particles.length - 1; i >= 0; i--) {
-          const particles_ref = particles[i];
-          particles_ref.update();
-          particles_ref.draw();
-          if (particles_ref.alpha <= 0) particles.splice(i, 1);
+          particles[i].update();
+          particles[i].draw();
+          if (particles[i].alpha <= 0) particles.splice(i, 1);
         }
 
         drawTrail();
