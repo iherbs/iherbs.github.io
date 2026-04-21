@@ -527,7 +527,20 @@
 
       // Initialize Tracking
       resize(); // Pastikan ukuran canvas benar sejak awal
-      setupHandTracking();
+
+      // Deteksi HP: Jangan aktifkan hand tracking jika di HP
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 800;
+
+      if (!isMobile) {
+        setupHandTracking();
+      } else {
+        statusIndicator.style.display = "none";
+        console.log("Hand tracking disabled on mobile device.");
+      }
+
       // Start persistent game loop
       requestAnimationFrame(gameLoop);
 
