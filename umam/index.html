@@ -36,11 +36,10 @@
       }
 
       #video-container {
-        display: none;
         position: absolute;
         bottom: 20px;
         right: 20px;
-        width: 200px;
+        width: 150px;
         aspect-ratio: 4/3;
         border: 2px solid var(--primary);
         border-radius: 12px;
@@ -49,6 +48,13 @@
         transform: scaleX(-1);
         box-shadow: 0 0 20px var(--primary-glow);
         background: #000;
+      }
+
+      #video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0; /* Sembunyikan gambar orang */
       }
 
       #hand-canvas {
@@ -187,7 +193,7 @@
     </div>
 
     <div id="video-container">
-      <video id="input-video" style="display: none" playsinline></video>
+      <video id="input-video" style="" playsinline></video>
       <canvas id="hand-canvas"></canvas>
     </div>
 
@@ -386,17 +392,17 @@
       let particles = [];
       let lastSpawn = 0;
       let lastTimeUpdate = 0;
-      
+
       // Partikel Background Menu
       let menuParticles = [];
-      for(let i=0; i<40; i++) {
-          menuParticles.push({
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              vx: (Math.random() - 0.5) * 0.5,
-              vy: (Math.random() - 0.5) * 0.5,
-              size: Math.random() * 3 + 1
-          });
+      for (let i = 0; i < 40; i++) {
+        menuParticles.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          size: Math.random() * 3 + 1,
+        });
       }
 
       // State Tangan
@@ -823,14 +829,18 @@
 
         if (!gameActive) {
           const time = Date.now() * 0.001;
-          
+
           // Background Gradient Subtle
           const grad = gctx.createRadialGradient(
-            gameCanvas.width/2, gameCanvas.height/2, 0,
-            gameCanvas.width/2, gameCanvas.height/2, gameCanvas.width
+            gameCanvas.width / 2,
+            gameCanvas.height / 2,
+            0,
+            gameCanvas.width / 2,
+            gameCanvas.height / 2,
+            gameCanvas.width,
           );
-          grad.addColorStop(0, '#1e293b');
-          grad.addColorStop(1, '#0f172a');
+          grad.addColorStop(0, "#1e293b");
+          grad.addColorStop(1, "#0f172a");
           gctx.fillStyle = grad;
           gctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 
@@ -846,7 +856,7 @@
             // Draw Particle
             gctx.beginPath();
             gctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            gctx.fillStyle = 'rgba(59, 130, 246, 0.5)';
+            gctx.fillStyle = "rgba(59, 130, 246, 0.5)";
             gctx.fill();
 
             // Connect to nearby particles
@@ -857,7 +867,7 @@
                 gctx.beginPath();
                 gctx.moveTo(p.x, p.y);
                 gctx.lineTo(p2.x, p2.y);
-                gctx.strokeStyle = `rgba(59, 130, 246, ${0.2 * (1 - dist/200)})`;
+                gctx.strokeStyle = `rgba(59, 130, 246, ${0.2 * (1 - dist / 200)})`;
                 gctx.lineWidth = 1;
                 gctx.stroke();
               }
@@ -865,13 +875,15 @@
           });
 
           // Add some floating glow blobs
-          for(let i=0; i<3; i++) {
-            const gx = (Math.sin(time * 0.2 + i) * 0.3 + 0.5) * gameCanvas.width;
-            const gy = (Math.cos(time * 0.3 + i) * 0.3 + 0.5) * gameCanvas.height;
+          for (let i = 0; i < 3; i++) {
+            const gx =
+              (Math.sin(time * 0.2 + i) * 0.3 + 0.5) * gameCanvas.width;
+            const gy =
+              (Math.cos(time * 0.3 + i) * 0.3 + 0.5) * gameCanvas.height;
             const gSize = 300 + Math.sin(time * 0.5) * 50;
             const glow = gctx.createRadialGradient(gx, gy, 0, gx, gy, gSize);
-            glow.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
-            glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+            glow.addColorStop(0, "rgba(59, 130, 246, 0.15)");
+            glow.addColorStop(1, "rgba(59, 130, 246, 0)");
             gctx.fillStyle = glow;
             gctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
           }
@@ -972,13 +984,10 @@
           const end = landmarks[connection[1]];
           ctx.beginPath();
           ctx.moveTo(
-            (1 - start.x) * canvasElement.width,
+            start.x * canvasElement.width,
             start.y * canvasElement.height,
           );
-          ctx.lineTo(
-            (1 - end.x) * canvasElement.width,
-            end.y * canvasElement.height,
-          );
+          ctx.lineTo(end.x * canvasElement.width, end.y * canvasElement.height);
           ctx.strokeStyle = style.color;
           ctx.lineWidth = style.lineWidth;
           ctx.lineCap = "round";
@@ -990,7 +999,7 @@
         for (const landmark of landmarks) {
           ctx.beginPath();
           ctx.arc(
-            (1 - landmark.x) * canvasElement.width,
+            landmark.x * canvasElement.width,
             landmark.y * canvasElement.height,
             style.radius,
             0,
