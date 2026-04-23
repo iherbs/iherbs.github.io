@@ -636,8 +636,8 @@
 
         // Cek Threshold Skor
         let threshold = 0;
-        if (currentGame === "fruit") threshold = 250;
-        else if (currentGame === "eggs") threshold = 150;
+        if (currentGame === "fruit") threshold = 100;
+        else if (currentGame === "eggs") threshold = 60;
         else if (currentGame === "rocket") threshold = 50;
 
         const congratsMsg = document.getElementById("congrats-msg");
@@ -682,7 +682,7 @@
 
       function spawnEntity() {
         const now = Date.now();
-        if (currentGame === "fruit" && now - lastSpawn > 800) {
+        if (currentGame === "fruit" && now - lastSpawn > 2000) {
           // Kalkulasi kecepatan vertikal agar tinggi loncatan tidak melebihi layar
           // v = sqrt(2 * g * h), h max = gameCanvas.height * 0.8
           const maxH = gameCanvas.height * 0.8;
@@ -703,7 +703,7 @@
             vrot: (Math.random() - 0.5) * 0.1,
           });
           lastSpawn = now;
-        } else if (currentGame === "eggs" && now - lastSpawn > 700) {
+        } else if (currentGame === "eggs" && now - lastSpawn > 1800) {
           entities.push({
             x: Math.random() * (gameCanvas.width - 100) + 50,
             y: -50,
