@@ -93,27 +93,42 @@
 
       .cursor {
         position: absolute;
-        width: 30px;
-        height: 30px;
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid white;
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
         border-radius: 50%;
         pointer-events: none;
         z-index: 1000;
         transform: translate(-50%, -50%);
-        transition:
-          transform 0.1s ease,
-          border-color 0.2s,
-          border-width 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
+        /* backdrop-filter: blur(20px); */
       }
 
-      .cursor::after {
-        content: "";
-        width: 6px;
-        height: 6px;
+      .cursor-ring {
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        width: 40px;
+        height: 40px;
+        transform: rotate(-90deg);
+      }
+
+      .cursor-ring circle {
+        fill: none;
+        stroke: #3b82f6;
+        stroke-width: 3;
+        stroke-dasharray: 106.8; /* 2 * PI * r (r=17) */
+        stroke-dashoffset: 106.8;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.1s linear;
+      }
+
+      .cursor-dot {
+        width: 4px;
+        height: 4px;
         background: white;
         border-radius: 50%;
       }
@@ -197,7 +212,12 @@
       <canvas id="hand-canvas"></canvas>
     </div>
 
-    <div id="cursor" class="cursor"></div>
+    <div id="cursor" class="cursor">
+      <svg class="cursor-ring" viewBox="0 0 40 40">
+        <circle id="cursor-progress" cx="20" cy="20" r="17"></circle>
+      </svg>
+      <div class="cursor-dot"></div>
+    </div>
 
     <div id="ui-layer">
       <!-- Menu Utama -->
@@ -209,10 +229,11 @@
           GESTURE PLAY
         </h1>
         <p class="mb-12 text-slate-400 text-lg">
-          Gunakan <span class="text-blue-400 font-bold">Telunjuk</span> untuk
+          Gunakan
+          <span class="text-blue-400 font-bold">Gerakan Tangan</span> untuk
           navigasi.<br />
-          <span class="text-pink-500 font-bold">Pinch</span> (Jempol + Telunjuk)
-          untuk Memilih.
+          <span class="text-blue-400 font-bold">Diamkan 1 Detik</span> di atas
+          tombol untuk Memilih.
         </p>
 
         <div class="flex gap-8">
@@ -408,8 +429,14 @@
       // State Tangan
       let handPos = { x: 0, y: 0, rawX: 0, rawY: 0, isPinching: false };
       let lastHandPos = { x: 0, y: 0 };
-      let clickCooldown = false;
       let handDetected = false;
+
+      // State Dwell Click
+      let hoverTarget = null;
+      let hoverStartTime = 0;
+      const DWELL_TIME = 1000; // 1 detik
+      const progressRing = document.getElementById("cursor-progress");
+      const ringTotalLength = 106.8; // 2 * PI * 17
 
       // Helper untuk mapping koordinat dengan sensitivitas
       function mapRange(val, inMin, inMax, outMin, outMax) {
@@ -513,34 +540,49 @@
           handPos.rawX = indexFinger.x;
           handPos.rawY = indexFinger.y;
 
-          // Deteksi Pinch
-          const dist = Math.hypot(
-            indexFinger.x - thumb.x,
-            indexFinger.y - thumb.y,
-          );
-          const wasPinching = handPos.isPinching;
-          handPos.isPinching = dist < PINCH_THRESHOLD;
-
           // Update Kursor UI
           cursor.style.left = handPos.x + "px";
           cursor.style.top = handPos.y + "px";
           cursor.style.opacity = "1";
 
-          if (handPos.isPinching) {
-            cursor.style.transform = "translate(-50%, -50%) scale(0.7)";
-            cursor.style.borderColor = "#ec4899";
-            cursor.style.borderWidth = "4px";
+          // Logika Dwell Click (Hover 1 detik)
+          const elements = document.elementsFromPoint(handPos.x, handPos.y);
+          let currentTarget = null;
+          for (const el of elements) {
+            if (
+              el.closest(".game-card") ||
+              el.id === "exit-btn" ||
+              el.closest(".btn")
+            ) {
+              currentTarget =
+                el.closest(".game-card") ||
+                el.closest("#exit-btn") ||
+                el.closest(".btn");
+              break;
+            }
+          }
 
-            // Logika Klik (Trigger hanya sekali saat mulai pinch)
-            if (!wasPinching && !clickCooldown) {
-              handleGameClick();
-              clickCooldown = true;
-              setTimeout(() => (clickCooldown = false), 300);
+          if (currentTarget) {
+            if (currentTarget === hoverTarget) {
+              const elapsed = Date.now() - hoverStartTime;
+              const progress = Math.min(elapsed / DWELL_TIME, 1);
+              progressRing.style.strokeDashoffset =
+                ringTotalLength * (1 - progress);
+
+              if (progress >= 1) {
+                currentTarget.click();
+                hoverTarget = null; // Reset agar tidak klik berkali-kali
+                hoverStartTime = 0;
+                progressRing.style.strokeDashoffset = ringTotalLength;
+              }
+            } else {
+              hoverTarget = currentTarget;
+              hoverStartTime = Date.now();
             }
           } else {
-            cursor.style.transform = "translate(-50%, -50%) scale(1)";
-            cursor.style.borderColor = "white";
-            cursor.style.borderWidth = "2px";
+            hoverTarget = null;
+            hoverStartTime = 0;
+            progressRing.style.strokeDashoffset = ringTotalLength;
           }
 
           // Gambar visualisasi di preview (mirrored)
