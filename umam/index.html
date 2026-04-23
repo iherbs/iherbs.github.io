@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hand Gesture Game Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap");
+
+      :root {
+        --primary: #3b82f6;
+        --primary-glow: rgba(59, 130, 246, 0.5);
+        --accent: #f43f5e;
+        --bg: #0f172a;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: "Outfit", sans-serif;
+        color: white;
+      }
+
+      #game-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 10;
+        background: #0f172a; /* Ensure solid background */
+      }
+
+      #video-container {
+        display: none;
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 200px;
+        aspect-ratio: 4/3;
+        border: 2px solid var(--primary);
+        border-radius: 12px;
+        overflow: hidden;
+        z-index: 100;
+        transform: scaleX(-1);
+        box-shadow: 0 0 20px var(--primary-glow);
+        background: #000;
+      }
+
+      #hand-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .game-card {
+        pointer-events: auto;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+      }
+
+      .game-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        background: rgba(30, 41, 59, 0.9);
+      }
+
+      .cursor {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        transition:
+          transform 0.1s ease,
+          border-color 0.2s,
+          border-width 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .cursor::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: white;
+        border-radius: 50%;
+      }
+
+      .loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .btn {
+        pointer-events: auto;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.2s;
+      }
+
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--primary);
+        padding: 3rem;
+        border-radius: 2rem;
+        text-align: center;
+        pointer-events: auto;
+        box-shadow: 0 0 60px rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        min-width: 400px;
+      }
+
+      .confetti {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        z-index: 3000;
+        animation: confetti-fall 3s ease-in forwards;
+      }
+
+      @keyframes confetti-fall {
+        0% {
+          transform: translateY(-100px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game-canvas"></canvas>
+
+    <div id="loading" class="loading-overlay">
+      <div class="relative w-24 h-24 mb-6">
+        <div
+          class="absolute inset-0 border-4 border-blue-500/20 rounded-full"
+        ></div>
+        <div
+          class="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin"
+        ></div>
+      </div>
+      <h2 class="text-2xl font-bold mb-2">ARCADE AI</h2>
+      <p class="text-slate-400 animate-pulse">
+        Menghubungkan ke Kamera & Inisialisasi AI...
+      </p>
+    </div>
+
+    <div id="video-container">
+      <video id="input-video" style="display: none" playsinline></video>
+      <canvas id="hand-canvas"></canvas>
+    </div>
+
+    <div id="cursor" class="cursor"></div>
+
+    <div id="ui-layer">
+      <!-- Menu Utama -->
+      <div id="menu-screen" class="text-center">
+        <h1
+          class="text-7xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500"
+        >
+          UMAM<br />
+          GESTURE PLAY
+        </h1>
+        <p class="mb-12 text-slate-400 text-lg">
+          Gunakan <span class="text-blue-400 font-bold">Telunjuk</span> untuk
+          navigasi.<br />
+          <span class="text-pink-500 font-bold">Pinch</span> (Jempol + Telunjuk)
+          untuk Memilih.
+        </p>
+
+        <div class="flex gap-8">
+          <div
+            onclick="startGame('fruit')"
+            class="game-card p-8 rounded-3xl border-2 border-slate-700 hover:border-pink-500 cursor-pointer w-56 group"
+          >
+            <div
+              class="text-6xl mb-4 group-hover:scale-110 transition-transform"
+            >
+              🍉
+            </div>
+            <h2 class="text-xl font-bold">Fruit Slash</h2>
+            <p class="text-xs text-slate-500 mt-2">
+              Tebas buah dengan gerakan cepat!
+            </p>
+          </div>
+          <div
+            onclick="startGame('eggs')"
+            class="game-card p-8 rounded-3xl border-2 border-slate-700 hover:border-yellow-500 cursor-pointer w-56 group"
+          >
+            <div
+              class="text-6xl mb-4 group-hover:scale-110 transition-transform"
+            >
+              <img
+                src="icon.png"
+                width="80px"
+                style="position: relative; margin: 0px auto"
+              />
+            </div>
+            <h2 class="text-xl font-bold">Tangkap UMAM</h2>
+            <p class="text-xs text-slate-500 mt-2">
+              Gunakan keranjang untuk menangkap.
+            </p>
+          </div>
+          <div
+            onclick="startGame('rocket')"
+            class="game-card p-8 rounded-3xl border-2 border-slate-700 hover:border-blue-500 cursor-pointer w-56 group"
+          >
+            <div
+              class="text-6xl mb-4 group-hover:scale-110 transition-transform"
+            >
+              🚀
+            </div>
+            <h2 class="text-xl font-bold">Hujan Meteor</h2>
+            <p class="text-xs text-slate-500 mt-2">
+              Hindari meteor dengan roketmu!
+            </p>
+          </div>
+        </div>
+        <div id="footer" style="margin-top: 50px">
+          Universiti Muhammadiyah Malaysia
+        </div>
+      </div>
+
+      <!-- HUD Game -->
+      <div
+        id="game-hud"
+        class="hidden absolute top-0 left-0 w-full p-8 flex justify-between items-start pointer-events-none"
+      >
+        <div class="flex gap-12">
+          <div class="flex flex-col gap-2">
+            <div
+              class="text-sm uppercase tracking-widest text-slate-400 font-bold"
+            >
+              Score
+            </div>
+            <div
+              id="score-val"
+              class="text-5xl font-black bg-black/40 backdrop-blur-md px-6 py-2 rounded-2xl border border-white/10"
+            >
+              0
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <div
+              class="text-sm uppercase tracking-widest text-slate-400 font-bold"
+            >
+              Time
+            </div>
+            <div
+              id="timer-val"
+              class="text-5xl font-black bg-black/40 backdrop-blur-md px-6 py-2 rounded-2xl border border-white/10 text-yellow-500"
+            >
+              30
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <div
+              class="text-sm uppercase tracking-widest text-slate-400 font-bold"
+            >
+              Lives
+            </div>
+            <div
+              id="lives-container"
+              class="flex gap-2 text-4xl py-2 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)]"
+            >
+              ❤️❤️❤️
+            </div>
+          </div>
+        </div>
+        <button
+          id="exit-btn"
+          onclick="backToMenu()"
+          class="btn bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/50 backdrop-blur-md pointer-events-auto"
+        >
+          EXIT
+        </button>
+      </div>
+
+      <!-- Modal Game Over -->
+      <div id="game-over-modal" class="hidden modal">
+        <h2 id="game-over-title" class="text-4xl font-black mb-2 text-red-500">
+          GAME OVER!
+        </h2>
+        <p
+          id="congrats-msg"
+          class="hidden text-2xl font-bold text-yellow-400 mb-4 animate-bounce"
+        >
+          Selamat! Kamu Menang! 🎉
+        </p>
+        <img
+          src="icon.png"
+          alt="Game Over"
+          style="width: 200px; position: relative; margin: 0px auto"
+        />
+        <p class="text-xl text-slate-400 mb-8">
+          Skor Akhir Anda:
+          <span id="final-score" class="text-white font-bold text-3xl">0</span>
+        </p>
+        <div class="flex gap-4 justify-center">
+          <button
+            onclick="retryGame()"
+            class="btn bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20"
+          >
+            RETRY
+          </button>
+          <button
+            onclick="backToMenu()"
+            class="btn bg-slate-700 hover:bg-slate-600 text-white"
+          >
+            MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="confetti-wrapper"
+      class="fixed inset-0 pointer-events-none overflow-hidden z-[3000]"
+    ></div>
+
+    <script>
+      const videoElement = document.getElementById("input-video");
+      const canvasElement = document.getElementById("hand-canvas");
+      const canvasCtx = canvasElement.getContext("2d");
+      const gameCanvas = document.getElementById("game-canvas");
+      const gctx = gameCanvas.getContext("2d");
+      const cursor = document.getElementById("cursor");
+
+      // Config & Smoothing
+      const LERP_FACTOR = 0.35; // Untuk kehalusan gerakan (0-1)
+      const PINCH_THRESHOLD = 0.04;
+
+      // Load Custom Icon
+      const iconImg = new Image();
+      iconImg.src = "icon.png";
+
+      // State Game
+      let currentScreen = "menu";
+      let currentGame = null;
+      let score = 0;
+      let lives = 3;
+      let timer = 30;
+      let gameActive = false;
+      let entities = [];
+      let particles = [];
+      let lastSpawn = 0;
+      let lastTimeUpdate = 0;
+      
+      // Partikel Background Menu
+      let menuParticles = [];
+      for(let i=0; i<40; i++) {
+          menuParticles.push({
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: (Math.random() - 0.5) * 0.5,
+              size: Math.random() * 3 + 1
+          });
+      }
+
+      // State Tangan
+      let handPos = { x: 0, y: 0, rawX: 0, rawY: 0, isPinching: false };
+      let lastHandPos = { x: 0, y: 0 };
+      let clickCooldown = false;
+      let handDetected = false;
+
+      // Helper untuk mapping koordinat dengan sensitivitas
+      function mapRange(val, inMin, inMax, outMin, outMax) {
+        return ((val - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+      }
+
+      // Inisialisasi Ukuran Canvas
+      function resize() {
+        gameCanvas.width = Math.floor(window.innerWidth);
+        gameCanvas.height = Math.floor(window.innerHeight);
+        // Match hand canvas resolution to display size
+        canvasElement.width = Math.floor(canvasElement.clientWidth);
+        canvasElement.height = Math.floor(canvasElement.clientHeight);
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // Deteksi Tangan MediaPipe
+      const hands = new Hands({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6,
+      });
+
+      hands.onResults(onResults);
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          try {
+            await hands.send({ image: videoElement });
+          } catch (e) {
+            console.error("Hands send error:", e);
+          }
+        },
+        width: 640,
+        height: 480,
+      });
+
+      camera
+        .start()
+        .then(() => {
+          document.getElementById("loading").style.opacity = "0";
+          setTimeout(
+            () => (document.getElementById("loading").style.display = "none"),
+            500,
+          );
+        })
+        .catch((err) => {
+          console.error("Camera error:", err);
+          document.querySelector("#loading p").innerText =
+            "Gagal memuat kamera. Pastikan izin diberikan!";
+        });
+
+      function onResults(results) {
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        if (
+          results.multiHandLandmarks &&
+          results.multiHandLandmarks.length > 0
+        ) {
+          handDetected = true;
+          const landmarks = results.multiHandLandmarks[0];
+
+          // Indeks telunjuk (8) dan Jempol (4)
+          const indexFinger = landmarks[8];
+          const thumb = landmarks[4];
+
+          // Target posisi dengan margin sensitivitas (agar mudah menjangkau pinggir layar)
+          const margin = 0.15; // 15% margin di setiap sisi
+          const mappedX = mapRange(
+            1 - indexFinger.x,
+            margin,
+            1 - margin,
+            0,
+            window.innerWidth,
+          );
+          const mappedY = mapRange(
+            indexFinger.y,
+            margin,
+            1 - margin,
+            0,
+            window.innerHeight,
+          );
+
+          // Clamp agar tidak keluar layar berlebihan
+          const targetX = Math.max(0, Math.min(window.innerWidth, mappedX));
+          const targetY = Math.max(0, Math.min(window.innerHeight, mappedY));
+
+          // Lerp untuk smoothing
+          handPos.x += (targetX - handPos.x) * LERP_FACTOR;
+          handPos.y += (targetY - handPos.y) * LERP_FACTOR;
+
+          // Simpan posisi mentah untuk preview
+          handPos.rawX = indexFinger.x;
+          handPos.rawY = indexFinger.y;
+
+          // Deteksi Pinch
+          const dist = Math.hypot(
+            indexFinger.x - thumb.x,
+            indexFinger.y - thumb.y,
+          );
+          const wasPinching = handPos.isPinching;
+          handPos.isPinching = dist < PINCH_THRESHOLD;
+
+          // Update Kursor UI
+          cursor.style.left = handPos.x + "px";
+          cursor.style.top = handPos.y + "px";
+          cursor.style.opacity = "1";
+
+          if (handPos.isPinching) {
+            cursor.style.transform = "translate(-50%, -50%) scale(0.7)";
+            cursor.style.borderColor = "#ec4899";
+            cursor.style.borderWidth = "4px";
+
+            // Logika Klik (Trigger hanya sekali saat mulai pinch)
+            if (!wasPinching && !clickCooldown) {
+              handleGameClick();
+              clickCooldown = true;
+              setTimeout(() => (clickCooldown = false), 300);
+            }
+          } else {
+            cursor.style.transform = "translate(-50%, -50%) scale(1)";
+            cursor.style.borderColor = "white";
+            cursor.style.borderWidth = "2px";
+          }
+
+          // Gambar visualisasi di preview (mirrored)
+          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+            color: "#3b82f6",
+            lineWidth: 3,
+          });
+          drawLandmarks(canvasCtx, landmarks, {
+            color: "#ffffff",
+            lineWidth: 1,
+            radius: 3,
+          });
+        } else {
+          handDetected = false;
+          cursor.style.opacity = "0";
+        }
+        canvasCtx.restore();
+      }
+
+      function handleGameClick() {
+        const elements = document.elementsFromPoint(handPos.x, handPos.y);
+        elements.forEach((el) => {
+          if (currentScreen === "menu") {
+            if (el.closest(".game-card")) el.closest(".game-card").click();
+          } else if (currentScreen === "game") {
+            if (el.id === "exit-btn" || el.closest("#exit-btn")) el.click();
+            if (el.closest(".btn")) el.closest(".btn").click(); // Untuk tombol retry di modal
+          }
+        });
+      }
+
+      // --- LOGIKA GAME ---
+
+      function updateLivesUI() {
+        const container = document.getElementById("lives-container");
+        if (!container) return;
+        container.innerHTML = "❤️".repeat(lives) + "🖤".repeat(3 - lives);
+      }
+
+      function createParticles(x, y, count, color = "#ffffff") {
+        const simplifiedCount = Math.min(count, 10); // Batasi max 10 partikel
+        for (let i = 0; i < simplifiedCount; i++) {
+          particles.push({
+            x,
+            y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 1.0,
+            color,
+            size: Math.random() * 6 + 2,
+          });
+        }
+      }
+
+      function startGame(type) {
+        currentScreen = "game";
+        currentGame = type;
+        score = 0;
+        lives = 3;
+        timer = 30;
+        entities = [];
+        particles = [];
+        gameActive = true;
+        document.getElementById("menu-screen").style.display = "none";
+        document.getElementById("game-hud").classList.remove("hidden");
+        document.getElementById("game-over-modal").classList.add("hidden");
+        document.getElementById("score-val").innerText = score;
+        document.getElementById("timer-val").innerText = timer;
+
+        lastHandPos = { x: handPos.x, y: handPos.y };
+        lastTimeUpdate = Date.now();
+        updateLivesUI();
+
+        createParticles(0, 0, 1, "#ff4444");
+      }
+
+      function retryGame() {
+        startGame(currentGame);
+      }
+
+      function backToMenu() {
+        currentScreen = "menu";
+        gameActive = false;
+        document.getElementById("menu-screen").style.display = "block";
+        document.getElementById("game-hud").classList.add("hidden");
+        document.getElementById("game-over-modal").classList.add("hidden");
+      }
+
+      function gameOver() {
+        gameActive = false;
+        document.getElementById("game-over-modal").classList.remove("hidden");
+        document.getElementById("final-score").innerText = score;
+
+        // Cek Threshold Skor
+        let threshold = 0;
+        if (currentGame === "fruit") threshold = 250;
+        else if (currentGame === "eggs") threshold = 150;
+        else if (currentGame === "rocket") threshold = 50;
+
+        const congratsMsg = document.getElementById("congrats-msg");
+        const title = document.getElementById("game-over-title");
+
+        if (score >= threshold) {
+          congratsMsg.classList.remove("hidden");
+          title.innerText = "YOU WIN!";
+          title.className = "text-4xl font-black mb-2 text-green-500";
+          createConfetti();
+        } else {
+          congratsMsg.classList.add("hidden");
+          title.innerText = "GAME OVER!";
+          title.className = "text-4xl font-black mb-2 text-red-500";
+        }
+      }
+
+      function createConfetti() {
+        const wrapper = document.getElementById("confetti-wrapper");
+        wrapper.innerHTML = "";
+        const colors = ["#f43f5e", "#3b82f6", "#fbbf24", "#10b981", "#8b5cf6"];
+
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement("div");
+          confetti.className = "confetti";
+          confetti.style.left = Math.random() * 100 + "vw";
+          confetti.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 2 + "s";
+          confetti.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+          wrapper.appendChild(confetti);
+        }
+      }
+
+      function loseLife() {
+        lives--;
+        updateLivesUI();
+        if (lives <= 0) {
+          gameOver();
+        }
+      }
+
+      function spawnEntity() {
+        const now = Date.now();
+        if (currentGame === "fruit" && now - lastSpawn > 800) {
+          // Kalkulasi kecepatan vertikal agar tinggi loncatan tidak melebihi layar
+          // v = sqrt(2 * g * h), h max = gameCanvas.height * 0.8
+          const maxH = gameCanvas.height * 0.8;
+          const targetVY = -Math.sqrt(
+            2 * 0.3 * (maxH * (0.7 + Math.random() * 0.3)),
+          );
+
+          entities.push({
+            x: Math.random() * (gameCanvas.width - 200) + 100,
+            y: gameCanvas.height + 50,
+            vx: (Math.random() - 0.5) * 6,
+            vy: targetVY,
+            type: ["🍉", "🍎", "🍊", "🍍", "🥝", "🥭"][
+              Math.floor(Math.random() * 6)
+            ],
+            cut: false,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 0.1,
+          });
+          lastSpawn = now;
+        } else if (currentGame === "eggs" && now - lastSpawn > 700) {
+          entities.push({
+            x: Math.random() * (gameCanvas.width - 100) + 50,
+            y: -50,
+            vy: Math.random() * 4 + 4,
+            type: "🥚",
+            size: 40,
+          });
+          lastSpawn = now;
+        } else if (currentGame === "rocket" && now - lastSpawn > 500) {
+          entities.push({
+            x: Math.random() * gameCanvas.width,
+            y: -50,
+            vy: Math.random() * 6 + 6,
+            type: "☄️",
+            size: Math.random() * 40 + 40,
+          });
+          lastSpawn = now;
+        }
+      }
+
+      function update() {
+        if (!gameActive) return;
+
+        const now = Date.now();
+
+        // Update Timer
+        if (now - lastTimeUpdate >= 1000) {
+          timer--;
+          document.getElementById("timer-val").innerText = Math.max(0, timer);
+          lastTimeUpdate = now;
+          if (timer <= 0) {
+            gameOver();
+            return;
+          }
+        }
+
+        spawnEntity();
+
+        // Update Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.02;
+          if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        if (currentGame === "fruit") {
+          for (let i = entities.length - 1; i >= 0; i--) {
+            const e = entities[i];
+            e.x += e.vx;
+            e.y += e.vy;
+            e.vy += 0.3;
+            e.rot += e.vrot;
+
+            if (!e.cut && handDetected) {
+              const d = Math.hypot(handPos.x - e.x, handPos.y - e.y);
+              const speed = Math.hypot(
+                handPos.x - lastHandPos.x,
+                handPos.y - lastHandPos.y,
+              );
+              if (d < 80 && speed > 10) {
+                e.cut = true;
+                score += 10;
+                document.getElementById("score-val").innerText = score;
+                createParticles(e.x, e.y, 8, "#ff4444");
+                entities.splice(i, 1);
+                continue;
+              }
+            }
+            if (e.y > gameCanvas.height + 100) {
+              if (!e.cut) loseLife();
+              entities.splice(i, 1);
+            }
+          }
+        } else if (currentGame === "eggs") {
+          for (let i = entities.length - 1; i >= 0; i--) {
+            const e = entities[i];
+            e.y += e.vy;
+            const basketX = handPos.x;
+            const basketY = gameCanvas.height - 100;
+            const d = Math.hypot(e.x - basketX, e.y - basketY);
+
+            if (d < 80) {
+              score += 5;
+              document.getElementById("score-val").innerText = score;
+              createParticles(e.x, e.y, 8, "#ffffff");
+              entities.splice(i, 1);
+            } else if (e.y > gameCanvas.height) {
+              loseLife();
+              entities.splice(i, 1);
+            }
+          }
+        } else if (currentGame === "rocket") {
+          for (let i = entities.length - 1; i >= 0; i--) {
+            const e = entities[i];
+            e.y += e.vy;
+            const d = Math.hypot(e.x - handPos.x, e.y - handPos.y);
+            if (d < 60) {
+              createParticles(handPos.x, handPos.y, 10, "#ffaa00");
+              loseLife();
+              entities.splice(i, 1);
+            } else if (e.y > gameCanvas.height + 100) {
+              score += 1;
+              document.getElementById("score-val").innerText = score;
+              entities.splice(i, 1);
+            }
+          }
+        }
+
+        lastHandPos = { x: handPos.x, y: handPos.y };
+      }
+
+      function draw() {
+        // Reset state untuk menghindari gambar buram/transparan sisa frame sebelumnya
+        gctx.globalAlpha = 1.0;
+        gctx.shadowBlur = 0;
+        gctx.shadowOffsetX = 0;
+        gctx.shadowOffsetY = 0;
+        gctx.shadowColor = "transparent";
+
+        gctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+        if (!gameActive) {
+          const time = Date.now() * 0.001;
+          
+          // Background Gradient Subtle
+          const grad = gctx.createRadialGradient(
+            gameCanvas.width/2, gameCanvas.height/2, 0,
+            gameCanvas.width/2, gameCanvas.height/2, gameCanvas.width
+          );
+          grad.addColorStop(0, '#1e293b');
+          grad.addColorStop(1, '#0f172a');
+          gctx.fillStyle = grad;
+          gctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+          // Update & Draw Menu Particles
+          menuParticles.forEach((p, i) => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Bounce edges
+            if (p.x < 0 || p.x > gameCanvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > gameCanvas.height) p.vy *= -1;
+
+            // Draw Particle
+            gctx.beginPath();
+            gctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            gctx.fillStyle = 'rgba(59, 130, 246, 0.5)';
+            gctx.fill();
+
+            // Connect to nearby particles
+            for (let j = i + 1; j < menuParticles.length; j++) {
+              const p2 = menuParticles[j];
+              const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+              if (dist < 200) {
+                gctx.beginPath();
+                gctx.moveTo(p.x, p.y);
+                gctx.lineTo(p2.x, p2.y);
+                gctx.strokeStyle = `rgba(59, 130, 246, ${0.2 * (1 - dist/200)})`;
+                gctx.lineWidth = 1;
+                gctx.stroke();
+              }
+            }
+          });
+
+          // Add some floating glow blobs
+          for(let i=0; i<3; i++) {
+            const gx = (Math.sin(time * 0.2 + i) * 0.3 + 0.5) * gameCanvas.width;
+            const gy = (Math.cos(time * 0.3 + i) * 0.3 + 0.5) * gameCanvas.height;
+            const gSize = 300 + Math.sin(time * 0.5) * 50;
+            const glow = gctx.createRadialGradient(gx, gy, 0, gx, gy, gSize);
+            glow.addColorStop(0, 'rgba(59, 130, 246, 0.15)');
+            glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+            gctx.fillStyle = glow;
+            gctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+          }
+
+          requestAnimationFrame(draw);
+          return;
+        }
+
+        // Draw Particles (Simplified Squares)
+        particles.forEach((p) => {
+          gctx.globalAlpha = p.life;
+          gctx.fillStyle = p.color;
+          gctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+        });
+        gctx.globalAlpha = 1.0;
+
+        gctx.textAlign = "center";
+        gctx.textBaseline = "middle";
+
+        if (currentGame === "fruit") {
+          entities.forEach((e) => {
+            gctx.save();
+            gctx.translate(e.x, e.y);
+            gctx.rotate(e.rot);
+            gctx.font = "100px Arial"; // Ukuran besar sesuai permintaan sebelumnya
+            gctx.fillText(e.type, 0, 0);
+            gctx.restore();
+          });
+
+          if (handDetected) {
+            gctx.beginPath();
+            const gradient = gctx.createLinearGradient(
+              lastHandPos.x,
+              lastHandPos.y,
+              handPos.x,
+              handPos.y,
+            );
+            gradient.addColorStop(0, "rgba(255,255,255,0)");
+            gradient.addColorStop(1, "rgba(255,255,255,0.8)");
+            gctx.strokeStyle = gradient;
+            gctx.lineWidth = 8;
+            gctx.lineCap = "round";
+            gctx.moveTo(lastHandPos.x, lastHandPos.y);
+            gctx.lineTo(handPos.x, handPos.y);
+            gctx.stroke();
+          }
+        } else if (currentGame === "eggs") {
+          // Keranjang dengan Logo
+          gctx.font = "120px Arial";
+          gctx.fillText("🧺", handPos.x, gameCanvas.height - 100);
+          gctx.drawImage(
+            iconImg,
+            handPos.x - 30,
+            gameCanvas.height - 110,
+            60,
+            60,
+          );
+
+          entities.forEach((e) => {
+            gctx.drawImage(iconImg, e.x - 50, e.y - 50, 100, 100); // Lebih besar (100px)
+          });
+        } else if (currentGame === "rocket") {
+          gctx.save();
+          gctx.translate(handPos.x, handPos.y);
+          gctx.shadowBlur = 30;
+          gctx.shadowColor = "#3b82f6";
+          gctx.drawImage(iconImg, -50, -50, 100, 100);
+
+          if (Math.random() > 0.5) {
+            gctx.save();
+            gctx.translate(0, 60);
+            gctx.rotate(Math.PI); // Putar 180 derajat
+            gctx.font = "30px Arial";
+            gctx.fillText("🔥", 0, 0);
+            gctx.restore();
+          }
+          gctx.restore();
+
+          entities.forEach((e) => {
+            gctx.save();
+            gctx.translate(e.x, e.y);
+            gctx.font = e.size + "px Arial";
+            gctx.shadowBlur = 10;
+            gctx.shadowColor = "orange";
+            gctx.fillText(e.type, 0, 0); // Kembali ke emoji meteor
+            gctx.restore();
+          });
+        }
+
+        update();
+        requestAnimationFrame(draw);
+      }
+
+      // Helper draw MediaPipe
+      function drawConnectors(ctx, landmarks, connections, style) {
+        for (const connection of connections) {
+          const start = landmarks[connection[0]];
+          const end = landmarks[connection[1]];
+          ctx.beginPath();
+          ctx.moveTo(
+            (1 - start.x) * canvasElement.width,
+            start.y * canvasElement.height,
+          );
+          ctx.lineTo(
+            (1 - end.x) * canvasElement.width,
+            end.y * canvasElement.height,
+          );
+          ctx.strokeStyle = style.color;
+          ctx.lineWidth = style.lineWidth;
+          ctx.lineCap = "round";
+          ctx.stroke();
+        }
+      }
+
+      function drawLandmarks(ctx, landmarks, style) {
+        for (const landmark of landmarks) {
+          ctx.beginPath();
+          ctx.arc(
+            (1 - landmark.x) * canvasElement.width,
+            landmark.y * canvasElement.height,
+            style.radius,
+            0,
+            2 * Math.PI,
+          );
+          ctx.fillStyle = style.color;
+          ctx.fill();
+        }
+      }
+
+      const HAND_CONNECTIONS = [
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [0, 5],
+        [5, 6],
+        [6, 7],
+        [7, 8],
+        [5, 9],
+        [9, 10],
+        [10, 11],
+        [11, 12],
+        [9, 13],
+        [13, 14],
+        [14, 15],
+        [15, 16],
+        [13, 17],
+        [17, 18],
+        [18, 19],
+        [19, 20],
+        [0, 17],
+      ];
+
+      window.onload = () => {
+        draw();
+      };
+    </script>
+  </body>
+</html>
