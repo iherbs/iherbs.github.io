@@ -7,7 +7,7 @@
     dayDuration: 60, // seconds per in-game day
     realTimeScale: 60, // 1 real second = 60 game seconds (1:60 ratio)
     lastPlayed: null,
-    emoji: "notoemoji",
+    emoji: "defemoji",
     level: 1,
     points: 0,
     quests: [],
@@ -1756,7 +1756,7 @@
           parsed.level = 1;
         }
         if (!parsed.emoji) {
-          parsed.emoji = "notoemoji";
+          parsed.emoji = "defemoji";
         }
         if (!parsed.points) {
           parsed.points = 0;
