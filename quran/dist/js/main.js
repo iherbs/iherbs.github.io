@@ -326,7 +326,7 @@ function makeqlist(key = "") {
                 <small class="arti">(${re[i]["text_id"]})</small>
                 <span class="type">${re[i]["type_id"] + ", " + re[i]["count"] + " Ayat"}</span>
             </div>
-            <div class="col" style="text-align:right;float:right;margin-top:8px;font-size:35px;white-space:nowrap;font-family:surahnames;">
+            <div class="col arid" style="text-align:right;float:right;margin-top:8px;font-size:35px;white-space:nowrap;font-family:surahnames;">
               ${("000" + i).slice(-3)}
             </div>
         </div>`;
