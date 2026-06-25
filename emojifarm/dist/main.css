@@ -2048,3 +2048,8 @@ input:checked + .slider:before {
   filter: sepia(1) hue-rotate(5deg) saturate(3) brightness(1.1) contrast(1.1)
     drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
 }
+
+.diamond-filter {
+  filter: hue-rotate(180deg) saturate(2.5) brightness(1.1) contrast(1.1)
+    drop-shadow(0 2px 4px rgba(0, 191, 255, 0.6));
+}

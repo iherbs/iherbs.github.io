@@ -461,9 +461,10 @@
   const initAchievements = () => {
     achievementsList = [];
     const tiers = [
-      { required: 25, name: "Bronze", emoji: "🥉" },
-      { required: 50, name: "Silver", emoji: "🥈" },
-      { required: 100, name: "Gold", emoji: "🥇" },
+      { required: 25, name: "Bronze", emoji: "🥉", reward: 100 },
+      { required: 50, name: "Silver", emoji: "🥈", reward: 150 },
+      { required: 100, name: "Gold", emoji: "🥇", reward: 250 },
+      { required: 200, name: "Diamond", emoji: "💎", reward: 500 },
     ];
 
     // Harvest achievements
@@ -480,7 +481,7 @@
           type: "harvest",
           targetId: p.emoji,
           targetCount: t.required,
-          reward: 100,
+          reward: t.reward,
         });
       });
     });
@@ -499,7 +500,7 @@
           type: "livestock",
           targetId: l.yield,
           targetCount: t.required,
-          reward: 100,
+          reward: t.reward,
         });
       });
       // Achievement for meat (Chicken/Beef)
@@ -514,7 +515,7 @@
           type: "livestock",
           targetId: l.meat,
           targetCount: t.required,
-          reward: 100,
+          reward: t.reward,
         });
       });
     });
@@ -532,7 +533,7 @@
           type: "fish",
           targetId: f.emoji,
           targetCount: t.required,
-          reward: 100,
+          reward: t.reward,
         });
       });
     });
@@ -551,7 +552,7 @@
           type: "cook",
           targetId: r.emoji,
           targetCount: t.required,
-          reward: 100,
+          reward: t.reward,
         });
       });
     });
