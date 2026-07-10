@@ -375,6 +375,33 @@
         </div>
     </div>
 
+    <div id="fullscreenayah" class="fullscreen-ayah">
+        <div id="fsinfo" class="fs-info"></div>
+        <div id="fscontent" class="fs-content"></div>
+        <div class="fs-nav">
+            <div class="fs-zoom">
+                <button type="button" class="fs-zoom-btn" onclick="fsZoomFont(-10)"
+                    aria-label="Perkecil font">−</button>
+                <button type="button" class="fs-zoom-btn" onclick="fsZoomFont(10)" aria-label="Perbesar font">+</button>
+            </div>
+            <button type="button" class="fs-nav-btn" id="fsnext" onclick="fullscreenNext()"
+                aria-label="Ayat sebelumnya">
+                <span class="arrow arrow-left"></span>
+            </button>
+            <span id="fsnum" class="fs-num"></span>
+            <button type="button" class="fs-nav-btn" id="fsprev" onclick="fullscreenPrev()"
+                aria-label="Ayat berikutnya">
+                <span class="arrow arrow-right"></span>
+            </button>
+
+            <div class="fs-nav-actions">
+                <label class="fs-play-btn play-button" id="btnplayfullscreen" onclick="fsPlayAudio()"
+                    aria-label="Putar audio"></label>
+                <div id="closefullscreen" onclick="closeFullscreenAyah()">&times;</div>
+            </div>
+        </div>
+    </div>
+
     <div id="options" class="poupmore">
         <div id="closeopt" onclick="closeOptions()">&times;</div>
         <div id="state" style="display:none;"></div>
@@ -389,6 +416,9 @@
                 </tr>
                 <tr id="btncreateimage">
                     <td><button type="button" class="btnop" onclick="imagemaker_show()">Create Image</button></td>
+                </tr>
+                <tr id="btnfullscreen">
+                    <td><button type="button" class="btnop" onclick="openFullscreenAyah()">Fullscreen</button></td>
                 </tr>
                 <tr id="btnmore"></tr>
             </tbody>

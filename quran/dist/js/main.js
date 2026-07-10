@@ -1187,6 +1187,8 @@ async function getjuz() {
 
 function gotoayah(i = 1, smoth = false) {
   _("#modalgotoayah").modal("hide");
+  fullscreenAyah = i;
+  renderFullscreenAyah();
   if (smoth) {
     if (_("#rawsurah").style.display == "none") {
       _("#n" + i).scrollIntoView({ behavior: "smooth" });
@@ -1228,6 +1230,7 @@ async function showtafsir(id = 0) {
 
 function goback() {
   _("#surah").innerHTML = ``;
+  closeFullscreenAyah();
   window.history.back();
 }
 
@@ -1236,6 +1239,7 @@ function nextsurah() {
   closeTrack();
   closeOptions();
   closeRecog();
+  closeFullscreenAyah();
   surah = parseInt(surah) + parseInt(1);
   if (surah > 114) {
     surah = 1;
@@ -1248,6 +1252,7 @@ function prevsurah() {
   closeTrack();
   closeOptions();
   closeRecog();
+  closeFullscreenAyah();
   surah = parseInt(surah) - parseInt(1);
   if (surah < 1) {
     surah = 114;
@@ -1506,17 +1511,20 @@ function moreOption(surat = 1, ayat = 1) {
 
         if (ayat == "doa") {
           _("#btncopylink").style.display = "none";
+          _("#btnfullscreen").style.display = "none";
           sayah = doa_data[surat]["text_ayah"];
           surah_text = doa_data[surat]["text_id"];
           sname = doa_data[surat]["name"];
         } else if (ayat == "asma") {
           _("#btncopylink").style.display = "none";
+          _("#btnfullscreen").style.display = "none";
           sayah = asma[surat]["text_ayah"];
           surah_text = asma[surat]["text_id"];
         } else {
           if (vwmd == "book") {
             _("#btnmore").innerHTML = _("#actmore" + ayat).innerHTML;
           }
+          _("#btnfullscreen").style.display = "table-row";
           _("#btncopylink").style.display = "table-row";
           sayah = surah_data[ayat - 1]["text_ayah"];
           surah_text = surah_data[ayat - 1]["text_id"].replace(
@@ -1554,6 +1562,149 @@ function closeOptions() {
   _("#btnmore").innerHTML = "";
   _("#options").style.display = "none";
 }
+
+let fullscreenAyah = 0;
+let fsFontScale = 100;
+
+function applyFsFontScale() {
+  _("#fscontent").style.setProperty("--fs-scale", fsFontScale / 100);
+}
+
+function fsZoomFont(delta = 0) {
+  fsFontScale = Math.min(200, Math.max(70, fsFontScale + delta));
+  localStorage.setItem("fsfontsize", fsFontScale);
+  applyFsFontScale();
+}
+
+function openFullscreenAyah() {
+  let state = _("#state").innerHTML;
+  if (!state) return;
+  let qs = JSON.parse(state);
+  if (qs["ayah"] == "doa" || qs["ayah"] == "asma") return;
+  if (!surah_data || !surah_data.length) return;
+
+  fsFontScale = parseInt(localStorage.getItem("fsfontsize")) || 100;
+  fullscreenAyah = parseInt(qs["ayah"]);
+  renderFullscreenAyah();
+  _("#fullscreenayah").style.display = "flex";
+  document.getElementsByTagName("body")[0].style.overflow = "hidden"
+  closeOptions();
+  // Tambahkan fitur fullscreen browser ketika membuka fullscreen ayah
+  if (document.fullscreenEnabled) {
+    let el = document.getElementById("fullscreenayah");
+    if (el && !document.fullscreenElement) {
+      el.requestFullscreen().catch((err) => {
+        // Handle any errors if needed
+        // console.warn('Fullscreen failed:', err);
+      });
+    }
+  }
+}
+
+function closeFullscreenAyah() {
+  _("#fullscreenayah").style.display = "none";
+  document.getElementsByTagName("body")[0].style.overflow = "";
+  // Tambahkan fitur keluar fullscreen browser ketika menutup fullscreen ayah
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch((err) => {
+      // Handle any errors if needed
+      // console.warn('Exit fullscreen failed:', err);
+    });
+  }
+}
+
+function renderFullscreenAyah() {
+  let idx = fullscreenAyah - 1;
+  let data = surah_data[idx];
+  if (!data) return;
+
+  let transliteration = localStorage.getItem("transliteration");
+  let translate = localStorage.getItem("translate");
+  let tajweed = localStorage.getItem("tajweed");
+  let srh = surah_list[surah];
+
+  _("#fsinfo").innerHTML =
+    surah + ") QS. " + srh["name"];
+  _("#fsnum").innerHTML = fullscreenAyah;
+
+  let html =
+    '<div class="fs-arabic arabic">' +
+    parseArabic(data["text_ayah"], tajweed) +
+    "</div>";
+  if (transliteration == "true") {
+    html +=
+      '<div class="fs-translit artr"><i>' + data["transliteration"] + "</i></div>";
+  }
+  if (translate == "true") {
+    html +=
+      '<div class="fs-translate arid">' +
+      data["text_id"].replace(
+        /<(.|\n)*?>*<(.|\n)*?>/g,
+        "",
+      ) +
+      "</div>";
+  }
+  _("#fscontent").innerHTML = html;
+  applyFsFontScale();
+
+  _("#fsprev").disabled = fullscreenAyah <= 1;
+  _("#fsnext").disabled = fullscreenAyah >= surah_data.length;
+  syncFsPlayBtn();
+}
+
+function syncFsPlayBtn() {
+  let btn = _("#btnplayfullscreen");
+  let current = parseInt(_("#notrack").innerHTML) || 0;
+  let soundEl = _("#track" + fullscreenAyah);
+  let sound = soundEl ? soundEl.innerHTML : "";
+  if (!track.paused && track.src == sound) {
+    btn.classList.remove("play-button");
+    btn.classList.add("pause-button");
+  } else {
+    btn.classList.remove("pause-button");
+    btn.classList.add("play-button");
+  }
+}
+
+function fsPlayAudio() {
+  let sound = _("#track" + fullscreenAyah).innerHTML;
+  let current = parseInt(_("#notrack").innerHTML) || 0;
+  if (current == fullscreenAyah && track.src == sound && !track.paused) {
+    track.pause();
+  } else if (current == fullscreenAyah && track.src == sound && track.paused) {
+    track.play();
+  } else {
+    audioPlay(fullscreenAyah);
+  }
+  syncFsPlayBtn();
+}
+
+function fullscreenPrev() {
+  if (fullscreenAyah > 1) {
+    fullscreenAyah--;
+    gotoayah(fullscreenAyah);
+    renderFullscreenAyah();
+  }
+}
+
+function fullscreenNext() {
+  if (fullscreenAyah < surah_data.length) {
+    fullscreenAyah++;
+    gotoayah(fullscreenAyah);
+    renderFullscreenAyah();
+  }
+}
+
+document.addEventListener("keydown", function (e) {
+  if (_("#fullscreenayah").style.display != "flex") return;
+  if (e.key == "Escape") {
+    closeFullscreenAyah();
+  } else if (e.key == "ArrowLeft") {
+    fullscreenNext();
+  } else if (e.key == "ArrowRight") {
+    fullscreenPrev();
+  }
+});
 function closeRecog() {
   _("#voiceresponse").innerHTML = "";
   _("#recognizer").style.display = "none";
@@ -1597,6 +1748,9 @@ function copytext() {
 }
 
 let track = _("#track");
+track.addEventListener("play", syncFsPlayBtn);
+track.addEventListener("pause", syncFsPlayBtn);
+track.addEventListener("ended", syncFsPlayBtn);
 let mouseDownOnSlider = false;
 let seekbar = _("#seekbar");
 seekbar.addEventListener("change", () => {
