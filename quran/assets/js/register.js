@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", init, false);
 function init() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("./service-worker.js")
+      .register("/quran/service-worker.js", { scope: "/quran/" })
       .then((reg) => {
         console.log("Registrasi service worker", reg);
         reg.addEventListener("updatefound", () => {

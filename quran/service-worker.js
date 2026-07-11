@@ -1,25 +1,27 @@
-const CACHE_NAME = "QURANBUKU-v2";
+const CACHE_NAME = "QURANBUKU-v3";
+const BASE = self.location.pathname.replace(/service-worker\.js$/, "");
+const INDEX_URL = BASE + "index.html";
+
 const toCache = [
-  "./",
-  "./index.html",
-  "./book.html",
-  "./privacy-policy.html",
-  "./service-worker.js",
-  "./assets/js/web.webmanifest",
-  "./assets/js/register.js",
-  "./qibla/index.html",
-  "./qibla/compass.png",
-  "./dist/css/imageker.css",
-  "./dist/css/main.css",
-  "./dist/font/Arabic.ttf",
-  "./dist/font/Poppins-Regular.ttf",
-  "./dist/font/sura_names.woff2",
-  "./dist/js/awake.js",
-  "./dist/js/html2canvas.js",
-  "./dist/js/imageker.js",
-  "./dist/js/laconv.js",
-  "./dist/js/main.js",
-  "./dist/js/tajweed.js",
+  BASE,
+  INDEX_URL,
+  BASE + "book.html",
+  BASE + "privacy-policy.html",
+  BASE + "manifest.webmanifest",
+  BASE + "assets/js/register.js",
+  BASE + "qibla/index.html",
+  BASE + "qibla/compass.png",
+  BASE + "dist/css/imageker.css",
+  BASE + "dist/css/main.css",
+  BASE + "dist/font/Arabic.ttf",
+  BASE + "dist/font/Poppins-Regular.ttf",
+  BASE + "dist/font/sura_names.woff2",
+  BASE + "dist/js/awake.js",
+  BASE + "dist/js/html2canvas.js",
+  BASE + "dist/js/imageker.js",
+  BASE + "dist/js/laconv.js",
+  BASE + "dist/js/main.js",
+  BASE + "dist/js/tajweed.js",
 ];
 
 self.addEventListener("install", function (event) {
@@ -38,6 +40,7 @@ self.addEventListener("fetch", function (event) {
 
   const reqUrl = new URL(event.request.url);
   if (reqUrl.origin !== self.location.origin) return;
+  if (!reqUrl.pathname.startsWith(BASE)) return;
 
   event.respondWith(
     caches.match(event.request).then(function (cached) {
@@ -53,7 +56,7 @@ self.addEventListener("fetch", function (event) {
         })
         .catch(function () {
           if (event.request.mode === "navigate") {
-            return caches.match("./index.html");
+            return caches.match(INDEX_URL);
           }
           return caches.match(event.request);
         });
