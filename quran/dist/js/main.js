@@ -25,19 +25,24 @@ let surah_list = {},
   repeatnum = 1,
   tracknow = 0;
 
-// Optimized Search Helpers
+// Optimized Search Helpers + Offline Storage
 const quranDB = {
   dbName: "QuranBukuDB",
-  dbVersion: 1,
-  storeName: "surahs",
+  dbVersion: 2,
 
   async open() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
       request.onupgradeneeded = (e) => {
         const db = e.target.result;
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName, { keyPath: "id" });
+        if (!db.objectStoreNames.contains("surahs")) {
+          db.createObjectStore("surahs", { keyPath: "id" });
+        }
+        if (!db.objectStoreNames.contains("metadata")) {
+          db.createObjectStore("metadata", { keyPath: "id" });
+        }
+        if (!db.objectStoreNames.contains("tafsir")) {
+          db.createObjectStore("tafsir", { keyPath: "id" });
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -45,38 +50,175 @@ const quranDB = {
     });
   },
 
-  async getSurah(id) {
+  async get(store, key) {
     const db = await this.open();
     return new Promise((resolve) => {
-      const transaction = db.transaction(this.storeName, "readonly");
-      const store = transaction.objectStore(this.storeName);
-      const request = store.get(id);
+      const transaction = db.transaction(store, "readonly");
+      const request = transaction.objectStore(store).get(key);
       request.onsuccess = () =>
         resolve(request.result ? request.result.data : null);
       request.onerror = () => resolve(null);
     });
   },
 
-  async saveSurah(id, data) {
+  async save(store, key, data) {
     const db = await this.open();
     return new Promise((resolve) => {
-      const transaction = db.transaction(this.storeName, "readwrite");
-      const store = transaction.objectStore(this.storeName);
-      store.put({ id, data, timestamp: Date.now() });
+      const transaction = db.transaction(store, "readwrite");
+      transaction.objectStore(store).put({
+        id: key,
+        data,
+        timestamp: Date.now(),
+      });
       transaction.oncomplete = () => resolve();
     });
+  },
+
+  async getSurah(id) {
+    return this.get("surahs", id);
+  },
+
+  async saveSurah(id, data) {
+    return this.save("surahs", id, data);
   },
 
   async getAllSurahsCount() {
     const db = await this.open();
     return new Promise((resolve) => {
-      const transaction = db.transaction(this.storeName, "readonly");
-      const store = transaction.objectStore(this.storeName);
-      const request = store.count();
+      const transaction = db.transaction("surahs", "readonly");
+      const request = transaction.objectStore("surahs").count();
       request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(0);
     });
   },
 };
+
+const METADATA_FILES = [
+  { key: "surah_list", url: "surah_list.json" },
+  { key: "doa_harian", url: "doa_harian.json" },
+  { key: "asmaul_husna", url: "asmaul_husna.json" },
+  { key: "zikir", url: "zikir.json" },
+  { key: "juz_list", url: "juz_list.json" },
+  { key: "zikir_pagi", url: "zikirpagi.json" },
+  { key: "zikir_petang", url: "zikirpetang.json" },
+  { key: "zikir_salat", url: "zikirsalat.json" },
+];
+
+let prefetchRunning = false;
+
+async function getJSON(store, key, fetchUrl, options = {}) {
+  const cached = await quranDB.get(store, key);
+  if (cached) return cached;
+
+  if (!navigator.onLine) {
+    if (options.showToast !== false) {
+      toast("Data belum tersimpan. Butuh koneksi internet.");
+    }
+    return null;
+  }
+
+  try {
+    const response = await fetch(fetchUrl);
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    await quranDB.save(store, key, data);
+    return data;
+  } catch (error) {
+    console.error("getJSON error [" + store + "/" + key + "]:", error);
+    if (options.showToast !== false) {
+      toast("Gagal memuat data. Periksa koneksi internet.");
+    }
+    return null;
+  }
+}
+
+async function updateOfflineStatus() {
+  const el = _("#navofflinestatus");
+  if (!el) return;
+
+  const count = await quranDB.getAllSurahsCount();
+  localStorage.setItem("offlineSurahCount", count);
+
+  if (prefetchRunning && navigator.onLine) {
+    el.textContent = "Syncing data... " + count + "/114 surah";
+    el.className = "nav-offline-status syncing";
+  } else if (count >= 114) {
+    el.textContent = navigator.onLine
+      ? "Ready offline (114 surah)"
+      : "Offline mode";
+    el.className = "nav-offline-status ready";
+  } else if (!navigator.onLine) {
+    el.textContent =
+      count > 0
+        ? "Offline (" + count + "/114 surah)"
+        : "Offline — Data not complete";
+    el.className = "nav-offline-status offline";
+  } else {
+    el.textContent =
+      count > 0
+        ? "Data saved: " + count + "/114 surah"
+        : "Preparing offline data...";
+    el.className = "nav-offline-status syncing";
+  }
+}
+
+function schedulePrefetch() {
+  const run = () => prefetchOfflineData();
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(run, { timeout: 5000 });
+  } else {
+    setTimeout(run, 1500);
+  }
+}
+
+async function prefetchOfflineData() {
+  if (prefetchRunning || !navigator.onLine) {
+    updateOfflineStatus();
+    return;
+  }
+  prefetchRunning = true;
+  updateOfflineStatus();
+
+  for (const meta of METADATA_FILES) {
+    if (!navigator.onLine) break;
+    const existing = await quranDB.get("metadata", meta.key);
+    if (!existing) {
+      await getJSON("metadata", meta.key, url + meta.url, { showToast: false });
+    }
+    updateOfflineStatus();
+  }
+
+  const batchSize = 4;
+  for (let i = 1; i <= 114; i += batchSize) {
+    if (!navigator.onLine) break;
+    const batch = [];
+    for (let q = i; q < i + batchSize && q <= 114; q++) {
+      batch.push(q);
+    }
+    await Promise.all(
+      batch.map(async (q) => {
+        const existing = await quranDB.get("surahs", q);
+        if (!existing) {
+          await getJSON("surahs", q, url + "Surah/" + q + ".json", {
+            showToast: false,
+          });
+        }
+      }),
+    );
+    updateOfflineStatus();
+    await new Promise((r) => setTimeout(r, 200));
+  }
+
+  prefetchRunning = false;
+  updateOfflineStatus();
+}
+
+function priorityPrefetchSurah(surahNum) {
+  if (!navigator.onLine) return;
+  getJSON("surahs", surahNum, url + "Surah/" + surahNum + ".json", {
+    showToast: false,
+  }).then(updateOfflineStatus);
+}
 
 function debounce(func, wait) {
   let timeout;
@@ -277,8 +419,13 @@ function setTajweed() {
 async function getqlist() {
   _("#list").innerHTML =
     `<div style="width:100%;height:150px;"><div class="loader"></div></div>`;
-  let re = await get(url + "surah_list.json");
-  re = JSON.parse(re);
+  let re = await getJSON("metadata", "surah_list", url + "surah_list.json");
+  if (!re) {
+    _("#list").innerHTML =
+      `<div style="padding:20px;text-align:center;color:var(--color-title-text);">Tidak dapat memuat daftar surah. Buka aplikasi saat online untuk mengunduh data.</div>`;
+    updateOfflineStatus();
+    return;
+  }
   surah_list = re;
   // console.log(re);
   makeqlist();
@@ -297,6 +444,7 @@ async function getqlist() {
   }
   _("#listsurah").innerHTML = listsurah;
   getlistayah();
+  updateOfflineStatus();
 }
 
 function makeqlist(key = "") {
@@ -426,24 +574,15 @@ async function carikata(qry = "") {
 
   // 2. Jika ada yang belum di-cache, download secara concurrent
   if (surahsToFetch.length > 0) {
-    const totalToFetch = surahsToFetch.length;
-    let fetchedCount = 0;
-
-    // Download dalam batch untuk menghindari rate limit/network congestion
     const batchSize = 10;
     for (let i = 0; i < surahsToFetch.length; i += batchSize) {
       const batch = surahsToFetch.slice(i, i + batchSize);
       await Promise.all(
         batch.map(async (q) => {
-          try {
-            const response = await fetch(url + "Surah/" + q + ".json");
-            const data = await response.json();
-            allSurahs[q] = data;
-            await quranDB.saveSurah(q, data);
-            fetchedCount++;
-          } catch (e) {
-            console.error(`Gagal mengunduh surah ${q}`, e);
-          }
+          const data = await getJSON("surahs", q, url + "Surah/" + q + ".json", {
+            showToast: false,
+          });
+          if (data) allSurahs[q] = data;
         }),
       );
     }
@@ -538,9 +677,14 @@ async function getsurah(surat = 1, nayah = "") {
   _("#wrapmenu").style.display = "block";
   _("#tsurah").innerHTML = surah + ") " + srh["name"];
 
-  let re = await get(url + "Surah/" + surah + ".json");
-  re = JSON.parse(re);
+  let re = await getJSON("surahs", surah, url + "Surah/" + surah + ".json");
+  if (!re) {
+    _("#surah").innerHTML =
+      `<div style="padding:20px;text-align:center;color:var(--color-title-text);">Data surah belum tersedia offline. Buka saat online untuk mengunduh.</div>`;
+    return;
+  }
   surah_data = re;
+  priorityPrefetchSurah(surah);
   // console.log(re);
 
   let ayah = "",
@@ -680,16 +824,25 @@ async function getayah(surat = 1, nayah = 0) {
   _("#lnav").style.display = "none";
   _("#rnav").style.display = "none";
 
-  let resl = await get(url + "surah_list.json");
+  let resl = await getJSON("metadata", "surah_list", url + "surah_list.json");
+  if (!resl) {
+    _("#surah").innerHTML =
+      `<div style="padding:20px;text-align:center;">Data belum tersedia offline.</div>`;
+    return;
+  }
 
-  surah_list = JSON.parse(resl);
+  surah_list = resl;
   let srh = surah_list[surat];
 
   if (nayah == 0) {
     getsurah(surat, "-");
   } else {
-    let re = await get(url + "Surah/" + surat + ".json");
-    re = JSON.parse(re);
+    let re = await getJSON("surahs", surat, url + "Surah/" + surat + ".json");
+    if (!re) {
+      _("#surah").innerHTML =
+        `<div style="padding:20px;text-align:center;">Data surah belum tersedia offline.</div>`;
+      return;
+    }
     surah_data = re;
     // console.log(re);
 
@@ -739,8 +892,16 @@ async function getasmaulhusna() {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
 
-  let reas = await get(url + "asmaul_husna.json");
-  let as = JSON.parse(reas);
+  let as = await getJSON(
+    "metadata",
+    "asmaul_husna",
+    url + "asmaul_husna.json",
+  );
+  if (!as) {
+    _("#surah").innerHTML =
+      `<div style="padding:20px;text-align:center;">Data belum tersedia offline.</div>`;
+    return;
+  }
   asma = as;
   // console.log(as);
 
@@ -774,8 +935,12 @@ async function gettasbih() {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
 
-  let reas = await get(url + "zikir.json");
-  let re = JSON.parse(reas);
+  let re = await getJSON("metadata", "zikir", url + "zikir.json");
+  if (!re) {
+    _("#surah").innerHTML =
+      `<div style="padding:20px;text-align:center;">Data belum tersedia offline.</div>`;
+    return;
+  }
   tasbih["sum"] = 0;
   tasbih["counter"] = 0;
   tasbih["target"] = 0;
@@ -1004,8 +1169,16 @@ async function loadzikir(jns = "") {
   _("#surah").style.display = "block";
   _("#surah").innerHTML = `<div class="loader"></div>`;
 
-  let rezikir = await get(url + "zikir" + jns + ".json");
-  let zikr = JSON.parse(rezikir);
+  let zikr = await getJSON(
+    "metadata",
+    "zikir_" + jns,
+    url + "zikir" + jns + ".json",
+  );
+  if (!zikr) {
+    _("#surah").innerHTML =
+      `<div style="padding:20px;text-align:center;">Data belum tersedia offline.</div>`;
+    return;
+  }
 
   let list = `<div class="titleq">Zikir ${jns.charAt(0).toUpperCase() + jns.slice(1)}</div>
           <table style="padding:20px;">`;
@@ -1061,8 +1234,12 @@ async function doaharian() {
 }
 
 async function listdoa(key = "") {
-  let redoa = await get(url + "doa_harian.json");
-  let doa = JSON.parse(redoa);
+  let doa = await getJSON("metadata", "doa_harian", url + "doa_harian.json");
+  if (!doa) {
+    _("#listdoa").innerHTML =
+      `<div style="padding:20px;text-align:center;">Data doa belum tersedia offline.</div>`;
+    return;
+  }
   doa_data = doa;
   // console.log(doa);
 
@@ -1175,8 +1352,12 @@ async function getjuz() {
   closeNav();
   _("#modalwidget").modal("show");
   _("#widgetcontent").innerHTML = '<div class="loader"></div>';
-  let reas = await get(url + "juz_list.json");
-  let juz = JSON.parse(reas);
+  let juz = await getJSON("metadata", "juz_list", url + "juz_list.json");
+  if (!juz) {
+    _("#widgetcontent").innerHTML =
+      `<span class="widgettittle">JUZ</span><p>Data juz belum tersedia offline.</p>`;
+    return;
+  }
 
   _("#widgetcontent").innerHTML = `<span class="widgettittle">JUZ</span>`;
   for (let i = 1; i <= 30; i++) {
@@ -1217,8 +1398,12 @@ async function showtafsir(id = 0) {
   if (id != 0) {
     _("#modalwidget").modal("show");
     _("#widgetcontent").innerHTML = '<div class="loader"></div>';
-    let re = await get(url + "Tafsir/" + id + ".json");
-    re = JSON.parse(re);
+    let re = await getJSON("tafsir", id, url + "Tafsir/" + id + ".json");
+    if (!re) {
+      _("#widgetcontent").innerHTML =
+        `<span class="widgettittle">Tafsir</span><p style="padding:10px;">Tafsir belum tersimpan. Butuh internet untuk memuat pertama kali.</p>`;
+      return;
+    }
     _("#widgetcontent").innerHTML =
       `<span class="widgettittle">Tafsir Wajiz</span><div class="arabic" style="text-align:justify;text-justify:inter-word;">` +
       re["tafsir_wajiz"] +
@@ -1798,6 +1983,10 @@ let timrsc = setTimeout(() => {}, 100);
 let timrpl = setTimeout(() => {}, 100);
 function audioPlay(id = "", recog = false) {
   closeOptions();
+  if (!navigator.onLine) {
+    toast("Audio membutuhkan koneksi internet.");
+    return;
+  }
   tracknow = parseInt(id);
   let sound = _("#track" + id).innerHTML;
   // track.setAttribute("controls", "true");
@@ -2366,17 +2555,20 @@ async function performVoiceLookup(transcript) {
 
   let matches = [];
   if (Object.keys(surah_list).length === 0) {
-    const resl = await get(url + "surah_list.json");
-    surah_list = JSON.parse(resl);
+    const resl = await getJSON("metadata", "surah_list", url + "surah_list.json", {
+      showToast: false,
+    });
+    if (resl) surah_list = resl;
   }
 
   for (let s = 1; s <= 114; s++) {
     let data = await quranDB.getSurah(s);
     if (!data) {
-      const res = await get(url + "Surah/" + s + ".json");
-      data = JSON.parse(res);
-      await quranDB.saveSurah(s, data);
+      data = await getJSON("surahs", s, url + "Surah/" + s + ".json", {
+        showToast: false,
+      });
     }
+    if (!data) continue;
 
     for (let a = 0; a < data.length; a++) {
       const normAyahText = normDiacritic(data[a].text_ayah);
@@ -2660,6 +2852,14 @@ if (pg.substring(0, 3) == "#qs") {
   zoompage(localStorage.getItem("zoomlevel"));
   getqlist();
 }
+
+window.addEventListener("online", function () {
+  updateOfflineStatus();
+  schedulePrefetch();
+});
+window.addEventListener("offline", updateOfflineStatus);
+updateOfflineStatus();
+schedulePrefetch();
 
 const arabicNumbers = (num) => {
   const arabic_numbers =

@@ -1619,6 +1619,10 @@ a {
   overflow-y: auto;
 }
 
+#navofflinestatus {
+  display: none;
+}
+
 /*=====================*/
 /* The side navigation menu */
 .sidenav {

@@ -1,13 +1,12 @@
-const CACHE_NAME = "QURANBUKU";
+const CACHE_NAME = "QURANBUKU-v2";
 const toCache = [
   "./",
-  "./assets/js/web.webmanifest",
-  "./assets/js/register.js",
-  "./assets/img/icon.png",
-  "./icon.png",
   "./index.html",
   "./book.html",
+  "./privacy-policy.html",
   "./service-worker.js",
+  "./assets/js/web.webmanifest",
+  "./assets/js/register.js",
   "./qibla/index.html",
   "./qibla/compass.png",
   "./dist/css/imageker.css",
@@ -30,16 +29,34 @@ self.addEventListener("install", function (event) {
       .then(function (cache) {
         return cache.addAll(toCache);
       })
-      .then(self.skipWaiting()),
+      .then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("fetch", function (event) {
+  if (event.request.method !== "GET") return;
+
+  const reqUrl = new URL(event.request.url);
+  if (reqUrl.origin !== self.location.origin) return;
+
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request);
-      });
+    caches.match(event.request).then(function (cached) {
+      if (cached) return cached;
+      return fetch(event.request)
+        .then(function (response) {
+          if (!response || response.status !== 200) return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, clone);
+          });
+          return response;
+        })
+        .catch(function () {
+          if (event.request.mode === "navigate") {
+            return caches.match("./index.html");
+          }
+          return caches.match(event.request);
+        });
     }),
   );
 });
@@ -48,9 +65,9 @@ self.addEventListener("activate", function (event) {
   event.waitUntil(
     caches
       .keys()
-      .then((keyList) => {
+      .then(function (keyList) {
         return Promise.all(
-          keyList.map((key) => {
+          keyList.map(function (key) {
             if (key !== CACHE_NAME) {
               console.log("[ServiceWorker] Hapus cache lama", key);
               return caches.delete(key);
@@ -58,6 +75,8 @@ self.addEventListener("activate", function (event) {
           }),
         );
       })
-      .then(() => self.clients.claim()),
+      .then(function () {
+        return self.clients.claim();
+      }),
   );
 });

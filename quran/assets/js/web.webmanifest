@@ -1,16 +1,26 @@
 {
+    "id": "./",
     "name": "Quran",
     "short_name": "Quran",
     "description": "Quranbuku, digital quran",
     "icons": [
         {
-            "src": "../img/icon.png",
+            "src": "https://iherbs.github.io/quran/icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://iherbs.github.io/quran/icon.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ],
-    "start_url": "/",
-    "display": "fullscreen",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
     "theme_color": "#007070",
-    "background_color": "#addddd"
+    "background_color": "#addddd",
+    "categories": ["books", "education"]
 }
